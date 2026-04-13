@@ -1,0 +1,47 @@
+--extra-index-url https://download.pytorch.org/whl/cu128
+--find-links https://data.pyg.org/whl/torch-2.7.0+cu128.html
+
+# ---- PyTorch (CUDA 12.8) ----
+torch==2.7.0+cu128
+torchvision==0.22.0+cu128
+torchaudio==2.7.0+cu128
+
+# ---- PyG (torch-geometric) ----
+torch-geometric==2.6.1
+
+torch-scatter
+torch-sparse
+torch-cluster
+torch-spline-conv
+
+# ---- Math & Machine Learning & Stastics ----
+numpy>=1.26.0
+scipy
+pandas
+scikit-learn
+tqdm
+
+# ---- Visualization ----
+matplotlib
+seaborn
+plotly
+bokeh
+altair
+
+# ---- Notebook ----
+jupyter
+ipykernel
+ipywidgets
+notebook
+jupyterlab
+
+# ---- IO ----
+openpyxl
+pyarrow
+h5py
+
+# ---- Large Language Models ----
+transformers
+accelerate
+peft
+bitsandbytes

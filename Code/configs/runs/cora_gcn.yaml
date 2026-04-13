@@ -1,0 +1,33 @@
+# # Cora + GCN node classification run
+# data:
+#   dataset: cora
+#   global_seed: 42
+#   split_spec: random
+#   split_seed: 42
+#   preprocess_version: v1
+#   feature_method: main   # null to disable R3_6 feature cache
+#   main:
+#     feature:
+#       feature_type: degree
+
+# model:
+#   name: main
+#   in_channels: 1433
+#   hidden_channels: 16
+#   out_channels: 7
+#   dropout: 0.5
+
+# training:
+#   batch_size: 1
+#   epochs: 200
+#   optimizer: adam
+#   learning_rate: 0.01
+#   monitor: val_accuracy
+#   log_interval: 10
+#   save_strategy: last+best
+
+# evaluation:
+#   metrics: [accuracy]
+
+# run:
+#   exp_name: cora_gcn

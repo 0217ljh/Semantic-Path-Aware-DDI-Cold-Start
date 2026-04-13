@@ -1,0 +1,8 @@
+# Training config: required for trainer. See docs/10-Training, required_config_keys.
+batch_size: 32
+epochs: 10
+optimizer: adam
+learning_rate: 0.001
+monitor: val_loss
+log_interval: 10
+save_strategy: last+best

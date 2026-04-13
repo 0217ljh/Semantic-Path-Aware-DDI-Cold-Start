@@ -1,0 +1,17 @@
+batch_size: 1
+epochs: 200
+optimizer: adam
+learning_rate: 0.01
+# 选 best 的指标与方向；record_metrics 仅记录，不参与选 best
+monitor_metric: val_accuracy
+monitor_direction: max   # max=越大越好, min=越小越好；默认 max
+record_metrics: [val_loss, val_accuracy]
+log_interval: 10
+save_strategy: last+best
+# 每 N 步保存一次 ckpt（0 或省略表示不按步保存），保存为 ckpt/step_<step>.pt
+save_steps: 0
+# 每 N 个 epoch 做一次验证（1=每 epoch，2=每 2 个 epoch）
+eval_interval: 1
+
+evaluation:
+  metrics: [accuracy]

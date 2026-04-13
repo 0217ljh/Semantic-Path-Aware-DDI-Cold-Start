@@ -1,0 +1,20 @@
+# Cora node classification
+dataset: cora
+global_seed: 42
+split_spec: random
+# split_seed: 42
+preprocess_version: v1
+
+# R3_6: method-specific feature cache. Set to null or omit to disable.
+feature_method: main
+# Feature config per method (key = model name); each method's options live under its own key.
+main:
+  feature:
+    feature_type: degree   # simple example: node degree from edge_index
+
+add_degree:
+  feature:
+    feature_type: degree   # simple example: node degree from edge_index
+# baseline_x:
+#   feature:
+#     feature_type: ...

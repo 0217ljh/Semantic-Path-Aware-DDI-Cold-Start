@@ -1,0 +1,15 @@
+batch_size: 64
+epochs: 10
+optimizer: adam
+learning_rate: 0.001
+
+monitor_metric: val_accuracy
+monitor_direction: max
+record_metrics: [val_loss, val_accuracy]
+log_interval: 10
+save_strategy: last+best
+save_steps: 0
+eval_interval: 1
+
+evaluation:
+  metrics: [accuracy]

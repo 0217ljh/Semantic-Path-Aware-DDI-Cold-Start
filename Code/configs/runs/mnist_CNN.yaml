@@ -1,0 +1,3 @@
+# MNIST + CNN run. Use --run main_CNN (loads data/model/training main_CNN).
+# exp_name: hyperparameter-style; override with --exp_name or --set exp_name=...
+exp_name: lr0.001_ep10

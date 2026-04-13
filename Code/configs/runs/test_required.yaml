@@ -1,0 +1,24 @@
+# Minimal run config: only keys required by current docs (5-Config, 3-Pipeline, 6-Init_Path).
+# See docs/required_config_keys.md for the required-keys list.
+
+data:
+  dataset: dataset_a              # required: name for data/<dataset>/ and data_key
+  global_seed: 42                 # required: single global seed for data pipeline; part of data_key
+  split_spec: random              # required: for data_key (e.g. random, time)
+  preprocess_version: v1          # required: for data_key
+  # subset: none                  # optional: part of data_key (e.g. none, r10, k5000)
+
+model:
+  name: main                      # required: registry lookup + runs/main or runs/baselines/<name>/
+
+training:
+  batch_size: 32                  # required
+  epochs: 10                      # required
+  optimizer: adam                 # required (string or dict with type)
+  learning_rate: 0.001            # required (or lr)
+  monitor: val_loss               # metric for best.pt (e.g. val_auc, val_loss)
+
+# Optional (used by init_run_paths; see docs/6-Init_Path):
+run:
+  branch: branch_001   # when model.name==main → runs/main/branch_001/<exp_name>/<timestamp>/
+  # exp_name: main_lr0.001

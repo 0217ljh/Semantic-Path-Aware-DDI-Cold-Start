@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p Paper Notes/Literature Notes/Ideas Notes/Log Notes/Templates)",
+      "Bash(touch Paper/.gitkeep Notes/Literature/.gitkeep Notes/Ideas/.gitkeep Notes/Log/.gitkeep)"
+    ]
+  }
+}

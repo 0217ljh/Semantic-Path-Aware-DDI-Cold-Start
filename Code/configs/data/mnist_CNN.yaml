@@ -1,0 +1,7 @@
+# MNIST image classification (torch path)
+dataset: mnist
+global_seed: 42
+preprocess_version: v1
+
+# No graph-style feature cache for image data
+feature_method: null

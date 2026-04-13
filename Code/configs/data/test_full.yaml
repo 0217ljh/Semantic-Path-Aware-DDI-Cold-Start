@@ -1,0 +1,6 @@
+# Data config: required for data_key and pipeline R3. See docs/7-GetOrLoadData, required_config_keys.
+dataset: dataset_a
+global_seed: 42
+split_spec: random
+preprocess_version: v1
+batch_size: 32

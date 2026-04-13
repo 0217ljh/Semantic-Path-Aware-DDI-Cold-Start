@@ -1,0 +1,36 @@
+# Data & outputs (inside Code/)
+/Code/data/**
+!/Code/data/.gitkeep
+
+/Code/runs/**
+!/Code/runs/.gitkeep
+
+# Notebooks
+/Notebooks/**
+!/Notebooks/.gitkeep
+
+# Paper - ignore PDFs (binary, large)
+/Paper/*.pdf
+/Paper/**/*.pdf
+
+# Obsidian config (personal settings, not shared)
+/Notes/.obsidian/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions / compiled artifacts
+*.so
+*.pyd
+*.dll
+*.dylib
+
+# common env / cache
+.venv/
+venv/
+.venv_sandbox_test/
+.env
+.cache/
+.ipynb_checkpoints/

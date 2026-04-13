@@ -1,0 +1,30 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}/Code",
+            "args": [
+                "--run",  "mnist_CNN", // name of specific methods
+                //"--run",  "cora_gcn", // name of specific methods
+                "--mode", "train",
+                "--exp_name", "lr0.01_ep200"
+                // --set run.exp_name=cora_lr0.01_ep200
+                // --set data.global_seed=42
+                // --set model.num_layers=3
+                // --set training.epochs=200
+            ],
+            
+        }
+    ]
+}
