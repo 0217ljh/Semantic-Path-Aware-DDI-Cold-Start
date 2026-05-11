@@ -1,7 +1,10 @@
 # Project Rules
 
 科研 ML 项目模板。代码文档见 `Code/docs/`（1-Overview 到 13-Log）。
-研究笔记见 `Notes/`（Obsidian vault）。
+研究笔记见 `Notes/`（项目内，同时被 Obsidian vault 索引）。
+
+本项目应 clone 到 Obsidian vault 的 `03-Projects/` 下使用，
+使 Obsidian 能搜索和链接项目笔记。
 
 ## 代码修改规则（最重要）
 
@@ -27,17 +30,26 @@
 ```
 project_root/                    ← 所有命令从这里运行（cwd = 项目根目录）
 ├─ Code/                         # 所有代码
-│  ├─ my_code/                   # 源码（pipeline, models, data, train, predict, eval, io, utils）
+│  ├─ my_code/                   # 所有源码
+│  │  ├─ pipeline/               # 编排逻辑（run.py, registry.py）
+│  │  ├─ models/                 # 模型结构（每个模型一个子文件夹，实现 Method 接口）
+│  │  ├─ data/                   # 数据加载、预处理、特征工程
+│  │  ├─ train/                  # 训练循环（trainer.py, callbacks.py）
+│  │  ├─ predict/                # 推理（CSV 流式写入）
+│  │  ├─ eval/                   # 评测（evaluator.py, metrics.py）
+│  │  ├─ io/                     # 路径管理、产物写盘、日志
+│  │  └─ utils/                  # 可复用工具（config, seeding, types）
 │  ├─ configs/                   # YAML 配置（data/ model/ training/ runs/）
 │  ├─ data/                      # 数据集（只读）
 │  ├─ runs/                      # 实验输出（自动生成，不手动修改）
-│  ├─ scripts/                   # CLI 入口（所有可运行脚本必须在此目录）
-│  └─ docs/                      # 代码文档
-├─ Notes/                        # Obsidian vault（研究笔记，不放脚本）
-│  ├─ Ideas/                     # 改进思路、实验想法（仅 .md 文件）
+│  ├─ scripts/                   # CLI 入口（所有可运行脚本必须在此目录，train.py 等）
+│  ├─ docs/                      # 代码文档
+│  └─ requirements.txt
+├─ Notes/                        # Obsidian vault（研究笔记，不放脚本，被 vault 索引）
 │  ├─ Literature/                # 文献笔记
+│  ├─ Ideas/                     # 改进思路、实验想法（仅 .md 文件）
 │  └─ Log/                       # 实验日志、会议记录
-├─ Paper/                        # 参考文献 PDF
+├─ Paper/                        # 参考文献 PDF（.gitignore 忽略 PDF）
 ├─ Notebooks/                    # Jupyter notebooks
 ├─ CLAUDE.md
 └─ README.md
@@ -66,10 +78,28 @@ project_root/                    ← 所有命令从这里运行（cwd = 项目�
 ## Notes/ 使用说明
 
 - `Notes/` 是 Obsidian vault，**仅放 .md 文件**，不放 .py 脚本
+- `Notes/` 存放本项目的研究笔记，随项目 git 同步
+- 项目应 clone 到 Obsidian vault 的 `03-Projects/<project_name>/` 下，这样 Obsidian 能直接搜索和链接笔记
 - Claude Code 可以读取 `Notes/` 下所有 markdown 笔记，并参与讨论
-- 文献笔记放 `Notes/Literature/`，使用 `Notes/Templates/Literature Note.md` 模板
-- 改进思路放 `Notes/Ideas/`，使用 `Notes/Templates/Idea Note.md` 模板
-- `.obsidian/` 配置不入 git（个人设置）
+- 可用 `[[双向链接]]` 关联 vault 中其他项目或论文笔记
+
+### 5 阶段研究工作流（用 vault Templater 模板生成）
+
+新项目第一步：在 Obsidian 里跑 `TPL-Proj-Init` → 覆盖顶层 `README.md` 为 dashboard（同时注册到 vault 的 `HOME.md` 和 `03-Projects/index.md` 进度表）。
+
+之后每个阶段都用对应模板，弹一次"One-line TL;DR"，模板会自动落到正确子文件夹：
+
+| 阶段 | 模板 | 落位 |
+|---|---|---|
+| 1. Insight / Purpose | `TPL-Proj-Insight` | `Notes/Settings/Insights/` |
+| 2. Setting（锁定） | `TPL-Proj-Setting` | `Notes/Settings/Setting.md` |
+| 3. Paper Review MOC | `TPL-Proj-PaperReview` | `Notes/Settings/Paper-Review/Review-MOC.md` |
+| 3. 单篇 paper 简评 | `TPL-Proj-PaperNote` | `Notes/Settings/Paper-Review/` |
+| 4. Dataset / Baselines | 无模板（按 context 自定，可写进 `Setting.md` 末尾） | — |
+| 5. Idea + 高层迭代日志 | `TPL-Proj-Idea` | `Notes/Ideas/` |
+| 5.1. 单次实验详细日志 | `TPL-Proj-ExpLog` | `Notes/Experiments/` |
+
+每个模板写的 TL;DR 一句话会自动出现在项目 dashboard 的 Dataview 表里，外面一眼能看到当前进度。
 
 ## 架构约束
 
@@ -92,7 +122,7 @@ project_root/                    ← 所有命令从这里运行（cwd = 项目�
 - Commit message 使用前缀：`feat:` 新功能 / `fix:` 修复 / `data:` 数据处理 / `exp:` 实验配置 / `docs:` 文档 / `refactor:` 重构
 - 不得 `git push --force` 到 main
 - 提交前检查：不提交 `.env`、密钥、大文件（PDF/数据集/权重）
-- `Code/data/`、`Code/runs/`、`Paper/*.pdf`、`Notes/.obsidian/` 已在 `.gitignore` 中
+- `Code/data/`、`Code/runs/`、`Paper/*.pdf` 已在 `.gitignore` 中
 
 ## 禁止行为
 
