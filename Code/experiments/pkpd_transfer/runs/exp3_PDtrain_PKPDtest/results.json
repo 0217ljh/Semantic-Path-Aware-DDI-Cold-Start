@@ -1,0 +1,55 @@
+{
+  "tag": "exp3_PDtrain_PKPDtest",
+  "config": {
+    "train_pairs": "Code/experiments/pkpd_transfer/data/train_PD.csv",
+    "val_pairs": "Code/experiments/pkpd_transfer/data/val_s2_PD.csv",
+    "test_pairs": "Code/experiments/pkpd_transfer/data/test_s2_PK.csv",
+    "extra_test_pairs": [
+      "Code/experiments/pkpd_transfer/data/test_s2_PD.csv"
+    ],
+    "test_neg_split": "test_s2",
+    "val_neg_split": "val_s2",
+    "tag": "exp3_PDtrain_PKPDtest",
+    "epochs": 100,
+    "seed": 42,
+    "batch_size": 8,
+    "n_dim": 16,
+    "n_layers": 3,
+    "mlp_hidden": 64,
+    "learning_rate": 0.001,
+    "weight_decay": 1e-08,
+    "neg_ratio": 1,
+    "early_stop_patience": 10,
+    "shuffle_train_mode": "S2",
+    "shuffle_ratio": 0.8,
+    "log_step_every": 50,
+    "disable_batched_bf": false
+  },
+  "train_pairs": "Code/experiments/pkpd_transfer/data/train_PD.csv",
+  "test_pairs": [
+    "Code/experiments/pkpd_transfer/data/test_s2_PK.csv",
+    "Code/experiments/pkpd_transfer/data/test_s2_PD.csv"
+  ],
+  "fit_sec": 1388.8812375068665,
+  "fit_metrics": {
+    "best_val_auc": 0.7273105488284991,
+    "best_epoch": 7,
+    "fit_sec": 1388.8621888160706
+  },
+  "test_metrics": {
+    "test_s2_PK": {
+      "auc": 0.5691739516821305,
+      "auprc": 0.4000779084216097,
+      "nll": 0.7001538718584417,
+      "n_pos": 964,
+      "n_neg": 1919
+    },
+    "test_s2_PD": {
+      "auc": 0.7242290520309838,
+      "auprc": 0.5934826355300782,
+      "nll": 0.6495577094753385,
+      "n_pos": 944,
+      "n_neg": 1919
+    }
+  }
+}

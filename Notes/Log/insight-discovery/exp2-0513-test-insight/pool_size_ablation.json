@@ -1,0 +1,172 @@
+{
+  "experiment": "E6-simplified pool-size ablation",
+  "feat_count_total": 22,
+  "univariate_top10": [
+    {
+      "feature": "1hop_protein_gene",
+      "auc": 0.6844805330057614
+    },
+    {
+      "feature": "2hop_molecular_function",
+      "auc": 0.6720023561691119
+    },
+    {
+      "feature": "2hop_pathway",
+      "auc": 0.6633839527410745
+    },
+    {
+      "feature": "2hop_biological_process",
+      "auc": 0.6605174243456655
+    },
+    {
+      "feature": "2hop_cellular_component",
+      "auc": 0.6483630656191929
+    },
+    {
+      "feature": "2hop_compound",
+      "auc": 0.6378392771918818
+    },
+    {
+      "feature": "2hop_disease",
+      "auc": 0.6363376762861127
+    },
+    {
+      "feature": "2hop_protein_gene",
+      "auc": 0.6358044312546216
+    },
+    {
+      "feature": "2hop_side_effect",
+      "auc": 0.6306969674632603
+    },
+    {
+      "feature": "2hop_anatomy",
+      "auc": 0.6219883833628115
+    }
+  ],
+  "results_by_k": [
+    {
+      "k": 1,
+      "auc": 0.6844805330057614,
+      "ci_lo": 0.6813874109711682,
+      "ci_hi": 0.6869453269196553,
+      "features": [
+        "1hop_protein_gene"
+      ]
+    },
+    {
+      "k": 3,
+      "auc": 0.7046518490775512,
+      "ci_lo": 0.7014274182150905,
+      "ci_hi": 0.7076153145271672,
+      "features": [
+        "1hop_protein_gene",
+        "2hop_molecular_function",
+        "2hop_pathway"
+      ]
+    },
+    {
+      "k": 5,
+      "auc": 0.7033445463112598,
+      "ci_lo": 0.7001670418033178,
+      "ci_hi": 0.7060708055064985,
+      "features": [
+        "1hop_protein_gene",
+        "2hop_molecular_function",
+        "2hop_pathway",
+        "2hop_biological_process",
+        "2hop_cellular_component"
+      ]
+    },
+    {
+      "k": 8,
+      "auc": 0.711015037113337,
+      "ci_lo": 0.707828451515901,
+      "ci_hi": 0.7138438806636036,
+      "features": [
+        "1hop_protein_gene",
+        "2hop_molecular_function",
+        "2hop_pathway",
+        "2hop_biological_process",
+        "2hop_cellular_component",
+        "2hop_compound",
+        "2hop_disease",
+        "2hop_protein_gene"
+      ]
+    },
+    {
+      "k": 12,
+      "auc": 0.7168354596126545,
+      "ci_lo": 0.7137154273805935,
+      "ci_hi": 0.7193471811885828,
+      "features": [
+        "1hop_protein_gene",
+        "2hop_molecular_function",
+        "2hop_pathway",
+        "2hop_biological_process",
+        "2hop_cellular_component",
+        "2hop_compound",
+        "2hop_disease",
+        "2hop_protein_gene",
+        "2hop_side_effect",
+        "2hop_anatomy",
+        "2hop_exposure",
+        "1hop_side_effect"
+      ]
+    },
+    {
+      "k": 16,
+      "auc": 0.7171118543258604,
+      "ci_lo": 0.7140350050785484,
+      "ci_hi": 0.7197843184221837,
+      "features": [
+        "1hop_protein_gene",
+        "2hop_molecular_function",
+        "2hop_pathway",
+        "2hop_biological_process",
+        "2hop_cellular_component",
+        "2hop_compound",
+        "2hop_disease",
+        "2hop_protein_gene",
+        "2hop_side_effect",
+        "2hop_anatomy",
+        "2hop_exposure",
+        "1hop_side_effect",
+        "1hop_disease",
+        "1hop_compound",
+        "1hop_pathway",
+        "1hop_anatomy"
+      ]
+    },
+    {
+      "k": 22,
+      "auc": 0.7171118543258604,
+      "ci_lo": 0.7140350050785484,
+      "ci_hi": 0.7197843184221837,
+      "features": [
+        "1hop_protein_gene",
+        "2hop_molecular_function",
+        "2hop_pathway",
+        "2hop_biological_process",
+        "2hop_cellular_component",
+        "2hop_compound",
+        "2hop_disease",
+        "2hop_protein_gene",
+        "2hop_side_effect",
+        "2hop_anatomy",
+        "2hop_exposure",
+        "1hop_side_effect",
+        "1hop_disease",
+        "1hop_compound",
+        "1hop_pathway",
+        "1hop_anatomy",
+        "1hop_biological_process",
+        "1hop_molecular_function",
+        "1hop_cellular_component",
+        "1hop_pharmacologic_class",
+        "1hop_exposure",
+        "2hop_pharmacologic_class"
+      ]
+    }
+  ],
+  "verdict": "i3 weakly supported: peak at k=16 (AUC=0.7171); k=22 AUC=0.7171 \u2014 small gap"
+}

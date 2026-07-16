@@ -1,0 +1,62 @@
+Title: RankMe: Assessing the Downstream Performance of Pretrained Self-Supervised Representations by Their Rank
+Authors: Quentin Garrido, Randall Balestriero, Laurent Najman, Yann LeCun (Meta AI - FAIR; Univ Gustave Eiffel/CNRS/LIGM; Courant Institute/NYU)
+Venue+Year: ICML 2023 (PMLR 202)
+arXiv-or-DOI: Not printed in the extracted body (published ICML 2023, PMLR vol. 202). No DOI/arXiv id in the PDF text captured.
+PDF filename: RankMe.pdf
+
+## TL;DR
+Proposes RankMe, a simple LABEL-FREE, training-free, parameter-free scalar = the EFFECTIVE RANK of a model's embeddings, defined as the exp of the Shannon entropy of the L1-normalized singular-value distribution (Eq. 1). Higher RankMe on the source (train) embeddings predicts better downstream linear-probe accuracy of the representations, both in-distribution and out-of-distribution, without any labels. Used for unsupervised hyperparameter selection of joint-embedding self-supervised learning (JE-SSL) methods; recovers nearly all of the accuracy of oracle (label-based) selection across 11 datasets / 110 models / 5 methods. THIS IS THE PAPER TO CITE FOR OUR A1 EFFECTIVE-RANK MEASURE.
+
+## Problem & Contributions
+Problem: JE-SSL (SimCLR, VICReg, DINO, etc.) lacks label-free signals to judge representation quality; existing selection uses labeled validation accuracy. Reconstruction-free training gives no visual cue; loss values are uninformative (Sec. 1).
+Contributions (Sec. 1, p.2-3):
+1. RankMe (Eq. 1): a smooth/effective-rank measure of embeddings, motivated from first principles (Cover's theorem; Sec. 5).
+2. RankMe correlates with downstream performance consistently across methods (VICReg, SimCLR, DINO, VICReg-exp, VICReg-ctr) and across evaluation protocols (linear probe, 3-layer MLP, k-NN) (Figs. 2-3, Sec. 3.3).
+3. RankMe enables label-free hyperparameter cross-validation, matching or beating label-based oracle on in-domain and OOD datasets (Tables 1-3, Fig. 1).
+Evidence scale: 11 datasets, 110 models, 5 methods (Sec. 1).
+
+## Method / Core mechanism (equations in words + notation) -- EXACT EFFECTIVE-RANK DEFINITION
+Let Z be the (N x K) embedding matrix (N samples, K dims). Let sigma_k(Z) be its k-th singular value, k = 1..min(N,K).
+Naive rank = count of nonzero singular values; too brittle (round-off) (Sec. 3.1).
+RankMe adopts the SMOOTH / EFFECTIVE RANK (originally from Roy & Vetterli, "The effective rank: a measure of effective dimensionality," EUSIPCO 2007):
+
+  RankMe(Z) = exp( - sum_{k=1}^{min(N,K)} p_k * log p_k )                (Eq. 1)
+  with  p_k = sigma_k(Z) / ||sigma(Z)||_1  + epsilon                    (Eq. 2)
+
+In words: normalize the singular values to a probability distribution p_k (each singular value divided by the sum/L1-norm of all singular values, plus a small epsilon for stability), compute the Shannon entropy H = -sum p_k log p_k of that distribution, and EXPONENTIATE it. exp(entropy) = the effective rank (a.k.a. perplexity of the singular-value distribution). It equals the true rank when singular values are uniform over a subspace and shrinks toward 1 under dimensional collapse. NOTE: this is exactly the standard effective-rank / entropy-of-normalized-singular-values measure we can adopt for A1.
+Implementation notes (Sec. 3.1): no threshold needed (unlike naive rank); epsilon ~ 1e-7 for float32; they use 25600 samples to estimate it reliably (Appendix G / Fig. S11); should be used to compare runs OF THE SAME METHOD, since rank is not the only performance factor. Also captures whitening of embeddings.
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Fig. 2: higher embedding rank is a NECESSARY (not sufficient) condition for good downstream linear-probe accuracy across ImageNet/iNat18/Places205/EuroSat/SUN397/StanfordCars.
+- Fig. 3: conclusion holds for a 3-layer MLP head and for k-NN evaluation (not just linear).
+- Fig. 1 / Table 1 (selection ON EMBEDDINGS): RankMe recovers within ~0.5 pt of the ImageNet oracle in-domain; on OOD it matches or slightly beats the oracle on average; outperforms alpha-ReQ (a competing eigenspectrum power-law method), with smaller worst-case drops. Example ImageNet oracle top-1 ~59.7 (VICReg) / 56.9 (SimCLR) / 64.8 (DINO); RankMe nearly matches (Table 1).
+- Table 2 (iNat-18 pretraining): RankMe close to iNat-18 oracle, beats ImageNet oracle and alpha-ReQ by large margins on VICReg covariance weight.
+- Table 3 (finetuning-based benchmarks: ImageNet-1%/10% semi-supervised, VOC07+12 detection AP50): RankMe retrieves most task-oracle performance; on detection even matches/improves over ImageNet linear oracle.
+- Sec. 5 theory: Eckart-Young-Mirsky theorem lower-bounds approximation error by tail singular values; a linear probe cannot raise rank (rank(P) <= min(rank(Z), rank(W)) + 1); Cover's theorem => linear separability probability rises as rank R increases (or N decreases). Proposition 5.1: max training accuracy of embeddings (linear regression/classification) increases with rank and PLATEAUS once rank exceeds the number of classes.
+- Fig. 5: three validated hypotheses — (i) linear probes do not overfit; (ii) embedding vs representation performance monotonically linked; (iii) source and target embedding ranks linearly/monotonically linked (Pearson > 0.99, e.g., R_iNat18 = 0.53 R_ImageNet + 5). This chain justifies predicting OOD representation performance from source-embedding rank.
+
+## Relevance to our cold-start low-rank DDI paper (RW bucket; how we'd cite; concrete DELTA vs our method)
+RW bucket: Stream B (low-rank / intrinsic-dimension / effective-rank as a quality-and-transfer diagnostic). ALSO directly our A1 MEASUREMENT METHODOLOGY citation.
+How we'd cite (two distinct uses):
+1. Methodology anchor for A1: adopt RankMe's exact effective-rank = exp(Shannon entropy of L1-normalized singular values) (Eq. 1-2) as our standard scalar when we report "warm ~4x higher effective rank than cold" from the unconstrained GCN probe. Cite RankMe (Garrido et al., ICML 2023) and the underlying Roy & Vetterli (2007) for the measure itself. This makes our effective-rank number a STANDARD, defensible metric rather than an ad hoc one.
+2. Conceptual support (Stream B): effective rank of representations tracks downstream/transfer quality and is a meaningful axis for comparing regimes.
+CONCRETE DELTA vs us:
+- RankMe uses effective rank DIAGNOSTICALLY (to select hyperparameters / predict accuracy) and argues HIGHER rank = better within a method. We use effective rank to DIAGNOSE a structural gap between regimes (warm vs cold) and then EXPLOIT the low-rank finding by baking an explicit low-rank residual (H = H_base + M_A M_B) into the architecture as a cold-safe inductive bias. RankMe measures; we measure AND then design a method around the measurement.
+- Domain: RankMe is image SSL representations. We are supervised DDI on a biomedical KG with a defined cold-start (both drugs unseen) vs warm split. No DDI/KG in RankMe.
+- Directionality nuance to respect when citing: RankMe's claim "higher rank is better" is WITHIN a method for a fixed downstream task. Our claim is that the TRANSFERABLE-TO-UNSEEN component needs LOWER effective rank than warm fitting uses — this is not contradicted by RankMe (different quantity: theirs = embedding quality within-method; ours = effective rank of what a probe fits in warm vs cold). Be careful not to conflate the two.
+
+## Safe-to-cite claims (section pointers)
+- Effective rank = exp(Shannon entropy of L1-normalized singular values), Eq. 1-2, Sec. 3.1; measure originally from Roy & Vetterli 2007 (cited in refs).
+- It is label-free, training-free, hyperparameter-free, computable in minutes on ~25600 samples (Sec. 3.1, Sec. 4).
+- Higher embedding effective rank is a necessary (not sufficient) condition for good downstream linear-probe accuracy, in- and out-of-distribution (Figs. 1-2; Sec. 3.2).
+- RankMe-based selection nearly matches label-based oracle selection and outperforms alpha-ReQ on average (Tables 1-3).
+- Holds beyond linear probes: MLP head and k-NN (Fig. 3, Sec. 3.3).
+- Theoretical grounding: Eckart-Young-Mirsky + Cover's theorem => Proposition 5.1 (max training accuracy increases with rank, plateaus past #classes), Sec. 5.
+- Source and target embedding ranks are (near-)linearly related when datasets share semantics (Fig. 5, Eq. 3, Pearson > 0.99).
+
+## Do-NOT-overclaim / caveats
+- "Higher rank = better" is asserted WITHIN a single method for a fixed downstream task, and rank is explicitly stated to be NOT the only factor (Sec. 3.1). RankMe "should only be used to compare different runs of a given method." Do not use it to argue our cross-regime (warm vs cold) low-rank story is universally "good/bad".
+- All evidence is image self-supervised learning (ResNet-50 backbone, MLP projector; SimCLR/VICReg/DINO). No supervised classification-from-scratch, no KG, no DDI. Do not port numbers.
+- RankMe measures the PROJECTOR EMBEDDINGS (Z), then argues via validated hypotheses (Fig. 5) that this predicts REPRESENTATION performance; that inference chain is empirical, holds "if the source dataset is diverse enough and target has semantic overlap" (Sec. 5, Eq. 3). StanfordCars is a noted weaker case (small overlap with ImageNet).
+- The theory (Prop. 5.1) concerns TRAINING accuracy and requires the linear-probe/monotonicity hypotheses to extend to test/OOD; it is not a closed-form transfer guarantee.
+- Adopt the DEFINITION (Eq. 1-2) for our A1; do NOT import RankMe's selection conclusions as if they validate our architectural low-rank claim.

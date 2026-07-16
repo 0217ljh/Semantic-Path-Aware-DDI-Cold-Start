@@ -1,0 +1,66 @@
+[E8.3] loaded key (len 108)
+[E8.3] loading KG ...
+[E8] cold-start G2 drugs (unseen at train): 634;  G1 (seen): 1266
+[E8] after S2 closedness filter: positives=54369  negatives=54369
+[E8] feature-filtered pool sizes:  PD-pos=8418  PK-pos=7972  neg=8823
+[E8.3] PD-pos=30  PK-pos=30  NEG=30
+
+[E8.3] === ANON PROMPT PREVIEW (first PD-pos pair) ===
+
+--- A_anon_null ---
+Drug A: (identity redacted)
+Drug B: (identity redacted)
+
+Estimate the probability (0 to 1) that these two drugs would have a clinically relevant drug-drug interaction when co-administered. No features are provided about either drug.
+
+--- B_anon_molecular ---
+Drug A: (identity redacted)
+Drug A's molecular targets/enzymes/transporters: PDE4A, ADORA2A, PDE5A, ADORA2B, PDE4B, OSBPL10, SPRED2, RFNG, ADORA1, MEST, CYP1A2, NT5E, ZNF395, MAFB, DERA, PTK2
+Drug B: (identity redacted)
+Drug B's molecular targets/enzymes/transporters: CYP3A7-CYP3A51P, CYP3A7, PDE3A, UFM1, EIF5, CYP3A5, CYP2C19, SCAND1, LAP3, CYP1A2, MCUR1, CYP2D6, CAST, CLTB, HP, CYP3A4, AGR2, PPP2R5E, TRIB3, RRP8
+
+Based ONLY on the listed molecular features (drug identities are redacted), estimate the probability (0 to 1) that these drugs share a pharmacokinetic interaction pathway (e.g., shared CYP isoform substrate/inhibitor pair, transporter competition, metabolic enzyme overlap) when co-administered.
+
+--- C_anon_effect ---
+Drug A: (identity redacted)
+Drug A's documented side effects / phenotypes: Blood fibrinogen decreased, Fibrinogen decreased, Cholestasis intrahepatic, Meningitis aseptic, Bad taste, Leukaemia, Salivation, Emotional distress, Abdominal bloating, Sleep disturbance, Cholecystitis, Lacrimation, Heartburn, Influenza-like symptoms, Laryngitis, Throat sore, Oropharyngeal discomfort, Cholestasis, Scotoma, Cholecystitis
+Drug B: (identity redacted)
+Drug B's documented side effects / phenotypes: Bradyarrhythmia, Haemorrhage subcutaneous, Oesophageal haemorrhage, Epidural haemorrhage, Bleeding tendency, Nodal arrhythmia, Retroperitoneal haemorrhage, Subdural haematoma, Polycythaemia, Iron deficiency anaemia, Pulmonary haemorrhage, Haemorrhagic disorder, Abscess periodontal, Electrocardiogram QT corrected interval prolonged, Abnormal faeces, Duodenitis, Cerebral infarction, Retinal haemorrhage, Atrioventricular block complete, Varicose vein
+
+Based ONLY on the listed side-effect/phenotype features (drug identities are redacted), estimate the probability (0 to 1) that these drugs share a pharmacodynamic risk pathway (e.g., overlapping toxicity, additive adverse effects on a shared organ system, common phenotypic risk like bleeding or QT prolongation) when co-administered.
+
+[E8.3] === END PREVIEW ===
+
+[E8.3] cache hits: 0
+  [1/270]  pair=PD-pos-DB00806_DB01166  variant=A_anon_null  score=0.15  elapsed=3s ETA=889s
+  [30/270]  pair=PD-pos-DB00264_DB00883  variant=C_anon_effect  score=0.72  elapsed=171s ETA=1368s
+  [60/270]  pair=PD-pos-DB00438_DB00605  variant=C_anon_effect  score=0.72  elapsed=275s ETA=963s
+  [90/270]  pair=PD-pos-DB00193_DB01080  variant=C_anon_effect  score=0.15  elapsed=383s ETA=765s
+  [120/270]  pair=PK-pos-DB00528_DB00745  variant=C_anon_effect  score=0.15  elapsed=494s ETA=617s
+  [150/270]  pair=PK-pos-DB00624_DB00656  variant=C_anon_effect  score=0.35  elapsed=603s ETA=482s
+  [180/270]  pair=PK-pos-DB00757_DB08820  variant=C_anon_effect  score=0.35  elapsed=713s ETA=356s
+  [210/270]  pair=NEG-DB01250_DB01627  variant=C_anon_effect  score=0.35  elapsed=819s ETA=234s
+  [240/270]  pair=NEG-DB00744_DB01586  variant=C_anon_effect  score=0.35  elapsed=930s ETA=116s
+  [270/270]  pair=NEG-DB00207_DB00988  variant=C_anon_effect  score=0.35  elapsed=1043s ETA=0s
+
+[E8.3] === AUROC ===
+  PD  A_anon_null         AUROC=0.500 [CI 0.500,0.500]  pos=0.15 neg=0.15  n_pos=30/n_neg=30
+  PD  B_anon_molecular    AUROC=0.630 [CI 0.488,0.758]  pos=0.30 neg=0.17  n_pos=30/n_neg=30
+  PD  C_anon_effect       AUROC=0.686 [CI 0.544,0.811]  pos=0.38 neg=0.25  n_pos=30/n_neg=30
+  PK  A_anon_null         AUROC=0.500 [CI 0.500,0.500]  pos=0.15 neg=0.15  n_pos=30/n_neg=30
+  PK  B_anon_molecular    AUROC=0.629 [CI 0.486,0.756]  pos=0.38 neg=0.17  n_pos=30/n_neg=30
+  PK  C_anon_effect       AUROC=0.510 [CI 0.373,0.644]  pos=0.26 neg=0.25  n_pos=30/n_neg=30
+
+[E8.3] === Paired ΔAUROC ===
+  PD:  eff-null = +0.186 [+0.044,+0.311]  eff-mol = +0.059 [-0.110,+0.236]  mol-null = +0.127 [-0.012,+0.258]
+  PK:  eff-null = +0.011 [-0.127,+0.144]  eff-mol = -0.115 [-0.293,+0.071]  mol-null = +0.126 [-0.014,+0.256]
+
+[E8.3] === Cross-class biological-signal check ===
+  PD + effect-anon AUROC: 0.6855555555555555
+  PK + effect-anon AUROC: 0.51
+  PD + mol-anon   AUROC: 0.6300000000000001
+  PK + mol-anon   AUROC: 0.6294444444444445
+
+[E8.3] tokens: in=86764 out=16035  cost~=$0.501
+
+[E8.3] saved → llm_oracle_results_anon.json

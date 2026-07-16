@@ -1,0 +1,2031 @@
+Towards Interpretable Drug-Drug Interaction Prediction: A
+Graph-Based Approach with Molecular and Network-Level
+Explanations
+Mengjie Chen
+Data Science Institute, School of
+Mathematics, Shandong University
+Jinan, Shandong, China
+mengjiechen@mail.sdu.edu.cn
+Ming Zhang∗
+Academy of Mathematics and
+Systems Science, Chinese Academy of
+Sciences
+Beijing, China
+mingzhang@amss.ac.cn
+Cunquan Qu∗
+Data Science Institute, Shandong
+University
+Jinan, Shandong, China
+cqqu@sdu.edu.cn
+Abstract
+Drug-drug interactions (DDIs) represent a critical challenge in
+pharmacology, often leading to adverse drug reactions with sig-
+nificant implications for patient safety and healthcare outcomes.
+While graph-based methods have achieved strong predictive per-
+formance, most approaches treat drug pairs independently, over-
+looking the complex, context-dependent interactions unique to
+drug pairs. Additionally, these models struggle to integrate bi-
+ological interaction networks and molecular-level structures to
+provide meaningful mechanistic insights. In this study, we pro-
+pose MolecBioNet, a novel graph-based framework that inte-
+grates molecular and biomedical knowledge for robust and inter-
+pretable DDI prediction. By modeling drug pairs as unified entities,
+MolecBioNet captures both macro-level biological interactions and
+micro-level molecular influences, offering a comprehensive per-
+spective on DDIs. The framework extracts local subgraphs from
+biomedical knowledge graphs and constructs hierarchical inter-
+action graphs from molecular representations, leveraging classi-
+cal graph neural network methods to learn multi-scale represen-
+tations of drug pairs. To enhance accuracy and interpretability,
+MolecBioNet introduces two domain-specific pooling strategies:
+context-aware subgraph pooling (CASPool), which emphasizes bio-
+logically relevant entities, and attention-guided influence pooling
+(AGIPool), which prioritizes influential molecular substructures.
+The framework further employs mutual information minimization
+regularization to enhance information diversity during embedding
+fusion. Experimental results demonstrate that MolecBioNet outper-
+forms state-of-the-art methods in DDI prediction, while ablation
+studies and embedding visualizations further validate the advan-
+tages of unified drug pair modeling and multi-scale knowledge
+integration. Moreover, the pooling strategies yield interpretable
+insights into the underlying interaction mechanisms, highlighting
+∗Corresponding author.
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than the
+author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or
+republish, to post on servers or to redistribute to lists, requires prior specific permission
+and/or a fee. Request permissions from permissions@acm.org.
+KDD ’25, Toronto, ON, Canada
+© 2025 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM ISBN 979-8-4007-1454-2/2025/08
+https://doi.org/10.1145/3711896.3737163
+MolecBioNet’s potential as a robust and transparent framework for
+predictive modeling in support of drug safety assessment.
+CCS Concepts
+• Computing methodologies →Machine learning; • Applied
+computing →Life and medical sciences.
+Keywords
+Drug-drug interactions; interpretable graph model; macro-level
+biological interactions; micro-level molecular influences; multi-
+scale representations; context-aware subgraph pooling; attention-
+guided influence pooling
+ACM Reference Format:
+Mengjie Chen, Ming Zhang, and Cunquan Qu. 2025. Towards Interpretable
+Drug-Drug Interaction Prediction: A Graph-Based Approach with Molecular
+and Network-Level Explanations. In Proceedings of the 31st ACM SIGKDD
+Conference on Knowledge Discovery and Data Mining V.2 (KDD ’25), August
+3–7, 2025, Toronto, ON, Canada. ACM, New York, NY, USA, 12 pages. https:
+//doi.org/10.1145/3711896.3737163
+1
+Introduction
+Combination therapy, which involves the concurrent use of two
+or more drugs, has increasingly emerged as a promising strategy
+for treating complex diseases such as hypertension and cancer
+[6, 33]. While this approach enhances treatment outcomes, it also
+elevates the risk of DDIs [21, 43]. These interactions can alter the
+pharmacokinetics or pharmacodynamics of co-administered drugs,
+potentially leading to adverse drug reactions (ADRs) and, in severe
+cases, drug withdrawals [3, 46]. Given their clinical significance and
+associated risks, accurately predicting DDIs is crucial for optimizing
+treatment regimens, ensuring clinical drug safety, and protecting
+patient health [49].
+Traditional methods for detecting DDIs, such as clinical trials and
+in vitro assays, though reliable, are time-consuming, labor-intensive,
+and limited in scalability for screening large numbers of potential
+interactions [51]. Computational approaches have emerged as low-
+cost, efficient alternatives to address these limitations, offering
+significant potential to accelerate DDI prediction [12, 23, 54]. Early
+computational methods primarily relied on drug fingerprints [45]
+or manually engineered features [8] to infer interactions from drug
+properties. However, such feature-centric methods often struggled
+to fully capture the intricate relations underlying DDIs, limiting
+their prediction accuracy.
+203
+
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+Mengjie Chen, Ming Zhang, & Cunquan Qu
+Recent advancements in graph-based modeling techniques, par-
+ticularly in complex networks and graph neural networks (GNNs),
+have enabled the development of powerful and flexible frameworks
+that leverage graph-structured data for DDI prediction [14, 18].
+Graph-structured data in the context of DDI prediction generally
+falls into two categories: homogeneous and heterogeneous graphs.
+Homogeneous graphs, such as traditional DDI networks, model
+drugs as nodes and their interactions as edges, providing a focused
+yet simplified view of drug relations [10, 54]. Despite their compu-
+tational efficiency, these representations often fail to capture the
+complexity of biological interactions. On the other hand, heteroge-
+neous graphs offer a richer representation by integrating diverse
+biological entities—such as drugs, proteins, and diseases—as nodes,
+and their various interactions (e.g., drug-protein, protein-disease)
+as edges, as exemplified by biomedical knowledge graphs. Addi-
+tionally, molecular graphs represent the internal structure of drugs
+at the atomic level, where nodes correspond to atoms and edges
+denote chemical bonds, providing essential molecular insights into
+DDIs. Together, approaches—biomedical knowledge graph-based
+modeling [19, 22, 29, 39, 42, 56, 62] and molecular graph-based mod-
+eling [28, 36, 37, 53, 55]—have driven remarkable progress in DDI
+prediction.
+Despite the success and potential of graph-based models, sev-
+eral challenges remain in DDI prediction. The first challenge lies
+in representing drug pairs holistically, capturing their intrinsic
+properties and interactions as a unified entity rather than treating
+each drug independently. Existing methods typically focus on en-
+coding the features of each drug separately, either at the network
+level or the molecular level, and then combine these representa-
+tions, often through concatenation or other heuristic operations
+[5, 32, 40]. Such approaches inherently fail to reflect the complex,
+context-dependent relationships that arise uniquely within the drug
+pair. Consequently, they may overlook key information at both the
+macroscopic biological and microscopic molecular levels, leading to
+incomplete or suboptimal drug-pair representations and a limited
+ability to model the complexities of DDIs fully.
+A second major challenge involves novel drugs—those in the
+early stages of development, with novel molecular structures, or
+rarely observed in existing DDI databases. The scarcity of interac-
+tion data for such drugs poses significant challenges for methods
+reliant on historical DDI information, particularly those grounded
+in DDI networks [1, 54]. Approaches based on molecular features,
+such as drug fingerprints or graph-based representations of molecu-
+lar structures, could be directly applied under cold-start conditions
+[9, 30]. However, these methods tend to lack the expressiveness nec-
+essary to fully capture the nuanced interactions between drugs and
+their broader biological context. Specifically, they often overlook
+inter-drug interactions and the connections between drugs and
+other biological entities, such as proteins or diseases. Biomedical
+knowledge graphs offer a promising source of side information to
+address these challenges [60], yet existing models predominantly
+focus on macroscopic biological interactions, often at the expense
+of capturing molecular-level intra- and inter-drug interactions. This
+limitation contributes to an incomplete representation of drug pairs
+and their complex behaviors.
+The third challenge is the interpretability of DDI prediction
+models. Beyond accurate predictions, interpretability is crucial for
+understanding the underlying mechanisms driving drug interac-
+tions. An interpretable model builds trust in its outputs and pro-
+vides biologically meaningful insights for domain experts, bridging
+the gap between computational predictions and real-world appli-
+cations [47]. However, current methods [48, 61] rarely integrate
+explanations across macroscopic biological interaction relations
+and microscopic molecular interaction mechanisms to elucidate the
+causes of drug interactions, limiting their capacity to explain the
+causes of DDIs comprehensively.
+To address these challenges, we propose MolecBioNet, a graph-
+based framework for DDI prediction that integrates molecular and
+biomedical knowledge. By treating drug pairs as unified entities,
+MolecBioNet captures both macro-level interactions within bio-
+logical networks and micro-level influences between molecular
+structures. Specifically, it extracts local subgraphs from biomedical
+knowledge graphs and constructs hierarchical interaction graphs
+based on molecular structures. Using classical graph neural network
+techniques, it learns drug-pair relationships at both biological and
+molecular levels. To enhance predictive accuracy and explainability,
+MolecBioNet introduces CASPool to identify biologically relevant
+entities and AGIPool to prioritize molecular substructures that most
+influence interactions. As a result, the framework facilitates robust
+and explainable DDI predictions, offering a valuable tool for DDI
+risk evaluation and mechanistic interpretation.
+The primary contributions of this work are as follows:
+• Unified Drug Pair Modeling: MolecBioNet shifts the focus
+from analyzing drugs in isolation to treating drug pairs as inte-
+grated entities. This paradigm enables the model to holistically
+capture mutual biological and molecular relationships, offering
+richer insights into DDI mechanisms.
+• Multi-Scale Knowledge Integration: MolecBioNet combines
+macro-level biological context and micro-level molecular infor-
+mation by extracting local subgraphs from knowledge graphs
+and constructing hierarchical interaction graphs. Through mu-
+tual information minimization regularization, the framework
+maximizes the diversity and complementarity of information
+captured during fusing multi-scale embeddings.
+• Interpretable and Robust DDI Predictions: MolecBioNet in-
+tegrates specialized pooling mechanisms at multiple biological
+scales to enhance both interpretability and robustness. CASPool
+highlights contextually relevant biomedical entities within local
+subgraphs, while AGIPool prioritizes molecular substructures
+that are crucial for driving drug interactions. This multi-scale
+approach not only improves predictive performance but also
+provides mechanistic insights into drug interactions, making
+the model both a powerful predictive tool and an explanatory
+resource for biomedical research.
+2
+Preliminaries
+2.1
+Problem Formulation
+This study aims to predict the type of interaction that may occur
+when two drugs are co-administered. To achieve this, we frame the
+problem as a multi-class classification task, aiming to develop a
+model that predicts the specific interaction type associated with a
+given drug pair.
+204
+
+Towards Interpretable Drug-Drug Interaction Prediction
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+Formally, let D denote a set of drugs and R a set of possible
+interaction types. Given a dataset S = {(𝑢,𝑟, 𝑣) | 𝑢, 𝑣∈D,𝑟∈
+R}, where each tuple (𝑢,𝑟, 𝑣) represents a drug pair (𝑢, 𝑣) and its
+corresponding interaction type 𝑟. Our goal is to learn a mapping
+function 𝑓: D × D →R that predicts the interaction type 𝑟for
+any given drug pair (𝑢, 𝑣).
+2.2
+Task-Specific Biomedical Knowledge Graph
+Construction
+Accurate prediction of DDIs requires a comprehensive contextual
+understanding that extends beyond isolated interaction data. To this
+end, we construct a task-specific Biomedical Knowledge Graph by
+integrating a Drug-Drug Interaction graph with an external Knowl-
+edge Graph. This integration not only combines direct interaction
+data but also enriches it with diverse biomedical relationships, en-
+abling a holistic modeling of drug interactions and their underlying
+biological mechanisms. The components of this task-specific graph
+are defined as follows.
+The Drug-Drug Interaction (DDI) graph, denoted as G𝐷𝐷𝐼=
+(V𝐷𝐷𝐼, E𝐷𝐷𝐼, R𝐷𝐷𝐼), forms the foundational component of our
+graph construction. Here, V𝐷𝐷𝐼= D represents the set of drugs,
+R𝐷𝐷𝐼= R is the set of interaction types, and E𝐷𝐷𝐼= {(𝑢,𝑟, 𝑣) |
+𝑢, 𝑣∈D,𝑟∈R} defines the observed interactions. Each edge
+(𝑢,𝑟, 𝑣) represents a specific interaction type 𝑟between the drug
+pair (𝑢, 𝑣). While this graph directly reflects drug interaction data,
+it does not capture the broader interactions that drugs might have
+with other biological entities.
+To provide a richer context, we integrate an external Knowledge
+Graph (eKG), represented as G𝐾𝐺= (V𝐾𝐺, E𝐾𝐺, R𝐾𝐺). In this
+graph, V𝐾𝐺denotes the set of biomedical entities, including drugs,
+proteins, diseases, and others, while R𝐾𝐺represents various types
+of relations, such as drug-protein interactions and drug-disease
+associations. Each edge (𝑢,𝑟, 𝑣) ∈E𝐾𝐺indicates the presence of
+relation𝑟between entities𝑢, 𝑣∈V𝐾𝐺. The eKG offers a rich contex-
+tual representation, extending the DDI graph by providing knowl-
+edge on diverse relationships between drugs and other biological
+entities.
+The task-specific Biomedical Knowledge Graph (tsBKG) is con-
+structed by merging the DDI graph and the eKG. Formally, G𝐵𝐾𝐺=
+(V𝐵𝐾𝐺, E𝐵𝐾𝐺, R𝐵𝐾𝐺), where V𝐵𝐾𝐺= V𝐷𝐷𝐼∪V𝐾𝐺, R𝐵𝐾𝐺=
+R𝐷𝐷𝐼∪R𝐾𝐺, and E𝐵𝐾𝐺= E𝐷𝐷𝐼∪E𝐾𝐺. This unified graph G𝐵𝐾𝐺
+bridges the gap between direct DDI data and its broader biological
+context, providing a comprehensive framework that can be directly
+applied to downstream tasks such as DDI prediction.
+2.3
+Substructure-Level Molecular Graph
+Construction
+For each drug 𝑢, its Simplified Molecular Input Line Entry System
+(SMILES) representation can be retrieved from publicly available
+databases such as PubChem [24]. Using RDKit1, the SMILES string
+is transformed into a molecular graph G𝑀
+𝑢
+= (V𝑀
+𝑢, E𝑀
+𝑢), where
+V𝑀
+𝑢represents the set of atoms (nodes) and E𝑀
+𝑢the set of chemical
+1https://github.com/rdkit/rdkit
+bonds (edges). This atomic-level molecular graph accurately repre-
+sents the molecule’s structural composition and atomic connectivity,
+providing the foundational information for further analysis.
+Despite its fine-grained detail, the atomic-level graph lacks in-
+terpretability and does not align with how chemists typically rea-
+son about molecular structures—through chemically meaningful
+substructures, such as functional groups and ring systems. To ad-
+dress this limitation, we employ a chemistry-inspired fragmentation
+strategy that transforms the atomic graph into a substructure-level
+graph capturing high-order chemical semantics [61]. Specifically,
+we use the Breaking Retrosynthetically Interesting Chemical Sub-
+structures (BRICS) algorithm [7], which applies a predefined set of
+reaction-based rules to identify cleavage sites relevant to retrosyn-
+thetic analysis.
+As illustrated in Fig. 1, the BRICS algorithm decomposes the
+molecular graph G𝑀
+𝑢into a set of chemically significant substruc-
+tures. Each substructure—often corresponding to functional groups,
+ring systems, or other characteristic fragments—is represented as
+a node in the resulting substructure-level molecular graph, G𝑆𝑢=
+(V𝑆𝑢, E𝑆𝑢). The edges in E𝑆𝑢preserve the connectivity between sub-
+structures by incorporating information from the original cleavage
+points in G𝑀
+𝑢. This representation captures both localized chemical
+environments and global structural organization, offering a more
+interpretable and modular view of the molecule.
+Substructure-Level 
+Molecular Graph
+CNCC[C@@H](C1=CC=CS1)
+OC2=CC=CC3=CC=CC=C32
+SMILES
+RDKit
+BRICS
+Chemical Substructures
+Molecular Graph              
+Drug 
+Figure 1: The process of constructing a substructure-level
+molecular graph of a drug molecule (example: Duloxetine2).
+3
+Methodology
+Fig. 2 presents the framework of our proposed model, MolecBioNet.
+The following subsections describe the model’s components in
+detail, outlining the specific methods employed in each module.
+3.1
+tsBKG-Based Subgraph Representation
+This subsection focuses on embedding representations of drug pairs
+within a tsBKG by extracting and encoding local subgraphs. As il-
+lustrated in Fig. 2a, the process consists of the following steps: (1)
+generating initial node embeddings, (2) extracting 𝑘-hop subgraphs
+2A medication used to treat depression, anxiety, nerve pain, and incontinence. Drug-
+Bank ID: DB00476.
+205
+
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+Mengjie Chen, Ming Zhang, & Cunquan Qu
+MLP
+Shared 
+Weights
+||
+MLP
+||
+b. Hierarchical Interaction Modeling of Drug Substructures
+GCN Module & SumPooling
+?
+Atomic-Level 
+Molecular Graph
+Substructure-Level 
+Molecular Graph
+Hierarchical 
+Interaction Graph
+AGIPool
+GCN Module & SumPooling
+Agg.
+ Inter-drug
+Intra-drug
+Subgraph 
+Extraction
+Graph Transformer
+Node Embeddings
+Linear
+Multi-
+Head 
+Attention
+FNN
+Node Embedding 
+Generation
+Base
+Vector
+CASPool
+Readout
+a. tsBKG-Based Subgraph Representation
+Center Loss
+?
+Drug
+Protein
+Disease
+Pathway
+Chemical Entity
+Side Effect
+Genetic Disorder
+c. Predict
+InfoMin
+Concat
+||
+d. AGIPool
+GAT 
+Compute 
+Influence
+1
+2
+3
+4
+5
+6
+7
+1
+2
+3
+4
+5
+6
+7
+1
+2
+3
+4
+5
+6
+7
+Weighted Average
+||
+Classifier
+MLP
+tsBKG
+?
+
+
+2
+,
+(
+)
+k
+u v
+L
+i
+i
+h
+
+,
+u v
+h
+2
+(
+)
+L
+v
+h
+2
+(
+)
+L
+u
+h
+b
+ u
+Drug
+ u
+Drug
+ u
+Drug
+ v
+Drug
+ v
+Drug
+ v
+Drug
+Q
+K
+V
+BKG
+
+,
+k
+u v
+
+M
+u
+
+M
+u
+
+S
+u
+
+S
+v
+
+,
+H
+u v
+
+,
+u v
+z
+M
+u
+h
+M
+v
+h
+7
+7
+1
+1
+1
+7
+ji
+i
+i
+j
+
+
+
+
+z
+z
+
+
+,
+u v
+h
+,
+u v
+z
+,
+ˆ u v
+y
+,
+u v
+f
+u
+h
+v
+h
+2
+(
+)
+L
+u
+h
+M
+u
+h
+2
+(
+)
+L
+v
+h
+M
+v
+h
+21
+
+62
+
+12
+
+31
+
+13
+
+13
+
+26
+
+63
+
+63
+
+36
+
+73
+
+73
+
+37
+
+45
+
+54
+
+35
+
+53
+
+53
+
+Figure 2: An overview of the proposed MolecBioNet framework (a, b, c) and a schematic illustration of the attention-guided
+influence pooling (AGIPool) process (d).
+surrounding each drug pair and encoding their features, (3) lever-
+aging a Graph Transformer to perform message passing, and (4)
+applying a context-aware subgraph pooling mechanism to derive
+the final representation of the drug pair. Each step is detailed as
+follows.
+3.1.1
+Node Embedding Generation in tsBKG. To capture global
+relational patterns and enhance drug node feature representations
+with contextual information from diverse biomedical entities, a
+GNN is applied to the tsBKG G𝐵𝐾𝐺= (V𝐵𝐾𝐺, E𝐵𝐾𝐺, R𝐵𝐾𝐺). This
+process generates embeddings for each entity in the graph. Let
+x(0)
+𝑣
+represent the initial feature of node 𝑣∈V𝐵𝐾𝐺, which, in this
+work, is represented as a one-hot vector. Using the GraphSAGE
+framework [16], the node embedding x(𝑙)
+𝑣
+is updated iteratively at
+the 𝑙-th layer as follows:
+x(𝑙+1)
+N(𝑣) = MEAN
+
+{W(𝑙)
+1 x(𝑙)
+𝑢
+| 𝑢∈N (𝑣)}
+
+,
+(1)
+x(𝑙+1)
+𝑣
+= 𝜎
+
+W(𝑙)
+2
+h
+x(𝑙)
+𝑣∥x(𝑙+1)
+N(𝑣)
+i
+,
+(2)
+where N (𝑣) denotes the neighbors of 𝑣, MEAN(·) aggregates fea-
+tures from neighbors, W(𝑙)
+1
+and W(𝑙)
+2
+are learnable weight matrices,
+∥denotes concatenation, and 𝜎is the ReLU activation function.
+After 𝐿1 layers, the embedding x(𝐿1)
+𝑣
+is the final representation of
+node 𝑣.
+3.1.2
+Extracting Local Subgraphs for Drug Pairs. To infer DDIs, we
+treat each drug pair as a unified entity and analyze its contextual
+dependencies within the biomedical knowledge graph (G𝐵𝐾𝐺), cap-
+turing the macro-scale influences of other entities such as proteins
+and diseases. These influences propagate through the connections
+in the graph and diminish with increasing distance from the drug
+pair [56]. Hence, we focus on the 𝑘-hop enclosing subgraph cen-
+tered on the drug pair to focus on the most contextually relevant
+region while balancing computational efficiency and the inclusion
+of meaningful connections. Specifically, Given a drug pair (𝑢, 𝑣), the
+𝑘-hop enclosing subgraph G𝑘𝑢,𝑣is induced from G𝐵𝐾𝐺by including
+all nodes 𝑖satisfying {𝑖| 𝑑(𝑖,𝑢) ≤𝑘𝑜𝑟𝑑(𝑖, 𝑣) ≤𝑘}, where 𝑑(𝑖,𝑢)
+represents the shortest path distance between nodes 𝑖and 𝑢.
+Encoding the relative positions of nodes within the subgraph is
+crucial for understanding how entities influence the central node
+[59]. To achieve this, we assign each node 𝑖a position vector, p𝑖=
+[one-hot(𝑑′(𝑖,𝑢))∥one-hot(𝑑′(𝑖, 𝑣))], where the adjusted shortest-
+path distance 𝑑′(𝑖,𝑢) and 𝑑′(𝑖, 𝑣) are defined follows:
+𝑑′(𝑖,𝑢) =
+(
+𝑑(𝑖,𝑢),
+if 𝑑(𝑖,𝑢) < ∞,
+max{𝑑(𝑗,𝑢) + 1 | 𝑗∈G𝑘𝑢,𝑣,𝑑(𝑗,𝑢) < ∞},
+otherwise.
+𝑑′(𝑖, 𝑣) =
+(
+𝑑(𝑖, 𝑣),
+if 𝑑(𝑖, 𝑣) < ∞,
+max{𝑑(𝑗, 𝑣) + 1 | 𝑗∈G𝑘𝑢,𝑣,𝑑(𝑗, 𝑣) < ∞},
+otherwise.
+Since positional information is encoded using one-hot vectors,
+nodes at the same distance share identical position encodings. How-
+ever, when a node 𝑖is disconnected from either 𝑢or 𝑣, directly
+assigning an infinite distance is not feasible for one-hot encoding.
+To address this, we assign such nodes a pseudo-distance based on
+206
+
+Towards Interpretable Drug-Drug Interaction Prediction
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+the maximum reachable distance in the subgraph, ensuring that all
+unreachable nodes fall into a consistent category rather than being
+arbitrarily assigned different encodings. This approach maintains
+structural coherence and prevents disconnected nodes from being
+treated as outliers in the representation space.
+Beyond positional information, the functional roles of nodes are
+equally important. To reflect this, each node 𝑖is assigned a categori-
+cal feature vector, c𝑖= one-hot(class(𝑖)), where class(𝑖) represents
+its entity type, such as protein, disease, or another biomedical cate-
+gory. By augmenting the precomputed embeddings x(𝐿1)
+𝑖
+with the
+positional and categorical encodings, we obtain the feature repre-
+sentation for each node 𝑖, expressed as h(0)
+𝑖
+= [x(𝐿1)
+𝑖
+∥p𝑖∥c𝑖] ∈R𝑑.
+3.1.3
+Message Passing via Graph Transformer. To aggregate fea-
+tures within the extracted 𝑘-hop subgraph G𝑘𝑢,𝑣, a Graph Trans-
+former [11] is employed. Unlike traditional GNNs, the Graph Trans-
+former leverages multi-head attention mechanisms to effectively
+capture both local structural patterns and long-range dependencies,
+enabling richer modeling of the influence of surrounding biomedi-
+cal entities on the central drug pair. Node embeddings are updated
+iteratively as follows:
+ˆh(𝑙+1)
+𝑖
+= O(𝑙) 𝑁
+∥
+𝑛=1
+∑︁
+𝑗∈N(𝑖)
+𝑤(𝑛,𝑙)
+𝑖,𝑗
+V(𝑛,𝑙)h(𝑙)
+𝑗,
+(3)
+𝑤(𝑛,𝑙)
+𝑖,𝑗
+= softmax𝑗
+Q(𝑛,𝑙)h(𝑙)
+𝑖
+· K(𝑛,𝑙)h(𝑙)
+𝑗
+√𝑑𝑛
+,
+(4)
+where Q(𝑛,𝑙), K(𝑛,𝑙), and V(𝑛,𝑙) ∈R𝑑𝑛×𝑑are learnable matrices
+for query, key, and value projections, 𝑑𝑛is the dimensionality of
+each head, and softmax𝑗normalizes attention weights. Multi-head
+attention provides diverse relational insights, and the outputs of 𝑁
+heads are concatenated and passed through O(𝑙) ∈R𝑑×𝑑to main-
+tain dimensional consistency. Then the attention outputs ˆh(𝑙+1)
+𝑖
+are
+passed through a Feed Forward Network (FFN) for further transfor-
+mation:
+h(𝑙+1)
+𝑖
+= W(𝑙)
+4 (GELU(W(𝑙)
+3
+ˆh(𝑙+1)
+𝑖
+)),
+(5)
+where W(𝑙)
+3
+and W(𝑙)
+4
+are learnable weight matrices, GELU denotes
+the activation function. After 𝐿2 layers, updated embeddings h(𝐿2)
+𝑖
+for all nodes are obtained.
+3.1.4
+Context-Aware Subgraph Pooling. To accurately predict DDIs,
+it is crucial to effectively capture the contextual relationships be-
+tween a drug pair and its surrounding entities in the biomedical
+knowledge graph. We propose a context-aware subgraph pooling
+(CASPool) mechanism, which adaptively aggregates node-level in-
+formation within the subgraph, assigning greater importance to
+nodes more relevant to the central drug pair (𝑢, 𝑣). The result is a
+unified subgraph-level embedding that represents the influence of
+the surrounding biomedical context on drug interaction.
+The process begins by constructing a base vector, b = [h(𝐿2)
+𝑢
+∥h(𝐿2)
+𝑣
+],
+which concatenates the embeddings of the two central drugs de-
+rived from the final Graph Transformer layer. Using this base vector,
+we compute an attention score 𝛼𝑖for each node 𝑖in the subgraph.
+This score quantifies the node’s contribution to the representation
+of the drug pair:
+𝛼𝑖= softmax𝑖
+
+Wℎh(𝐿2)
+𝑖
+· W𝑏b
+
+,
+(6)
+where Wℎand W𝑏are learnable matrices that project node em-
+beddings h(𝐿2)
+𝑖
+and the base vector b into a shared latent space.
+The softmax function normalizes the scores across all nodes in the
+subgraph, ensuring Í
+𝑖∈G𝑘𝑢,𝑣𝛼𝑖= 1.
+With these attention scores, we compute the subgraph-level
+representation by aggregating the re-weighted node embeddings:
+h𝑢,𝑣= MEAN
+n
+𝛼𝑖h(𝐿2)
+𝑖
+| 𝑖∈G𝑘
+𝑢,𝑣
+o
+.
+(7)
+The resulting pooled embedding, h𝑢,𝑣, serves as the final repre-
+sentation of the drug pair within the knowledge graph, effectively
+summarizing their contextual interactions and the contributions of
+surrounding entities.
+3.2
+Hierarchical Interaction Modeling of Drug
+Substructures
+Based on medicinal chemistry knowledge, drugs are complex en-
+tities composed of various chemically meaningful substructures,
+which collectively dictate their pharmacokinetic (how the body
+processes the drug) and pharmacodynamic (how the drug affects
+the body) properties [17, 41]. Importantly, DDIs often stem from the
+chemical reactivity of specific substructures rather than the entirety
+of a drug’s molecular structure [4, 20]. Recognizing this, accurate
+prediction of DDIs requires an approach that explicitly models
+the behavior of substructures, capturing intra-drug relationships
+alongside inter-drug interactions.
+To address this need, we present a substructure-aware hierarchical
+interaction model that incorporates internal drug structures with
+cross-drug substructural dependencies. This model bridges the gap
+between chemical intuition and computational graph modeling,
+offering a fine-grained and biologically interpretable framework
+for DDI prediction. The details are described below.
+3.2.1
+Modeling Inter- and Intra-Drug Interactions through Mes-
+sage Passing. For a drug pair (𝑢, 𝑣), we construct substructure-level
+molecular graphs G𝑆𝑢and G𝑆𝑣for the individual drugs. Each node
+represents a chemical substructure obtained through BRICS decom-
+position, and its initial features z0
+𝑖are encoded as Morgan Finger-
+prints [34] generated from the substructure’s SMILES representa-
+tion using RDKit. To capture inter-drug substructural interactions,
+we extend these molecular graphs to form a hierarchical interaction
+graph (HIG) G𝐻
+𝑢,𝑣, which connects all nodes in G𝑆𝑢with all nodes
+in G𝑆𝑣. This graph offers the dual perspectives of localized struc-
+tural dependencies and global inter-drug relationships, enabling
+the model to encode the intricate patterns underlying DDIs.
+The graph’s intra-drug edges are processed through a Graph
+Convolutional Network (GCN) [25] to propagate information be-
+tween neighboring substructures. This step captures their local
+structural and chemical dependencies. The node embeddings are
+updated iteratively as follows:
+z(𝑙+1)
+𝑖,intra = 𝜎©­
+«
+∑︁
+𝑗∈N(𝑖)
+1
+√𝑑𝑖
+√︁
+𝑑𝑗
+W(𝑙)
+intraz(𝑙)
+𝑗,intra
+ª®
+¬
+,
+(8)
+207
+
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+Mengjie Chen, Ming Zhang, & Cunquan Qu
+where N (𝑖) denotes the neighbors of node 𝑖, 𝑑𝑖represents the
+degree of node 𝑖, W(𝑙)
+intra is a learnable weight matrix, and 𝜎denotes
+the ReLU activation function. This yields intra-drug embeddings
+z(𝑙+1)
+𝑖,intra, encoding localized structural and functional characteristics
+of each substructure.
+For inter-drug interactions, we employ a multi-head Graph At-
+tention Network (GAT) [44] on the cross-drug edges of G𝐻
+𝑢,𝑣, to
+adaptively allocate weights to neighboring nodes. The updated
+node embeddings are computed as:
+z(𝑙+1)
+𝑖,inter = 𝜎©­
+«
+∑︁
+𝑗∈M(𝑖)
+𝛼(𝑙)
+𝑖𝑗W(𝑙)
+interz(𝑙)
+𝑗,inter
+ª®
+¬
+,
+(9)
+where M(𝑖) represents the set of cross-drug neighbors of node
+𝑖, W(𝑙)
+inter is a learnable weight matrix, and 𝛼(𝑙)
+𝑖𝑗
+is the attention
+coefficient from node 𝑗to 𝑖, defined as:
+𝛼(𝑙)
+𝑖𝑗
+=
+exp
+
+LeakyReLU
+
+a𝑇h
+W(𝑙)
+interz(𝑙)
+𝑖,inter∥W(𝑙)
+interz(𝑙)
+𝑗,inter
+i
+Í
+𝑘∈M(𝑖) exp
+
+LeakyReLU
+
+a𝑇
+h
+W(𝑙)
+interz(𝑙)
+𝑖,inter∥W(𝑙)
+interz(𝑙)
+𝑘,inter
+i ,
+(10)
+with a is the learnable parameter vector.
+Finally, the embeddings from intra-drug and inter-drug interac-
+tions are combined at each layer:
+z(𝑙+1)
+𝑖
+= z(𝑙+1)
+𝑖,intra + z(𝑙+1)
+𝑖,inter,
+(11)
+integrating both localized structural features and cross-drug inter-
+action signals.
+3.2.2
+Attention-Guided Influence Pooling. To obtain a drug-pair-
+level representation from the hierarchical graph G𝐻
+𝑢,𝑣, we introduce
+attention-guided influence pooling (AGIPool). As shown in Fig. 2d,
+AGIPool leverages the attention coefficients 𝛼𝑖𝑗computed by the
+Graph Attention Network to quantify the relative influence of each
+node. Intuitively, a node that receives more attention from its neigh-
+bors is considered more influential, as it contributes more signif-
+icantly to their representation updates [13]. This aligns with the
+underlying chemistry of drug interactions, where certain functional
+substructures disproportionately contribute to molecular behavior
+and interactions. Mathematically, the influence score 𝑐𝑖for node 𝑖
+is defined as:
+𝑐𝑖=
+∑︁
+𝑗∈N(𝑖)
+𝛼(𝐿3)
+𝑗𝑖
+,
+(12)
+where 𝛼(𝐿3)
+𝑗𝑖
+represents the attention weight assigned by node 𝑗
+to node 𝑖in the final layer 𝐿3 of message passing process. For
+simplicity, we use a single attention head in the final GAT layer.
+The final drug-pair embedding z𝑢,𝑣is obtained by aggregating
+the node embeddings, weighted by their influence scores:
+z𝑢,𝑣= MEAN
+n
+𝑐𝑖z(𝐿3)
+𝑖
+|𝑖∈G𝐻
+𝑢,𝑣
+o
+.
+(13)
+This pooling approach ensures that the resulting representation em-
+phasizes the most influential substructures, enhancing interpretabil-
+ity and predictive accuracy. By integrating domain knowledge of
+chemically meaningful substructures with classical graph neural
+networks, this substructure-aware hierarchical interaction model
+offers a robust and interpretable framework for DDI prediction at
+the molecular level.
+3.3
+Multi-Scale Embedding Fusion and Loss
+Design
+To ensure the embeddings derived from the biological network-level
+𝑘-hop subgraph G𝑘𝑢,𝑣(h𝑢,𝑣) and the molecular-level hierarchical
+interaction graph G𝐻
+𝑢,𝑣(z𝑢,𝑣) are complementary while minimizing
+redundancy, we introduce a mutual information (MI) minimization
+[58] regularization term. Mutual information measures the depen-
+dence between two variables by quantifying how much uncertainty
+in one variable is reduced given knowledge of the other. For the
+pairwise embeddings h𝑢,𝑣and z𝑢,𝑣, MI is defined as:
+𝑀𝐼(h𝑢,𝑣, z𝑢,𝑣) = 𝐻(h𝑢,𝑣) + 𝐻(z𝑢,𝑣) −𝐻(h𝑢,𝑣, z𝑢,𝑣),
+(14)
+where 𝐻(·) represents entropy and 𝐻(h𝑢,𝑣, z𝑢,𝑣) is the joint entropy.
+Intuitively, a high 𝑀𝐼value indicates significant shared information
+between the two embeddings, which is undesirable in this context
+as it indicates redundancy.
+Since directly computing 𝐻(h𝑢,𝑣) and 𝐻(z𝑢,𝑣) is challenging, we
+reformulate 𝑀𝐼(h𝑢,𝑣, z𝑢,𝑣) using conditional entropy and Kullback-
+Leibler (KL) divergence:
+𝑀𝐼(h𝑢,𝑣, z𝑢,𝑣) =𝐻z𝑢,𝑣(h𝑢,𝑣) + 𝐻h𝑢,𝑣(z𝑢,𝑣) −𝐻(h𝑢,𝑣, z𝑢,𝑣)
+−𝐾𝐿(h𝑢,𝑣∥z𝑢,𝑣) −𝐾𝐿(z𝑢,𝑣∥h𝑢,𝑣),
+(15)
+𝐾𝐿(h𝑢,𝑣∥z𝑢,𝑣) = 𝐻z𝑢,𝑣(h𝑢,𝑣) −𝐻(h𝑢,𝑣),
+(16)
+𝐾𝐿(z𝑢,𝑣∥h𝑢,𝑣) = 𝐻h𝑢,𝑣(z𝑢,𝑣) −𝐻(z𝑢,𝑣),
+(17)
+where 𝐻z𝑢,𝑣(h𝑢,𝑣) = −E[log𝑝(h𝑢,𝑣| z𝑢,𝑣)] is the cross-entropy
+of h𝑢,𝑣conditioned on z𝑢,𝑣. This reformulation allows efficient
+computation and optimization during training. Minimizing this MI
+term constrains the embeddings h𝑢,𝑣and z𝑢,𝑣to capture unique and
+complementary aspects of the biological and molecular interactions.
+Since 𝐻(h𝑢,𝑣, z𝑢,𝑣) is non-negative, the mutual information loss
+is defined as:
+L𝑀𝐼= E(𝑢,𝑣)∼D
+h
+𝐻z𝑢,𝑣(h𝑢,𝑣) + 𝐻h𝑢,𝑣(z𝑢,𝑣)
+−𝐾𝐿(h𝑢,𝑣∥z𝑢,𝑣) −𝐾𝐿(z𝑢,𝑣∥h𝑢,𝑣)
+i
+,
+(18)
+where D denotes the dataset or a mini-batch of samples.
+For each drug 𝑢, we compute a biological embedding h(𝐿2)
+𝑢
+de-
+rived from the 𝑘-hop subgraph G𝑘𝑢and a molecular embedding
+h𝑀
+𝑢obtained from its molecular graph G𝑀
+𝑢via a 𝐿4-layers GCN
+(more details in Appendix A). These embeddings are fused through
+a multi-layer perceptron (MLP):
+h𝑢= MLP
+h
+h(𝐿2)
+𝑢
+∥h𝑀
+𝑢
+i
+.
+(19)
+This combined embedding h𝑢captures both the biological and
+molecular features of the drug 𝑢, making it suitable for further drug
+interaction analysis.
+For each drug pair (𝑢, 𝑣), we construct a joint representation that
+integrates biological, molecular, and pairwise features:
+f𝑢,𝑣=
+
+h𝑢,𝑣∥z𝑢,𝑣∥h𝑢∥h𝑣
+
+.
+(20)
+A classifier is then used to predict the interaction type between the
+pair:
+ˆy𝑢,𝑣= W𝑐f𝑢,𝑣,
+(21)
+208
+
+Towards Interpretable Drug-Drug Interaction Prediction
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+Table 1: Performance comparison on Ryu’s dataset and DrugBank dataset. All results are obtained through 5-fold cross-
+validation, with the mean and standard deviation reported on the test set. Bold values indicate the best performance. P-values
+are computed using the corrected paired Student’s t-test [35] comparing MolecBioNet with the second-best model, TIGER.
+Methods
+Ryu’s Dataset
+DrugBank Dataset
+ACC
+F1
+PR-AUC
+Cohen’s 𝜅
+ACC
+F1
+PR-AUC
+Cohen’s 𝜅
+DeepDDI [38]
+0.868±0.005
+0.703±0.006
+0.811±0.010
+0.842±0.006
+0.862±0.003
+0.676±0.026
+0.810±0.016
+0.848±0.004
+SSI-DDI [37]
+0.848±0.006
+0.618±0.017
+0.704±0.014
+0.818±0.007
+0.743±0.009
+0.327±0.005
+0.438±0.009
+0.717±0.010
+GGI-DDI [55]
+0.889±0.006
+0.811±0.019
+0.880±0.012
+0.869±0.007
+0.859±0.008
+0.762±0.015
+0.836±0.016
+0.846±0.009
+KGNN [29]
+0.916±0.003
+0.814±0.021
+0.872±0.014
+0.900±0.004
+0.907±0.002
+0.764±0.011
+0.832±0.007
+0.898±0.002
+SumGNN [56]
+0.904±0.002
+0.842±0.005
+0.912±0.013
+0.886±0.002
+0.864±0.002
+0.732±0.019
+0.855±0.011
+0.851±0.002
+LaGAT [19]
+0.935±0.001
+0.843±0.014
+0.899±0.012
+0.922±0.001
+0.900±0.001
+0.741±0.010
+0.829±0.008
+0.891±0.001
+KnowDDI [48]
+0.923±0.002
+0.880±0.010
+0.934±0.011
+0.909±0.002
+0.894±0.001
+0.772±0.015
+0.868±0.008
+0.885±0.001
+TIGER [40]
+0.938±0.003
+0.880±0.007
+0.894±0.011
+0.926±0.004
+0.917±0.001
+0.791±0.008
+0.763±0.011
+0.910±0.001
+MolecBioNet
+0.952±0.002
+0.912±0.008
+0.942±0.006
+0.943±0.003
+0.935±0.002
+0.846±0.010
+0.910±0.008
+0.929±0.002
+P-values
+7.1 × 10−3
+1.4 × 10−2
+7.2 × 10−3
+7.1 × 10−3
+3.6 × 10−4
+2.0 × 10−3
+1.1 × 10−5
+3.4 × 10−4
+where W𝑐is the learnable weight matrix of the classifier.
+We frame DDI prediction as a multi-class classification task and
+optimize using a cross-entropy loss:
+L𝑃= −
+∑︁
+(𝑢,𝑟,𝑣)∈E𝐷𝐷𝐼
+y𝑇
+𝑢,𝑣log ˆy𝑢,𝑣,
+(22)
+where y𝑢,𝑣is the one-hot encoded ground truth vector correspond-
+ing to the drug interaction type.
+To account for the shared nature of drugs across multiple pairs,
+we employ a center loss [50] that constrains the embeddings of the
+same drug to be similar across different pairs:
+L𝐶= 1
+2
+∑︁
+(𝑢,𝑟,𝑣)∈E𝐷𝐷𝐼
+
+∥h(𝐿2)
+𝑢
+−c𝑢∥2
+2 + ∥h(𝐿2)
+𝑣
+−c𝑣∥2
+2
+
+,
+(23)
+where c𝑢and c𝑣are learnable center vectors for drugs 𝑢and 𝑣,
+respectively.
+The overall loss function combines the prediction loss, center
+loss, and mutual information minimization loss:
+L = L𝑃+ 𝛽L𝐶+ 𝛾L𝑀𝐼,
+(24)
+where 𝛽and 𝛾are hyperparameters controlling the contributions
+of center loss and mutual information minimization loss.
+4
+Results
+We used two benchmark datasets for multi-class DDI prediction:
+Ryu’s dataset [38] and an updated version of the DrugBank dataset
+(version 5.1.12, March 14, 2024) [26]. To ensure robust evaluation,
+we applied 5-fold cross-validation and measured performance us-
+ing four metrics: accuracy (ACC), macro-averaged F1 Score (F1),
+PR-AUC, and Cohen’s Kappa. All experimental settings, includ-
+ing detailed descriptions of the datasets, baseline configurations,
+novel drug experimental setups, ablation study design, and evalua-
+tion metrics, as well as the associated datasets and source code for
+MolecBioNet, are publicly available at: https://github.com/Mengjie
+Chan/MolecBioNet.
+4.1
+Analysis of Model Performance
+We evaluate MolecBioNet against several state-of-the-art models
+on Ryu’s and DrugBank datasets, with results summarized in Ta-
+ble 1. Across all evaluation metrics, MolecBioNet consistently out-
+performs competing approaches, highlighting the effectiveness of
+hierarchical molecular interaction modeling and context-aware
+representation learning from biomedical knowledge graphs. These
+findings reinforce the necessity of integrating both molecular-level
+interactions and knowledge-driven contextual relationships for
+accurate multi-class DDI prediction.
+Among the competing methods, TIGER [40] leverages both
+biomedical knowledge graphs and molecular graphs, leading to
+better performance than models relying solely on biomedical knowl-
+edge (KGNN [29], SumGNN [56], LaGAT [19], KnowDDI [48])
+or molecular structures (SSI-DDI [37], GGI-DDI [55]). However,
+TIGER’s approach to representation learning is inherently limited.
+Rather than explicitly capturing interaction mechanisms, it encodes
+each drug separately and then concatenates their embeddings to
+form a drug-pair representation. This naïve fusion strategy over-
+looks crucial biochemical and pharmacological interactions, ulti-
+mately restricting its predictive power.
+For molecular graph-based models (SSI-DDI, GGI-DDI), they
+treat drug-drug interaction types as contextual inputs rather than
+direct prediction targets, effectively reducing the problem to a bi-
+nary classification task (i.e., determining whether a given drug pair
+exhibits a specific pre-defined interaction). When reformulated as a
+true multi-class classification problem, their performance is likely
+to degrade due to the lack of explicit interaction modeling. This
+limitation is particularly evident in SSI-DDI, which performs even
+worse than DeepDDI [38]—a model that relies solely on molecular
+fingerprints to infer interactions based on structural similarity.
+4.2
+Effectiveness on Novel Drugs
+To evaluate MolecBioNet’s ability to predict drug interactions in-
+volving novel drugs, we conduct two experiments using Ryu’s
+dataset: Novel Drug–Existing Drug and Novel Drug–Novel Drug.
+These experiments aim to predict interactions between new drugs
+209
+
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+Mengjie Chen, Ming Zhang, & Cunquan Qu
+Table 2: Performance comparison of MolecBioNet with baseline models in the Novel Drug–Existing Drug and Novel Drug–Novel
+Drug settings. All results are obtained through 5-fold cross-validation, with the mean and standard deviation reported on the
+test set. Bold values indicate the best performance.
+Methods
+Novel Drug–Existing Drug
+Novel Drug–Novel Drug
+ACC
+F1
+PR-AUC
+Cohen’s 𝜅
+ACC
+F1
+PR-AUC
+Cohen’s 𝜅
+DeepDDI [38]
+0.630±0.028
+0.459±0.018
+0.430±0.021
+0.552±0.031
+0.372±0.028
+0.197±0.018
+0.144±0.017
+0.238±0.021
+SSI-DDI [37]
+0.569±0.020
+0.360±0.021
+0.357±0.030
+0.477±0.020
+0.337±0.048
+0.144±0.017
+0.125±0.015
+0.181±0.032
+GGI-DDI [55]
+0.636±0.023
+0.486±0.024
+0.485±0.030
+0.559±0.022
+0.364±0.037
+0.170±0.008
+0.153±0.012
+0.239±0.024
+KGNN [29]
+0.418±0.029
+0.044±0.008
+0.069±0.014
+0.268±0.023
+0.207±0.034
+0.018±0.001
+0.172±0.026
+0.047±0.020
+SumGNN [56]
+0.580±0.027
+0.405±0.025
+0.421±0.033
+0.486±0.027
+0.311±0.058
+0.078±0.017
+0.093±0.024
+0.102±0.040
+LaGAT [19]
+0.557±0.015
+0.249±0.011
+0.276±0.012
+0.455±0.012
+0.227±0.044
+0.012±0.001
+0.171±0.025
+0.002±0.021
+KnowDDI [48]
+0.516±0.023
+0.282±0.014
+0.269±0.014
+0.409±0.017
+0.264±0.064
+0.015±0.001
+0.017±0.004
+0.046±0.014
+TIGER [40]
+0.543±0.019
+0.322±0.028
+0.266±0.026
+0.442±0.018
+0.269±0.020
+0.037±0.010
+0.037±0.007
+0.071±0.019
+MolecBioNet
+0.652±0.020
+0.535±0.017
+0.549±0.039
+0.576±0.021
+0.388±0.049
+0.208±0.019
+0.179±0.029
+0.240±0.041
+A C C
+F 1
+P R - A U C
+      	
+0 . 7
+0 . 8
+0 . 9
+1 . 0
+P e r f o r m
+a n c e
+  M
+o l e c B i o N e t
+  w / o .  t s B K G
+  w / o .  H I G
+  w / o .  D e s i g n e d  P o o l i n g
+  w / o .  I n f o M
+i n
+A
+A C C
+F 1
+P R - A U C
+      	
+0 . 7
+0 . 8
+0 . 9
+1 . 0
+P e r f o r m
+a n c e
+  M
+o l e c B i o N e t
+  w / o .  t s B K G
+  w / o .  H I G
+  w / o .  D e s i g n e d  P o o l i n g
+  w / o .  I n f o M
+i n
+B
+Figure 3: Performance of MolecBioNet and its variants on the two datasets. (A) Performance for the Ryu’s dataset. (B) Perfor-
+mance for the DrugBank dataset.
+and existing drugs, as well as between novel drugs themselves. As
+shown in Table 2, MolecBioNet consistently outperforms the base-
+line models in both experimental settings. This demonstrates that
+by incorporating both biomedical knowledge graph relationships
+and molecular graph information, MolecBioNet is highly effective
+at learning the relationships between novel drugs and other drugs,
+even in a cold-start scenario.
+The baseline models, including DeepDDI, which uses molecular
+fingerprints, and SSI-DDI and GGI-DDI, which rely on molecular
+graphs, perform well in cold-start conditions. However, their perfor-
+mance is still limited, as they lack the biological context provided by
+biomedical knowledge graphs. In contrast, models that rely solely
+on biomedical knowledge graphs, such as KGNN, SumGNN, LaGAT
+and KnowDDI, show significantly poorer performance, particu-
+larly in the Novel Drug–Novel Drug experiment. This is primarily
+because these models are unable to incorporate molecular-level
+information, leading to inaccurate predictions, especially when
+novel drugs have limited relationships with other entities in the
+biomedical knowledge graph. Additionally, while TIGER incorpo-
+rates both biomedical knowledge graphs and molecular graphs, its
+performance in novel drug experiments does not meet expectations,
+further validating the importance of modeling drug pairs as unified
+entities in our approach.
+4.3
+Ablation Study
+To assess the contribution of each component in MolecBioNet, we
+conduct ablation studies by removing specific modules and evalu-
+ating their impact on model performance. The results, presented in
+Fig. 3, highlight the critical role of each component in improving
+DDI prediction accuracy.
+Removing biomedical knowledge-based subgraph representa-
+tions (w/o. tsBKG) or hierarchical interaction graphs (w/o. HIG)
+significantly reduces performance, demonstrating the necessity
+of capturing both macro-level biological interactions and micro-
+level molecular influences. Notably, the removal of molecular-level
+interaction modeling (w/o. HIG) causes a more pronounced de-
+cline, emphasizing the importance of substructure-aware interac-
+tion learning in accurately modeling DDIs. Additionally, replacing
+CASPool and AGIPool with MeanPooling (w/o. Designed Pooling)
+leads to performance degradation, confirming that context-aware re-
+lational analysis in biomedical subgraphs and substructure-guided
+interaction prioritization are essential for learning rich and dis-
+criminative drug pair representations. Furthermore, removing the
+210
+
+Towards Interpretable Drug-Drug Interaction Prediction
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+Sparsity
+0.5
+0.6
+0.7
+0.8
+0.9
+𝐹𝑖𝑑𝑒𝑙𝑖𝑡𝑦+
+0.282±0.014
+0.252±0.016
+0.231±0.017
+0.217±0.015
+0.213±0.016
+𝐹𝑖𝑑𝑒𝑙𝑖𝑡𝑦−
+0.269±0.024
+0.297±0.023
+0.316±0.022
+0.325±0.020
+0.330±0.020
+Table 3: Interpretability evaluation via Fidelity scores under varying sparsity levels.
+mutual information minimization loss term (w/o InfoMin) results
+in a consistent decline in performance, indicating its effectiveness
+in enhancing representation quality by reducing redundant infor-
+mation. It also contributes to improved generalization, as evidenced
+by the lower generalization error and higher generalization ratio
+of models trained with InfoMin, as shown in Table 6, especially
+on the larger DrugBank dataset. These findings collectively affirm
+the significance of InfoMin in learning robust and generalizable
+representations.
+4.4
+Interpretability and Explanation of Results
+Interpretability is essential for understanding the mechanisms un-
+derlying DDIs, in addition to achieving accurate predictions. To
+quantitatively evaluate the interpretability of MolecBioNet, we
+adopt the Fidelity [2] and Sparsity [57] metrics, which assess the
+faithfulness and compactness of model explanations. As shown in
+Table 3, increasing sparsity—i.e., reducing the number of explana-
+tory nodes—leads to a gradual decrease in 𝐹𝑖𝑑𝑒𝑙𝑖𝑡𝑦+, suggesting
+that the explanations gradually become less necessary, which aligns
+with expectations. However, the smooth trend indicates that re-
+moving more explanatory nodes does not significantly degrade
+explanation quality. Meanwhile, 𝐹𝑖𝑑𝑒𝑙𝑖𝑡𝑦−remains consistently
+low across all sparsity levels, showing that even a small subset of
+critical nodes (e.g., the top 10%) is sufficient to maintain predictive
+performance. Notably, during the evaluation, only node features
+are masked, while the graph structure remains intact. The relatively
+low 𝐹𝑖𝑑𝑒𝑙𝑖𝑡𝑦+ values emphasize the importance of structural infor-
+mation in model reasoning, further validating the effectiveness of
+our graph-based design.
+Chemical Substructure
+# Drug Pairs
+# Hits
+(Top 1)
+# Hits
+(Top 2)
+# Drugs
+1,3-Benzdioxole
+1,417
+120
+767
+3
+Acetylene
+425
+337
+40
+3
+Imidazole
+1,110
+94
+599
+2
+Hydrazine
+839
+546
+293
+2
+Pyridine
+705
+184
+84
+2
+Thiophene
+1,348
+29
+379
+3
+Triazole
+2,495
+821
+1,369
+4
+Table 4: Literature-supported chemical substructures identi-
+fied as most influential in DDIs by MolecBioNet.
+To further examine the model’s ability to provide biologically
+meaningful explanations, we apply the model to a curated dataset
+of 8,339 drug pairs involving 19 drugs, each known to participate
+in metabolism-related DDIs via specific chemical substructures
+[15, 61]. Using the model’s attention-guided influence pooling, we
+identify the two most influential chemical substructures for each
+interaction. As summarized in Table 4, the top-1 predicted substruc-
+ture matches literature-reported functional groups in 2,131 DDIs,
+while at least one of the top-2 predictions aligns in 5,662 DDIs,
+highlighting strong alignment between model explanations and
+domain knowledge.
+We also conduct a case study on the interaction between Itra-
+conazole and Promazine, where Itraconazole is known to inhibit the
+metabolism of Promazine [26, 31]. MolecBioNet identifies three key
+substructures in Itraconazole contributing to this interaction (Fig. 5),
+with Triazole ranked highest. This aligns with evidence that Tria-
+zole binds to CYP3A4 and inhibits its enzymatic activity, thereby
+affecting Promazine metabolism [15]. Moreover, by extracting the
+local subgraph of Itraconazole and Promazine from tsBKG and ap-
+plying context-aware subgraph pooling, we highlight the top 10%
+most influential nodes, visualized in Fig. 6. The visualization shows
+that Itraconazole inhibits the ABCG2 transporter, which may affect
+the metabolism of other drugs such as Atogepant and Mycophe-
+nolate mofetil through modulation of ABCG2-mediated transport
+[26], offering additional insights into its interaction mechanism.
+These results collectively demonstrate that MolecBioNet not only
+achieves high predictive performance but also delivers faithful and
+biologically grounded explanations across multiple interpretability
+levels.
+5
+Conclusion
+In this work, we introduce MolecBioNet, a graph-based framework
+for predicting DDIs by integrating molecular interactions with
+biomedical knowledge graphs. Our results show that MolecBioNet
+outperforms existing models, capturing complex drug pair rela-
+tionships through hierarchical modeling and context-aware learn-
+ing. The model also performs well in cold-start scenarios, effec-
+tively predicting interactions for novel drugs. The interpretability
+of MolecBioNet is further demonstrated through its pooling mech-
+anisms, which provide insights into the key chemical substructures
+and contextual relationships driving DDIs.
+Acknowledgments
+This work was supported in part by the National Natural Science
+Foundation of China under Grant 12471488 and Grant 12231018
+and in part by the Postdoctoral Fellowship Program of CPSF under
+Grant GZC20232912.
+References
+[1] Mohammad Hussain Al-Rabeah and Amir Lakizadeh. 2022. Prediction of drug-
+drug interaction events using graph neural networks based feature extraction.
+Scientific Reports 12 (Sept. 2022), 15590. doi:10.1038/s41598-022-19999-4
+211
+
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+Mengjie Chen, Ming Zhang, & Cunquan Qu
+[2] Kenza Amara, Zhitao Ying, Zitao Zhang, Zhichao Han, Yang Zhao, Yinan Shan,
+Ulrik Brandes, Sebastian Schemm, and Ce Zhang. 2022. GraphFramEx: Towards
+Systematic Evaluation of Explainability Methods for Graph Neural Networks.
+In The First Learning on Graphs Conference. https://openreview.net/forum?id=
+rGVGf1T-dK
+[3] Ingolf Cascorbi. 2012. Drug Interactions—Principles, Examples and Clinical
+Consequences. Dtsch Arztebl International 109, 33-34 (Aug. 2012), 546–555. doi:10.
+3238/arztebl.2012.0546
+[4] M.A.P. Chamikara and Yi-Ping Phoebe Chen. 2021. MedFused: A framework
+to discover the relationships between drug chemical functional group impacts
+and side effects. Computers in Biology and Medicine 133 (June 2021), 104361.
+doi:10.1016/j.compbiomed.2021.104361
+[5] Yujie Chen, Tengfei Ma, Xixi Yang, Jianmin Wang, Bosheng Song, and Xiangxiang
+Zeng. 2021. MUFFIN: multi-scale feature fusion for drug–drug interaction predic-
+tion. Bioinformatics 37, 17 (Sept. 2021), 2651–2658. doi:10.1093/bioinformatics/
+btab169
+[6] Feixiong Cheng, István A. Kovács, and Albert-László Barabási. 2019. Network-
+based prediction of drug combinations. Nature Communications 10 (March 2019),
+1197. doi:10.1038/s41467-019-09186-x
+[7] Jörg Degen, Christof Wegscheid-Gerlach, Andrea Zaliani, and Matthias Rarey.
+2008. On the Art of Compiling and Using ‘Drug-Like’ Chemical Fragment Spaces.
+ChemMedChem 3, 10 (Oct. 2008), 1503–1507. doi:10.1002/cmdc.200800178
+[8] Yifan Deng, Xinran Xu, Yang Qiu, Jingbo Xia, Wen Zhang, and Shichao Liu. 2020.
+A multimodal deep learning framework for predicting drug–drug interaction
+events. Bioinformatics 36, 15 (Aug. 2020), 4316–4322. doi:10.1093/bioinformatics/
+btaa501
+[9] Pieter Dewulf, Michiel Stock, and Bernard De Baets. 2021. Cold-Start Problems
+in Data-Driven Prediction of Drug–Drug Interaction Effects. Pharmaceuticals 14,
+5 (May 2021), 429. doi:10.3390/ph14050429
+[10] Haotong Du, Quanming Yao, Juzheng Zhang, Yang Liu, and Zhen Wang. 2024.
+Customized Subgraph Selection and Encoding for Drug-drug Interaction Predic-
+tion. In The Thirty-eighth Annual Conference on Neural Information Processing
+Systems. https://openreview.net/forum?id=crlvDzDPgM
+[11] Vijay Prakash Dwivedi and Xavier Bresson. 2021. A Generalization of Trans-
+former Networks to Graphs. arXiv:2012.09699 [cs.LG] https://arxiv.org/abs/2012.
+09699
+[12] Reza Ferdousi, Reza Safdari, and Yadollah Omidi. 2017. Computational prediction
+of drug-drug interactions based on drugs functional similarities. Journal of
+Biomedical Informatics 70 (June 2017), 54–64. doi:10.1016/j.jbi.2017.04.021
+[13] Weiwei Gu, Fei Gao, Xiaodan Lou, and Jiang Zhang. 2021. Discovering latent
+node Information by graph attention network. Scientific Reports 11 (March 2021),
+6967. doi:10.1038/s41598-021-85826-x
+[14] Zhichun Guo, Kehan Guo, Bozhao Nan, Yijun Tian, Roshni G. Iyer, Yihong Ma,
+Olaf Wiest, Xiangliang Zhang, Wei Wang, Chuxu Zhang, and Nitesh V. Chawla.
+2023. Graph-based Molecular Representation Learning. In Proceedings of the
+Thirty-Second International Joint Conference on Artificial Intelligence, IJCAI-23,
+Edith Elkind (Ed.). International Joint Conferences on Artificial Intelligence
+Organization, 6638–6646. doi:10.24963/ijcai.2023/744 Survey Track.
+[15] Jukka Hakkola, Janne Hukkanen, Miia Turpeinen, and Olavi Pelkonen. 2020.
+Inhibition and induction of CYP enzymes in humans: an update. Archives of
+Toxicology 94 (Oct. 2020), 3671–3722. doi:10.1007/s00204-020-02936-7
+[16] William L. Hamilton, Rex Ying, and Jure Leskovec. 2017. Inductive representation
+learning on large graphs. In Proceedings of the 31st International Conference on
+Neural Information Processing Systems (Long Beach, California, USA) (NIPS’17).
+Curran Associates Inc., Red Hook, NY, USA, 1025–1035.
+[17] Marc W. Harrold and Robin M. Zavod. 2014.
+Basic Concepts in Medicinal
+Chemistry. Drug Development and Industrial Pharmacy 40, 7 (2014), 988–988.
+doi:10.3109/03639045.2013.789908
+[18] Changxiang He, Yuru Liu, Hao Li, Hui Zhang, Yaping Mao, Xiaofei Qin, Lele
+Liu, and Xuedian Zhang. 2022. Multi-type feature fusion based on graph neural
+network for drug-drug interaction prediction. BMC Bioinformatics 23 (June 2022),
+224. doi:10.1186/s12859-022-04763-2
+[19] Yue Hong, Pengyu Luo, Shuting Jin, and Xiangrong Liu. 2022. LaGAT: link-aware
+graph attention network for drug–drug interaction prediction. Bioinformatics 38,
+24 (Dec. 2022), 5406–5412. doi:10.1093/bioinformatics/btac682
+[20] Kexin Huang, Cao Xiao, Trong Hoang, Lucas Glass, and Jimeng Sun. 2020.
+CASTER: Predicting Drug Interactions with Chemical Substructure Representa-
+tion. Proceedings of the AAAI Conference on Artificial Intelligence 34, 01 (April
+2020), 702–709. doi:10.1609/aaai.v34i01.5412
+[21] Jia Jia, Feng Zhu, Xiaohua Ma, Zhiwei W. Cao, Yixue X. Li, and Yu Zong Chen.
+2009. Mechanisms of drug combinations: interaction and network perspectives.
+Nature Reviews Drug Discovery 8 (Feb. 2009), 111–128. doi:10.1038/nrd2683
+[22] Md. Rezaul Karim, Michael Cochez, Joao Bosco Jares, Mamtaz Uddin, Oya Beyan,
+and Stefan Decker. 2019. Drug-Drug Interaction Prediction Based on Knowledge
+Graph Embeddings and Convolutional-LSTM Network. In Proceedings of the
+10th ACM International Conference on Bioinformatics, Computational Biology and
+Health Informatics (Niagara Falls, NY, USA) (BCB ’19). Association for Computing
+Machinery, New York, NY, USA, 113–123. doi:10.1145/3307339.3342161
+[23] Andrej Kastrin, Polonca Ferk, and Brane Leskošek. 2018. Predicting potential drug-
+drug interactions on topological and semantic similarity features using statistical
+learning. PLOS ONE 13, 5 (May 2018), 54–64. doi:10.1371/journal.pone.0196865
+[24] Sunghwan Kim, Jie Chen, Tiejun Cheng, Asta Gindulyte, Jia He, Siqian He,
+Qingliang Li, Benjamin A Shoemaker, Paul A Thiessen, Bo Yu, Leonid Zaslavsky,
+Jian Zhang, and Evan E Bolton. 2023. PubChem 2023 update. Nucleic Acids
+Research 51, D1 (Jan. 2023), D1373–D1380. doi:10.1093/nar/gkac956
+[25] Thomas N. Kipf and Max Welling. 2017. Semi-Supervised Classification with
+Graph Convolutional Networks. In International Conference on Learning Repre-
+sentations. https://openreview.net/forum?id=SJU4ayYgl
+[26] Craig Knox, Mike Wilson, Christen M Klinger, Mark Franklin, Eponine Oler,
+Alex Wilson, Allison Pon, Jordan Cox, Na Eun (Lucy) Chin, Seth A Straw-
+bridge, Marysol Garcia-Patino, Ray Kruger, Aadhavya Sivakumaran, Selena San-
+ford, Rahil Doshi, Nitya Khetarpal, Omolola Fatokun, Daphnee Doucet, Ashley
+Zubkowski, Dorsa Yahya Rayat, Hayley Jackson, Karxena Harford, Afia Anjum,
+Mahi Zakir, Fei Wang, Siyang Tian, Brian Lee, Jaanus Liigand, Harrison Peters,
+Ruo Qi (Rachel) Wang, Tue Nguyen, Denise So, Matthew Sharp, Rodolfo da Silva,
+Cyrella Gabriel, Joshua Scantlebury, Marissa Jasinski, David Ackerman, Timothy
+Jewison, Tanvir Sajed, Vasuk Gautam, and David S Wishart. 2024. DrugBank 6.0:
+the DrugBank Knowledgebase for 2024. Nucleic Acids Research 52, D1 (Jan. 2024),
+D1265–D1275. doi:10.1093/nar/gkad976
+[27] Longlong Li, Yipeng Zhang, Guanghui Wang, and Kelin Xia. 2024. KA-GNN:
+Kolmogorov-Arnold Graph Neural Networks for Molecular Property Prediction.
+arXiv:2410.11323 [cs.LG] https://arxiv.org/abs/2410.11323
+[28] Zimeng Li, Shichao Zhu, Bin Shao, Xiangxiang Zeng, Tong Wang, and Tie-Yan Liu.
+2023. DSN-DDI: an accurate and generalized framework for drug–drug interac-
+tion prediction by dual-view representation learning. Briefings in Bioinformatics
+24, 1 (Jan. 2023), bbac597. doi:10.1093/bib/bbac597
+[29] Xuan Lin, Zhe Quan, Zhi-Jie Wang, Tengfei Ma, and Xiangxiang Zeng. 2020.
+KGNN: Knowledge Graph Neural Network for Drug-Drug Interaction Prediction.
+In Proceedings of the Twenty-Ninth International Joint Conference on Artificial
+Intelligence, IJCAI-20, Christian Bessiere (Ed.). International Joint Conferences
+on Artificial Intelligence Organization, 2739–2745. doi:10.24963/ijcai.2020/380
+Main track.
+[30] Zun Liu, Xing-Nan Wang, Hui Yu, Jian-Yu Shi, and Wen-Min Dong. 2022. Predict
+multi-type drug–drug interactions in cold start scenario. BMC Bioinformatics 23
+(Feb. 2022), 75. doi:10.1186/s12859-022-04610-4
+[31] Tom Lynch and Amy Price. 2007. The effect of cytochrome P450 metabolism on
+drug response, interactions, and adverse effects. American Family Physician 76, 3
+(Aug. 2007), 391–396.
+[32] Tengfei Lyu, Jianliang Gao, Ling Tian, Zhao Li, Peng Zhang, and Ji Zhang. 2021.
+MDNN: A Multimodal Deep Neural Network for Predicting Drug-Drug Interac-
+tion Events. In Proceedings of the Thirtieth International Joint Conference on Arti-
+ficial Intelligence, IJCAI-21, Zhi-Hua Zhou (Ed.). International Joint Conferences
+on Artificial Intelligence Organization, 3536–3542. doi:10.24963/ijcai.2021/487
+Main Track.
+[33] Reza Bayat Mokhtari, Tina S Homayouni, Narges Baluch, Evgeniya Morgatskaya,
+Sushil Kumar, Bikul Das, and Herman Yeger. 2017. Combination therapy in
+combating cancer. Oncotarget 8, 23 (March 2017), 38022–38043. doi:10.18632/
+oncotarget.16723
+[34] H. L. Morgan. 1965. The Generation of a Unique Machine Description for Chem-
+ical Structures-A Technique Developed at Chemical Abstracts Service. Journal of
+Chemical Documentation 5, 2 (May 1965), 107–113. doi:10.1021/c160017a018
+[35] Claude Nadeau and Yoshua Bengio. 1999. Inference for the generalization error. In
+Proceedings of the 13th International Conference on Neural Information Processing
+Systems (Denver, CO) (NIPS ’99). MIT Press, Cambridge, MA, USA, 307–313.
+[36] Arnold K Nyamabo, Hui Yu, Zun Liu, and Jian-Yu Shi. 2022. Drug–drug interaction
+prediction with learnable size-adaptive molecular substructures. Briefings in
+Bioinformatics 23, 1 (Jan. 2022), bbab441. doi:10.1093/bib/bbab441
+[37] Arnold K Nyamabo, Hui Yu, and Jian-Yu Shi. 2021.
+SSI–DDI: substruc-
+ture–substructure interactions for drug–drug interaction prediction. Briefings in
+Bioinformatics 22, 6 (Nov. 2021), bbab133. doi:10.1093/bib/bbab133
+[38] Jae Yong Ryu, Hyun Uk Kim, and Sang Yup Lee. 2018. Deep learning improves
+prediction of drug–drug and drug–food interactions. Proceedings of the Na-
+tional Academy of Sciences 115, 18 (March 2018), E4304–E4311. doi:10.1073/pnas.
+1803294115
+[39] Xiaorui Su, Lun Hu, Zhuhong You, Pengwei Hu, and Bowei Zhao. 2022. Attention-
+based Knowledge Graph Representation Learning for Predicting Drug-drug In-
+teractions. Briefings in Bioinformatics 23, 3 (May 2022), bbac140. doi:10.1093/bib/
+bbac140
+[40] Xiaorui Su, Pengwei Hu, Zhu-Hong You, Philip S. Yu, and Lun Hu. 2024. Dual-
+Channel Learning Framework for Drug-Drug Interaction Prediction via Relation-
+Aware Heterogeneous Graph Transformer. Proceedings of the AAAI Conference
+on Artificial Intelligence 38, 1 (March 2024), 249–256. doi:10.1609/aaai.v38i1.27777
+[41] Zhenchao Tang, Guanxing Chen, Hualin Yang, Weihe Zhong, and Calvin Yu-
+Chian Chen. 2024. DSIL-DDI: A Domain-Invariant Substructure Interaction
+Learning for Generalizable Drug–Drug Interaction Prediction. IEEE Transactions
+on Neural Networks and Learning Systems 35, 8 (Aug. 2024), 10552–10560. doi:10.
+212
+
+Towards Interpretable Drug-Drug Interaction Prediction
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+1109/TNNLS.2023.3242656
+[42] Farhan Tanvir, Muhammad Ifte Khairul Islam, and Esra Akbas. 2021. Predicting
+Drug-Drug Interactions Using Meta-path Based Similarities. In 2021 IEEE Confer-
+ence on Computational Intelligence in Bioinformatics and Computational Biology
+(CIBCB). 1–8. doi:10.1109/CIBCB49929.2021.9562802
+[43] Nicholas P. Tatonetti, Patrick P. Ye, Roxana Daneshjou, and Russ B. Altman. 2012.
+Data-Driven Prediction of Drug Effects and Interactions. Science Translational
+Medicine 4 (March 2012), 125ra31. doi:10.1126/scitranslmed.3003377
+[44] Petar Veličković, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro
+Liò, and Yoshua Bengio. 2018. Graph Attention Networks. In International Confer-
+ence on Learning Representations. https://openreview.net/forum?id=rJXMpikCZ
+[45] Santiago Vilar, Rave Harpaz, Eugenio Uriarte, Lourdes Santana, Raul Rabadan,
+and Carol Friedman. 2012. Drug—drug interaction through molecular structure
+similarity analysis. Journal of the American Medical Informatics Association 19, 6
+(Nov. 2012), 1066–1074. doi:10.1136/amiajnl-2012-000935
+[46] Santiago Vilar, Eugenio Uriarte, Lourdes Santana, Tal Lorberbaum, George Hripc-
+sak, Carol Friedman, and Nicholas P Tatonetti. 2014. Similarity-based modeling
+in large-scale prediction of drug-drug interactions. Nature Protocols 9 (Aug. 2014),
+2147–2163. doi:10.1038/nprot.2014.151
+[47] Thanh Hoa Vo, Ngan Thi Kim Nguyen, Quang Hien Kha, and Nguyen Quoc Khanh
+Le. 2022. On the road to explainable AI in drug-drug interactions prediction: A
+systematic review. Computational and Structural Biotechnology Journal 20 (April
+2022), 2112–2123. doi:10.1016/j.csbj.2022.04.021
+[48] Yaqing Wang, Zaifei Yang, and Quanming Yao. 2024. Accurate and interpretable
+drug-drug interaction prediction enabled by knowledge subgraph learning. Com-
+munications Medicine 4 (March 2024), 59. doi:10.1038/s43856-024-00486-y
+[49] Zhi-Yu Wang, Meng Chen, Ling-Ling Zhu, Lu-Shan Yu, Su Zeng, Mei-Xiang
+Xiang, and Quan Zhou. 2015. Pharmacokinetic drug interactions with clopidogrel:
+updated review and risk management in combination therapy. Therapeutics and
+Clinical Risk Management 11 (March 2015), 449–67. doi:10.2147/TCRM.S80437
+[50] Yandong Wen, Kaipeng Zhang, Zhifeng Li, and Yu Qiao. 2016. A Discriminative
+Feature Learning Approach for Deep Face Recognition. In Computer Vision –
+ECCV 2016, Bastian Leibe, Jiri Matas, Nicu Sebe, and Max Welling (Eds.). Springer
+International Publishing, Cham, 499–515.
+[51] Steven Whitebread, Jacques Hamon, Dejan Bojanic, and Laszlo Urban. 2005.
+Keynote review: In vitro safety pharmacology profiling: an essential tool for
+successful drug development. Drug Discovery Today 10, 21 (Nov. 2005), 1421–
+1433. doi:10.1016/S1359-6446(05)03632-9
+[52] Tian Xie and Jeffrey C. Grossman. 2018. Crystal Graph Convolutional Neural
+Networks for an Accurate and Interpretable Prediction of Material Properties.
+Phys. Rev. Lett. 120 (Apr 2018), 145301. Issue 14. doi:10.1103/PhysRevLett.120.
+145301
+[53] Nuo Xu, Pinghui Wang, Long Chen, Jing Tao, and Junzhou Zhao. 2019. MR-GNN:
+Multi-Resolution and Dual Graph Neural Network for Predicting Structured
+Entity Interactions. In Proceedings of the Twenty-Eighth International Joint Con-
+ference on Artificial Intelligence, IJCAI-19. International Joint Conferences on
+Artificial Intelligence Organization, 3968–3974. doi:10.24963/ijcai.2019/551
+[54] Hui Yu, Kui-Tao Mao, Jian-Yu Shi, Hua Huang, Zhi Chen, Kai Dong, and Siu-Ming
+Yiu. 2018. Predicting and understanding comprehensive drug-drug interactions
+via semi-nonnegative matrix factorization. BMC Systems Biology 12 (April 2018),
+14. doi:10.1186/s12918-018-0532-7
+[55] Hui Yu, Jing Wang, Shi-Yu Zhao, Omayo Silver, Zun Liu, JingTao Yao, and Jian-Yu
+Shi. 2024. GGI-DDI: Identification for key molecular substructures by granule
+learning to interpret predicted drug–drug interactions. Expert Systems with
+Applications 240 (April 2024), 122500. doi:10.1016/j.eswa.2023.122500
+[56] Yue Yu, Kexin Huang, Chao Zhang, Lucas M Glass, Jimeng Sun, and Cao Xiao.
+2021. SumGNN: multi-typed drug interaction prediction via efficient knowledge
+graph summarization. Bioinformatics 37, 18 (Sept. 2021), 2988–2995. doi:10.1093/
+bioinformatics/btab207
+[57] Hao Yuan, Haiyang Yu, Shurui Gui, and Shuiwang Ji. 2023. Explainability in Graph
+Neural Networks: A Taxonomic Survey. IEEE Transactions on Pattern Analysis and
+Machine Intelligence 45, 5 (2023), 5782–5799. doi:10.1109/TPAMI.2022.3204236
+[58] Jing Zhang, Deng-Ping Fan, Yuchao Dai, Xin Yu, Yiran Zhong, Nick Barnes,
+and Ling Shao. 2021. RGB-D Saliency Detection via Cascaded Mutual Informa-
+tion Minimization. In Proceedings of the IEEE/CVF International Conference on
+Computer Vision (ICCV). 4338–4347.
+[59] Muhan Zhang and Yixin Chen. 2018. Link prediction based on graph neural net-
+works. In Proceedings of the 32nd International Conference on Neural Information
+Processing Systems (Montréal, Canada) (NIPS’18). Curran Associates Inc., Red
+Hook, NY, USA, 5171–5181.
+[60] Yongqi Zhang, Quanming Yao, Ling Yue, Xian Wu, Ziheng Zhang, Zhenxi Lin,
+and Yefeng Zheng. 2023. Emerging drug interaction prediction enabled by a flow-
+based graph neural network with biomedical network. Nature Computational
+Science 3 (Dec. 2023), 1023–1033. doi:10.1038/s43588-023-00558-4
+[61] Yi Zhong, Gaozheng Li, Ji Yang, Houbing Zheng, Yongqiang Yu, Jiheng Zhang,
+Heng Luo, Biao Wang, and Zuquan Weng. 2024. Learning motif-based graphs for
+drug–drug interaction prediction via local–global self-attention. Nature Machine
+Intelligence 6 (Sept. 2024), 1094–1105. doi:10.1038/s42256-024-00888-6
+[62] Marinka Zitnik, Monica Agrawal, and Jure Leskovec. 2018. Modeling polyphar-
+macy side effects with graph convolutional networks. Bioinformatics 34, 13 (July
+2018), i457–i466. doi:10.1093/bioinformatics/bty294
+A
+Molecular Graph Representation via GCN
+To compute the graph-level representation of each drug molecule,
+we apply a GCN [25] on its molecular graph G𝑀
+𝑢
+= (V𝑀
+𝑢, E𝑀
+𝑢).
+In this setup, A ∈R|V𝑀
+𝑢|×|V𝑀
+𝑢| represents the adjacency matrix
+of the molecular graph, and X(0) ∈R|V𝑀
+𝑢|×107 is the initial node
+feature matrix, where each row encodes a 107-dimensional fea-
+ture vector for an atom. Specifically, the first 92 dimensions are
+derived using the CGCNN [52] framework, capturing fundamen-
+tal atomic characteristics such as atomic number, atomic radius,
+and electronegativity. The remaining 15 dimensions are aggregated
+features of all chemical bonds connected to the atom, encoding
+properties such as bond type, directionality, length, and ring status
+(detailed in Table 5) [27]. The GCN iteratively propagates and ag-
+gregates these features across the molecular graph in the following
+rule:
+X(𝑙+1) = 𝜎
+
+˜D−1
+2 ˜A ˜D−1
+2 X(𝑙)W(𝑙)
+𝑀
+
+,
+(25)
+where ˜A = A + I|V𝑀
+𝑢| is the adjacency matrix with added self-
+connections, ˜D is the diagonal degree matrix of ˜A, W(𝑙)
+𝑀denotes
+the trainable weight matrix for the 𝑙-th layer, and 𝜎represents the
+ReLU activation function. By stacking 𝐿4 such layers, the GCN
+refines the node embeddings, X(𝐿4), effectively capturing both lo-
+cal structural information and chemical properties. To obtain a
+unified representation of the entire molecular graph, we apply a
+SumPooling operation across all node embeddings:
+h𝑀
+𝑢= SumPooling
+
+X(𝐿4)
+.
+(26)
+The resulting vector h𝑀
+𝑢encodes the drug molecule’s structural and
+chemical properties, enabling practical downstream analysis.
+B
+Sensitivity Analysis
+We analyze the effect of key hyperparameters in our framework,
+with the results presented in Fig. 4. In particular, Fig. 4A shows
+the performance trend as the center loss weight 𝛽varies from 0.5
+to 3. We observe that the F1 score generally increases initially,
+indicating that incorporating center loss is beneficial. While the
+model’s performance stabilizes on the Ryu dataset and fluctuates
+slightly on the DrugBank dataset, both achieve peak performance
+at 𝛽= 2. Therefore, we adopt 𝛽= 2 as the default setting. As for the
+mutual information loss coefficient 𝛾, we set its value by observing
+that the prediction loss is approximately ten times larger than the
+mutual information loss, and scale 𝛾accordingly to maintain a
+balanced optimization.
+We also investigate the effect of the 𝑘parameter in 𝑘-hop enclos-
+ing subgraphs. As shown in Fig. 4B, model performance improves
+from 𝑘= 1 to 𝑘= 2, but slightly declines at 𝑘= 3. We default
+to 𝑘= 2 in MolecBioNet, as it strikes a good balance between
+capturing meaningful biomedical context and avoiding unneces-
+sary complexity. Two-hop neighborhoods already include the main
+types of biomedical entities relevant to DDIs, such as proteins,
+pathways, diseases, side effects, chemical compounds, and genetic
+disorders, while extending to 3-hop brings little additional diversity
+213
+
+KDD ’25, August 3–7, 2025, Toronto, ON, Canada
+Mengjie Chen, Ming Zhang, & Cunquan Qu
+Table 5: List of atom and bond features.
+Feature Type
+Feature Name
+Description
+Size
+Type
+Atom Feature
+CGCNN
+Atomic number, Radius, and electronegativity.
+92
+One-hot
+Bond Feature
+Bond Directionality
+None, Beginwedge, Begindash, etc.
+7
+One-hot
+Bond Type
+Single, Double, Triple, or Aromatic.
+4
+One-hot
+Bond Length
+Numerical and square length of the bond.
+2
+Float
+In Ring
+Whether the bond is part of a chemical ring.
+2
+One-hot
+Table 6: Effect of InfoMin on Generalization Performance.
+Dataset
+Model
+Train F1
+Test F1
+Gen. Error (Train F1-Test F1)
+Gen. Ratio (Test F1/Train F1)
+Ryu
+MolecBioNet
+0.9999±0.0001
+0.9124±0.0079
+0.0874±0.0080
+0.9126±0.0080
+w/o InfoMin
+0.9985±0.0020
+0.9003±0.0136
+0.0982±0.0126
+0.9016±0.0127
+DrugBank
+MolecBioNet
+0.9986±0.0018
+0.8465±0.0098
+0.1521±0.0092
+0.8477±0.0093
+w/o InfoMin
+0.9963±0.0030
+0.8068±0.0086
+0.1895±0.0060
+0.8098±0.0065
+4,5-dihydro-1H-1,2,4-
+triazol-5-one
+C1=NNC(=O)N1
+Triazole
+C1=NC=NN1
+C1COCO1
+1,3-dioxolane
+Figure 5: Chemical substructures in Itraconazole that influ-
+ence the metabolism of Promazine. The top three substruc-
+tures are identified through attention-guided influence pool-
+ing, with Triazole showing the greatest impact by binding to
+the active site of CYP3A4.
+Itraconazole
+Promazine
+Atogepant
+Methylprednisone
+Ubrogepant
+Bictegravir
+Ventricular 
+Fibrillation
+Broad substrate specificity 
+ATP-binding cassette 
+transporter ABCG2
+Mycophenolate 
+mofetil
+UDP-glucuronosyltransferase 1A7
+Carbidopa
+Dextran
+Figure 6: Local subgraph extracted from tsBKG for Itracona-
+zole and Promazine, showing the top 10% of most influential
+nodes.
+0 . 5
+1 . 0
+1 . 5
+2 . 0
+2 . 5
+3 . 0
+0 . 8 0
+0 . 8 5
+0 . 9 0
+0 . 9 5
+ R y u ' s  D a t a s e t
+ D r u g B a n k  D a t a s e t
+F 1
+b
+A
+1
+2
+3
+0 . 8 0
+0 . 8 5
+0 . 9 0
+0 . 9 5
+ R y u ' s  D a t a s e t
+ D r u g B a n k  D a t a s e t
+F 1
+k - h o p
+B
+Figure 4: Sensitivity analysis of hyperparameters on model
+performance. (A) The effect of 𝛽, the weighting factor for the
+center loss L𝐶, and (B) the influence of 𝑘, which determines
+the size of the 𝑘-hop enclosing subgraph for each drug pair.
+Results are reported as mean F1 scores with standard devia-
+tion across five-fold cross-validation.
+or relevance. Moreover, increasing 𝑘to 3 substantially enlarges
+the subgraphs, especially in densely connected biomedical graphs,
+leading to higher computational cost and potential dilution of in-
+formative signals. These findings support 𝑘= 2 as an effective and
+efficient choice.
+C
+Additional Results and Visualizations
+This section includes supplementary generalization results (Table 6)
+and interpretability visualizations (Fig. 5 and Fig. 6) to support the
+main analysis.
+214

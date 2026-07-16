@@ -1,9 +1,22 @@
-# Data & outputs (inside Code/)
+# =====================================================================
+# Data & experiment outputs (inside Code/)
+# =====================================================================
 /Code/data/**
 !/Code/data/.gitkeep
 
 /Code/runs/**
 !/Code/runs/.gitkeep
+
+# Per-reproduction paper-original datasets (per CLAUDE.md §"复现代码
+# (Reproduction) 规范" §1): each Code/reproductions/<Name>/_Original-Dataset/
+# holds the paper's downloaded data + subgraph caches; large + often
+# licensed, never commit. Legacy unprefixed name kept for back-compat
+# with reproductions that haven't been migrated yet (TIGER migrated
+# 2026-05-18; older reproductions still use unprefixed).
+/Code/reproductions/*/_Original-Dataset/**
+!/Code/reproductions/*/_Original-Dataset/.gitkeep
+/Code/reproductions/*/Original-Dataset/**
+!/Code/reproductions/*/Original-Dataset/.gitkeep
 
 # Notebooks
 /Notebooks/**
@@ -34,3 +47,85 @@ venv/
 .env
 .cache/
 .ipynb_checkpoints/
+
+# Credentials — never commit
+/API-KEY/**
+!/API-KEY/.gitkeep
+
+# =====================================================================
+# Large binary artifacts: model weights, serialized caches, datasets.
+# Only source code (.py/.md/.yaml/.txt) is versioned; these blobs are
+# either rebuilt on demand (detect-and-build) or transferred out-of-band
+# (scp + kubectl cp) when moving to a server. Extension-based so they are
+# caught wherever they live (baseline _data/, code-adapter caches, etc.).
+# NOTE: this is what shrinks the repo from ~6 GB to ~1 MB of .py.
+# =====================================================================
+*.pkl
+*.pickle
+*.npz
+*.npy
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.bin
+*.model
+
+# Cache directories (KnowDDI enclosing-subgraph cache, SapBERT node-embed
+# cache, EmerGNN/TIGER KG-setup caches, etc.) — all rebuildable.
+_cache/
+Code/**/_cache/
+
+# Baseline per-method auxiliary data/caches (KG-setup pkl, event DBs, dataset dumps,
+# mol/bkg/subgraph caches under _data/). Keep ONLY the .py builders; every blob is
+# rebuilt (baseline detect-and-build) or transferred out-of-band. This is the rule that
+# drops baseline/emergnn (5.4G) + baseline/tiger (434M) + mkg_fenn event.db to ~0.
+Code/baseline/*/_data/**
+!Code/baseline/*/_data/**/
+!Code/baseline/*/_data/**/*.py
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+*.duckdb
+
+# Reproduction upstream archives: full git-clone snapshots + PDFs. Read-only
+# reference; baselines never import from here (§文件级独立性), and they are
+# large. Keep our reproduction .py (flat in the reproduction root).
+Code/reproductions/*/_paper-and-GitHub/**
+!Code/reproductions/*/_paper-and-GitHub/.gitkeep
+
+# Upstream original-code archives / reference clones (large; NOT our project code,
+# baselines never import them). The reference clones under Paper/Reference/Original-Code/.
+/Paper/Reference/Original-Code/**
+!/Paper/Reference/Original-Code/.gitkeep
+
+# Tabular / corpus data files (datasets, corpora, node-description dumps). Data is
+# transferred out-of-band or rebuilt, never committed. Keep .json (small configs/meta).
+*.csv
+*.tsv
+*.jsonl
+
+# Compressed archives / tarballs (transfer bundles)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.gz
+
+# Agent / session artifacts (not project code)
+/.claude/agents/
+/AGENT_LOG.jsonl
+/AGENT_STATE.json
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*~

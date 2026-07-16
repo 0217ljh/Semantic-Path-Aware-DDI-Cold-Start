@@ -1,0 +1,51 @@
+[E4] device=cuda
+[E4] nodes=178029  edges=7099528  drugs=7754
+[E4] init dim: 23
+[E4] train=408938  test_s2=108738
+[E4] test_s2 positives by PK/PD: {'PK': 28093, 'PD': 26273, 'Mixed': 3}
+
+[E4] Building edge_index for variant 'full' ...
+  edge_index: torch.Size([2, 7848735])  built in 0.9s
+[E4] training GCN-full ...
+      epoch  1/15  AUC=0.6398  best=0.6398
+      epoch  5/15  AUC=0.6563  best=0.6563
+      epoch 10/15  AUC=0.6735  best=0.6735
+      epoch 15/15  AUC=0.6780  best=0.6780
+  full overall AUC = 0.6780  [95% CI 0.6748-0.6811]
+    PK: AUC=0.7095  CI=[0.7056062559705978, 0.7133913548917933]  n_pos=28093
+    PD: AUC=0.6443  CI=[0.6400318277286803, 0.6482674733988879]  n_pos=26273
+
+[E4] Building edge_index for variant 'molecular_only' ...
+  edge_index: torch.Size([2, 4335351])  built in 1.7s
+[E4] training GCN-molecular_only ...
+      epoch  1/15  AUC=0.6471  best=0.6471
+      epoch  5/15  AUC=0.6615  best=0.6615
+      epoch 10/15  AUC=0.6627  best=0.6691
+      epoch 15/15  AUC=0.6698  best=0.6698
+  molecular_only overall AUC = 0.6698  [95% CI 0.6665-0.6728]
+    PK: AUC=0.6974  CI=[0.6934884870237834, 0.7018278659894879]  n_pos=28093
+    PD: AUC=0.6404  CI=[0.636104079247961, 0.6450133394863815]  n_pos=26273
+
+[E4] Building edge_index for variant 'effect_only' ...
+  edge_index: torch.Size([2, 3168454])  built in 1.6s
+[E4] training GCN-effect_only ...
+      epoch  1/15  AUC=0.5812  best=0.5812
+      epoch  5/15  AUC=0.5956  best=0.5956
+      epoch 10/15  AUC=0.5957  best=0.5970
+      epoch 15/15  AUC=0.5984  best=0.5984
+  effect_only overall AUC = 0.5984  [95% CI 0.5953-0.6016]
+    PK: AUC=0.5899  CI=[0.5858658748768703, 0.5936975878549352]  n_pos=28093
+    PD: AUC=0.6074  CI=[0.603295019480388, 0.6113753595555981]  n_pos=26273
+
+[E4] Δ-AUC vs full (per-class):
+  molecular_only PK: Δ-AUC = -0.0121
+  molecular_only PD: Δ-AUC = -0.0039
+  effect_only PK: Δ-AUC = -0.1195
+  effect_only PD: Δ-AUC = -0.0369
+
+[E4] saved → per_mechanism.json
+
+[E4] i1 verdict (direction-based, not significance):
+  AUC_PK - AUC_PD (full KG): +0.0652
+  molecular-only hurts PD more than PK?  NO (Δ_PD=-0.0039 ≥ Δ_PK=-0.0121)
+  effect-only hurts PK more than PD?  YES (Δ_PK=-0.1195 < Δ_PD=-0.0369)

@@ -1,0 +1,69 @@
+[E8] loaded API key (length 108 chars)
+[E8] loading KG ...
+[E8] nodes=178029  edges=7099528  drugs=7754
+[E8] drugs with mol features: 1806;  with eff features: 1175
+[E8] avg #mol per drug = 7.6;  avg #eff per drug = 19.1
+[E8] cold-start G2 drugs (unseen at train): 634;  G1 (seen): 1266
+[E8] after S2 closedness filter: positives=54369  negatives=54369
+[E8] feature-filtered pool sizes:  PD-pos=8418  PK-pos=7972  neg=8823
+[E8] sampled: PD-pos=30  PK-pos=30  NEG=30  total=90
+
+[E8] === PROMPT PREVIEW (first PD-pos pair, all three variants) ===
+
+--- A_name ---
+Drug A: Pentoxifylline
+Drug B: Cilostazol
+
+Question: Is there a clinically relevant drug-drug interaction between Drug A and Drug B?
+
+--- B_molecular ---
+Drug A: Pentoxifylline
+Drug A's molecular targets/enzymes/transporters: PDE4A, ADORA2A, PDE5A, ADORA2B, PDE4B, OSBPL10, SPRED2, RFNG, ADORA1, MEST, CYP1A2, NT5E, ZNF395, MAFB, DERA, PTK2
+Drug B: Cilostazol
+Drug B's molecular targets/enzymes/transporters: CYP3A7-CYP3A51P, CYP3A7, PDE3A, UFM1, EIF5, CYP3A5, CYP2C19, SCAND1, LAP3, CYP1A2, MCUR1, CYP2D6, CAST, CLTB, HP, CYP3A4, AGR2, PPP2R5E, TRIB3, RRP8
+
+Question: Is there a clinically relevant drug-drug interaction between Drug A and Drug B?
+
+--- C_effect ---
+Drug A: Pentoxifylline
+Drug A's documented side effects / phenotypes: Blood fibrinogen decreased, Fibrinogen decreased, Cholestasis intrahepatic, Meningitis aseptic, Bad taste, Leukaemia, Salivation, Emotional distress, Abdominal bloating, Sleep disturbance, Cholecystitis, Lacrimation, Heartburn, Influenza-like symptoms, Laryngitis, Throat sore, Oropharyngeal discomfort, Cholestasis, Scotoma, Cholecystitis
+Drug B: Cilostazol
+Drug B's documented side effects / phenotypes: Bradyarrhythmia, Haemorrhage subcutaneous, Oesophageal haemorrhage, Epidural haemorrhage, Bleeding tendency, Nodal arrhythmia, Retroperitoneal haemorrhage, Subdural haematoma, Polycythaemia, Iron deficiency anaemia, Pulmonary haemorrhage, Haemorrhagic disorder, Abscess periodontal, Electrocardiogram QT corrected interval prolonged, Abnormal faeces, Duodenitis, Cerebral infarction, Retinal haemorrhage, Atrioventricular block complete, Varicose vein
+
+Question: Is there a clinically relevant drug-drug interaction between Drug A and Drug B?
+
+[E8] === END PREVIEW ===
+
+[E8] cache hits available: 0
+  [1/270]  pair=PD-pos-DB00806_DB01166  variant=A_name  pred=1  elapsed=3s  ETA=928s
+  [20/270]  pair=PD-pos-DB00484_DB00960  variant=B_molecular  pred=1  elapsed=62s  ETA=770s
+  [40/270]  pair=PD-pos-DB00423_DB00748  variant=A_name  pred=1  elapsed=118s  ETA=681s
+  [60/270]  pair=PD-pos-DB00438_DB00605  variant=C_effect  pred=0  elapsed=178s  ETA=622s
+  [80/270]  pair=PD-pos-DB00332_DB04572  variant=B_molecular  pred=0  elapsed=235s  ETA=558s
+  [100/270]  pair=PK-pos-DB00300_DB01215  variant=A_name  pred=0  elapsed=297s  ETA=505s
+  [120/270]  pair=PK-pos-DB00528_DB00745  variant=C_effect  pred=0  elapsed=352s  ETA=440s
+  [140/270]  pair=PK-pos-DB00501_DB00993  variant=B_molecular  pred=0  elapsed=410s  ETA=381s
+  [160/270]  pair=PK-pos-DB00279_DB00993  variant=A_name  pred=0  elapsed=464s  ETA=319s
+  [180/270]  pair=PK-pos-DB00757_DB08820  variant=C_effect  pred=0  elapsed=519s  ETA=260s
+  [200/270]  pair=NEG-DB00484_DB06702  variant=B_molecular  pred=0  elapsed=575s  ETA=201s
+  [220/270]  pair=NEG-DB00245_DB00360  variant=A_name  pred=0  elapsed=633s  ETA=144s
+  [240/270]  pair=NEG-DB00744_DB01586  variant=C_effect  pred=0  elapsed=693s  ETA=87s
+  [260/270]  pair=NEG-DB00550_DB00911  variant=B_molecular  pred=0  elapsed=751s  ETA=29s
+
+[E8] === Results ===
+  PD   A_name         acc=0.533  [CI 0.400, 0.667]  yes_rate=0.07  n=60/60
+  PD   B_molecular    acc=0.533  [CI 0.400, 0.650]  yes_rate=0.07  n=60/60
+  PD   C_effect       acc=0.533  [CI 0.417, 0.650]  yes_rate=0.10  n=60/60
+  PK   A_name         acc=0.500  [CI 0.367, 0.617]  yes_rate=0.03  n=60/60
+  PK   B_molecular    acc=0.600  [CI 0.483, 0.717]  yes_rate=0.13  n=60/60
+  PK   C_effect       acc=0.500  [CI 0.367, 0.617]  yes_rate=0.07  n=60/60
+
+[E8] === Differentials (effect - name-only, effect - molecular) ===
+  PD: name=0.534  mol=0.532  eff=0.533  eff-name=-0.001  eff-mol=+0.001
+  PK: name=0.499  mol=0.597  eff=0.497  eff-name=-0.002  eff-mol=-0.100
+
+[E8] tokens: in=69883  out=17230
+[E8] estimated cost (Sonnet 4.5): $0.468
+[E8] errors: 0, unparsed: 0
+
+[E8] saved → llm_oracle_results.json

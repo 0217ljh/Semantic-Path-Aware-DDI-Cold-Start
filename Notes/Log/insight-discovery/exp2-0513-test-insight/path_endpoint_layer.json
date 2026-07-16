@@ -1,0 +1,69 @@
+{
+  "experiment": "E1b path endpoint layer by PK/PD",
+  "n_pairs_total": 258838,
+  "n_pk_labeled": 135677,
+  "n_pd_labeled": 123123,
+  "n_pk_with_shared_neighbor": 116279,
+  "n_pd_with_shared_neighbor": 83581,
+  "intermediate_count": {
+    "PK": {
+      "molecular": 575053,
+      "effect_system": 3153991,
+      "other": 0
+    },
+    "PD": {
+      "molecular": 294069,
+      "effect_system": 3006336,
+      "other": 0
+    }
+  },
+  "per_pair_occurrence": {
+    "PK": {
+      "molecular": 96745,
+      "effect_system": 63252,
+      "other": 0
+    },
+    "PD": {
+      "molecular": 54087,
+      "effect_system": 63328,
+      "other": 0
+    }
+  },
+  "per_pair_pct": {
+    "PK_molecular_pct": 83.2,
+    "PK_effect_pct": 54.4,
+    "PD_molecular_pct": 64.71,
+    "PD_effect_pct": 75.77
+  },
+  "chi_square": {
+    "intermediate_count_table_chi2": 68496.91840821506,
+    "intermediate_count_table_p": 0.0,
+    "per_pair_table_chi2": 5661.087975477529,
+    "per_pair_table_p": 0.0
+  },
+  "layer_map": {
+    "Gene": "molecular",
+    "gene/protein": "molecular",
+    "Protein": "molecular",
+    "Pathway": "molecular",
+    "pathway": "molecular",
+    "Molecular Function": "molecular",
+    "molecular_function": "molecular",
+    "Compound": "molecular",
+    "Pharmacologic Class": "molecular",
+    "Side Effect": "effect_system",
+    "effect/phenotype": "effect_system",
+    "drug_effect": "effect_system",
+    "Symptom": "effect_system",
+    "Disease": "effect_system",
+    "disease": "effect_system",
+    "Anatomy": "effect_system",
+    "anatomy": "effect_system",
+    "Phenotype": "effect_system",
+    "Biological Process": "other",
+    "biological_process": "other",
+    "Cellular Component": "other",
+    "cellular_component": "other",
+    "exposure": "other"
+  }
+}

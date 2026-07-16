@@ -1,0 +1,50 @@
+Title: Measuring the Intrinsic Dimension of Objective Landscapes
+Authors: Chunyuan Li, Heerad Farkhoor, Rosanne Liu, Jason Yosinski (Duke University; Uber AI Labs)
+Venue+Year: ICLR 2018 (conference paper)
+arXiv-or-DOI: arXiv:1804.08838v1 [cs.LG], 24 Apr 2018
+PDF filename: Measuring Intrinsic Dimension of Objective Landscapes.pdf
+
+## TL;DR
+The paper defines and empirically measures the "intrinsic dimension" of a neural-network training problem by training the network not in its native D-dimensional weight space but inside a smaller, randomly oriented d-dimensional affine subspace, then sweeping d upward until a good solution first appears. That crossing point, d_int, is the intrinsic dimension. Many problems have far smaller intrinsic dimension than their parameter count (e.g., an MNIST FC net solves to 90% baseline in only ~750 of 199,210 dims), and d_int stays roughly constant across a model family even as native D varies widely. (Abstract; Sec. 2; Sec. 3.)
+
+## Problem & Contributions
+Problem. How many degrees of freedom does a given objective landscape actually require, independent of the (often bloated) native parameter count? (Sec. 1.)
+Contributions. (1) A precise, constructive definition of intrinsic dimension via random subspace training (Sec. 2). (2) Measurements across supervised and RL tasks (MNIST, CIFAR-10, ImageNet, several RL problems) showing many problems need far fewer effective DOF than parameters (Sec. 3, Table 1). (3) The observation that d_int is roughly invariant across a family of models of very different sizes, implying extra parameters mostly enlarge the solution-manifold dimensionality (Sec. 3.1, Fig. 3). (4) A link from d_int to an upper bound on Minimum Description Length (MDL) and a simple network-compression scheme (Sec. 3.1 "MDL"; Abstract).
+
+## Method / Core mechanism (equations in words + notation)
+Notation: theta^(D) in R^D is the full parameter vector; theta_0^(D) is a random frozen initialization; P is a random, frozen D-by-d projection matrix (columns normalized to unit length, approximately orthonormal); theta^(d) in R^d is the only trainable vector, initialized to all zeros.
+Re-parameterization (Eq. 2, in words): the full parameters equal the frozen random initialization plus P applied to the low-dimensional trainable vector, i.e. theta^(D) = theta_0^(D) + P * theta^(d). Because theta_0^(D) and P are frozen, the system has exactly d degrees of freedom. Gradients are computed w.r.t. theta^(d) and steps taken in that d-dim space. Setting theta^(d)=0 recovers a good standard initialization.
+Intrinsic-dimension definition (Eq. 1, in words): for a solution set of dimensionality s inside R^D, the intrinsic dimension d_int is the codimension of the solution set, so native D = d_int + s. In a toy problem with D=1000 and 10 sum-constraints, the solution set is a 990-dim hyperplane, giving d_int = 10 (verified analytically and by the subspace sweep, Fig. 1).
+Measurement protocol: sweep d upward, re-run optimization at each d, and record the smallest d whose performance crosses a threshold. Because exact d_int100 (matching baseline exactly) is noisy and can be nearly as high as D, the paper primarily reports d_int90 = the smallest subspace dimension reaching 90% of the best directly-trained baseline's performance (accuracy for classification, shifted reward for RL) (Sec. 2.2). P can be dense, sparse, or implicit (Fastfood-style) to make high-dim projection tractable (Sec. 2.1 footnote; later sections).
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Toy problem: d_int = 10 for D=1000 (matches analytic codimension), Fig. 1 (right), Sec. 2.
+- MNIST, FC net (784-200-200-10), D = 199,210: d_int90 ~ 750 (0.4% of params), Fig. 2 (left), Sec. 3.1. Enables ~260x storage compression (793kB -> 3.2kB) by storing only the two RNG seeds plus the 750 trained floats.
+- MNIST, LeNet conv net, D = 44,426: d_int90 = 290 (~150x compression), Fig. 2 (right); lower than FC, consistent with LeNet being a "better" (lower-MDL) model for MNIST images (Sec. 3.1 "MDL").
+- Robustness of d_int: over 20 FC MNIST models, native D varies by a factor of 24.1 but d_int90 varies by only 1.33 (Fig. 3, Sec. 3.1). Interpretation: each added parameter mostly adds one dimension to solution redundancy s.
+- MNIST shuffled pixels: FC d_int90 stays 750 (FC is permutation-invariant); LeNet d_int90 rises from 290 to 1400 when local structure is destroyed (Sec. 3.1, Table 1).
+- Table 1 (selected d_int90): MNIST-shuf-labels FC ~190,000 (D=959,610); CIFAR-10 FC = 9,000 (D=656,810), LeNet = 2,900 (D=62,006); ImageNet SqueezeNet > 500k (D=1,248,424); RL Inverted Pendulum FC = 4 (D=562); RL Humanoid FC = 700 (D=166,673); Atari Pong ConvNet = 6,000 (D=1,005,974).
+- Cross-domain comparison (Abstract): inverted pendulum is ~100x "easier" than MNIST; Atari Pong from pixels is about as hard as CIFAR-10.
+- MDL link (Sec. 3.1): d is a constructive upper bound on the solution's MDL (in DOF; bits differ by a constant factor for fixed-precision floats); lower d_int implies a better-suited model at equal accuracy.
+
+## Relevance to our cold-start low-rank DDI paper (RW bucket; how we'd cite; concrete DELTA vs our method)
+RW bucket: Stream B foundational citation -- "adaptation / task-solving lives in a low intrinsic dimension." This is the seminal empirical result grounding the premise that the useful degrees of freedom for solving a task are far fewer than the model's native parameters, which is the root justification for choosing a SMALL rank a in our residual H = H_base + M_A * M_B. Cite it as the origin of the intrinsic-dimension concept and of the random-subspace re-parameterization theta = theta_0 + P*theta_d that LoRA and Aghajanyan et al. later build on.
+How we would cite: "The premise that a network's effective solution occupies a low-dimensional subspace of its parameter space was established by Li et al. (2018), who measured intrinsic dimensions orders of magnitude below the parameter count (e.g., d_int90 ~ 750 on MNIST). We inherit this premise to justify a low-rank per-pair coefficient realization." Use it to motivate the existence of a low-rank realization, not for any DDI-specific number.
+Concrete DELTA vs our method: (1) Their low-dimensionality is realized by a RANDOM, frozen projection P into a generic subspace of the full weight vector; our low-rank structure is a TYPED, learned mediator basis M_A with per-pair coefficients M_B tailored to DDI, not a random projection. (2) They measure d_int as a diagnostic of problem difficulty via a threshold sweep; we do not sweep-and-threshold -- we impose a fixed small rank a by architecture as an inductive bias for cold-start transfer. (3) Their subspace is task-solving-for-a-fixed-model in a standard (warm) regime; our claim is specifically that the TRANSFERABLE-TO-UNSEEN signal (both drugs unseen) admits a lower-rank realization than warm fitting needs -- a warm/cold contrast that this paper does not study. (4) They operate on a single flat objective landscape; our residual is a cold-safe structured decomposition over a biomedical KG.
+
+## Safe-to-cite claims (section pointers)
+- Definition: intrinsic dimension = codimension of the solution set, D = d_int + s (Eq. 1, Sec. 2).
+- Random-subspace re-parameterization theta^(D) = theta_0^(D) + P*theta^(d) with frozen theta_0 and P (Eq. 2, Sec. 2.1).
+- d_int90 = smallest subspace dim reaching 90% of baseline performance (Sec. 2.2).
+- MNIST FC d_int90 ~ 750; LeNet d_int90 = 290 (Fig. 2, Sec. 3.1).
+- d_int is roughly invariant across a model family: D varies 24.1x, d_int90 varies 1.33x (Fig. 3, Sec. 3.1).
+- Full task-by-task d_int90 numbers in Table 1.
+- d as an upper bound on MDL and a compression scheme (Sec. 3.1).
+
+## Do-NOT-overclaim / caveats
+- d_int is measured relative to a chosen threshold (90% of a specific baseline) and to a specific architecture/dataset pair; the authors explicitly warn NOT to claim "all FC nets on MNIST have d_int ~ 750" -- it is a plateau for that arch/dataset combo (Sec. 3.1). Do not treat any single number as universal.
+- d_int100 (exact-match) is unstable and can be nearly as high as D; only d_int90 is robustly reported (Sec. 2.2). Do not cite a clean "exact" intrinsic dimension.
+- The measured d is an UPPER BOUND on the true intrinsic dimension / MDL; tightness is unknown and may vary by problem (Sec. 3.1). Do not present it as the exact minimal DOF.
+- The subspace is RANDOM and generic; the paper does NOT claim the subspace is task-structured or interpretable, and does NOT address transfer to unseen entities or cold-start -- it is a warm, single-task landscape analysis. Do not cite it as evidence for typed/semantic low-rank structure or for cold-start transfer specifically.
+- Compression reduces DOF, not bits per DOF, and does not speed up inference (Sec. 3.1). Avoid overclaiming compression benefits.
+- No DDI, no graphs, no knowledge-graph content -- relevance is purely conceptual (low intrinsic dimension of learning).

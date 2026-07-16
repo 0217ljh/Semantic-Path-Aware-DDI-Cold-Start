@@ -1,0 +1,54 @@
+Title: Invariant-Feature Subspace Recovery: A New Class of Provable Domain Generalization Algorithms
+Authors: Haoxiang Wang*, Gargi Balasubramaniam*, Haozhe Si, Bo Li, Han Zhao (UIUC; Bo Li now U Chicago). *equal contribution.
+Venue+Year: 2023 (journal-style / extended manuscript; submitted to JMLR-style venue)
+arXiv-or-DOI: arXiv:2311.00966v1 [cs.LG], 2 Nov 2023
+PDF filename: ISR-Invariant-Feature Subspace Recovery2311.00966v1.pdf
+
+NOTE ON RELATIONSHIP TO THE 2201 VERSION:
+This is the EXTENDED (journal-length, 45pp) version of the ICML 2022 paper "Provable Domain Generalization via Invariant-Feature Subspace Recovery" (arXiv:2201.12919; see ISR-Invariant-Feature Subspace Recovery-2201.txt). The core algorithms ISR-Mean (Thm 1, E >= d_s+1) and ISR-Cov (Thm 2, O(1) / E>=2) are UNCHANGED. What this version ADDS beyond 2201 (see contributions table, Table 1, page 2):
+  (a) ISR-Multiclass (new Algorithm 3, Theorem 3): extends ISR-Mean to k-class classification; reduces environment complexity to ceil(d_s/k) + 1 — i.e. the number of CLASSES can compensate for the number of environments (a factor-1/k reduction). Also removes the binary-symmetry assumption on class-conditional means.
+  (b) ISR-Regression (new Algorithm 4, Theorem 4): extends ISR to REGRESSION (continuous target) under a NEW CAUSAL data model (z_c -> y, causal; vs the anti-causal y -> z_c used for classification, Fig. 2); recovers the invariant subspace with E >= d_s + 1.
+  (c) New benchmarks: semi-synthetic Colored MNIST variants (binary MC-CMNIST and 10-class Multi-Class Colored MNIST, Ahuja et al. 2021), plus an additional tabular dataset and a synthetic regression benchmark.
+  (d) More post-processing baselines: now also includes IRM, IB-IRM/IB-ERM, Information Bottleneck, MixUp/C-MixUp beyond ERM/Reweighting/GroupDRO.
+Everything below focuses on the NEW material; for the shared ISR-Mean/ISR-Cov core see the 2201 summary.
+
+## TL;DR
+Extends the provable invariant-feature-subspace-recovery framework from binary classification to MULTI-CLASS classification (ISR-Multiclass, environment complexity ceil(d_s/k)+1) and to REGRESSION (ISR-Regression under a causal z_c->y model, E>=d_s+1), showing the number of classes can trade off against the number of environments, all via moment statistics + eigen/SVD, optimization-free with global convergence.
+
+## Problem & Contributions (new relative to 2201)
+- Q1 answered: In linear causal models, can the number of CLASSES compensate for the number of ENVIRONMENTS in recovering invariant features? YES — ISR-Multiclass needs only ceil(d_s/k)+1 environments (Sec 4.2, Theorem 3).
+- Q2 answered: Can we provably recover the invariant subspace for CONTINUOUS targets (regression)? YES — ISR-Regression, E>=d_s+1, under a new causal model (Sec 4.3, Theorem 4).
+- Removes the binary-symmetry assumption on conditional feature means used in the original ISR-Mean.
+- Broader empirical validation: Colored MNIST (multi-class), tabular data, regression benchmark; more baselines.
+
+## Method / Core mechanism (NEW parts only)
+- ISR-Multiclass (Algorithm 3, Sec 4.2, pages 15-17): (I) estimate class- AND environment-conditional sample means x_ek = A mu_k + B mu_ke; build one matrix M_k (E x d) per class k. (II) PCA each M_k; take the E-1 eigenvectors of NON-zero eigenvalues -> P_k (recovers the per-class spurious directions). (III) stack all P_k into M_total = [P_1 | ... | P_k] in R^{d x (E-1)k} (motivated by flag-mean). (IV) SVD of M_total: the top d_s singular vectors recover the COMMON spurious subspace (Theorem 3, Eq. 28). (V) train classifier in the NULL SPACE of the recovered spurious subspace = the invariant subspace. Key counting argument: need (E-1)k >= d_s, giving E >= ceil(d_s/k)+1.
+- ISR-Regression (Algorithm 4, Sec 4.3, pages 18-19): NEW causal model (Fig. 2) where invariant z_c causally determines y (y independent of spurious z_e given z_c). Algorithm = "ISR-Mean applied over the ENTIRE dataset" (global input means per environment, not class-conditioned): (I) per-environment global sample mean x_e = A mu_c + B mu_e, stack into M (E x d). (II) PCA. (III) take the d_s HIGHEST-eigenvalue eigenvectors as the spurious subspace P'', then its null space P' is the invariant subspace. (IV) fit ERM predictor on x -> P' x. Environment complexity E >= d_s+1 (Theorem 4).
+
+## Key results & numbers (NEW parts; with pointers)
+- Multi-Class Colored MNIST (MC-CMNIST, 10-class, Sec 5.2.2, Table 4): ISR-Multiclass as post-processing improves both average and worst-group / worst-10-group accuracy, especially over ERM and IB-ERM; variance of worst-group accuracy is high (noted by authors). Baselines include ERM, IRM, IB-ERM, IB-IRM (Arjovsky et al. 2019; Ahuja et al. 2021a).
+- Synthetic regression benchmark (Sec 5.3.2, Table ~5, page ~44): ISR-Regression post-processing evaluated by worst-group RMSE against ERM, IRM, MixUp, C-MixUp (Yao et al. 2022); environment defined by binning red-pixel values.
+- Real datasets (Waterbirds/CelebA/MultiNLI, Table 1; CLIP ViT-B/32 Waterbirds, Table 3; partial env labels, Fig. 6): SAME headline results as the 2201 version (e.g. Waterbirds/ERM worst-group 62.93 -> 76.10 ISR-Mean -> 82.46 ISR-Cov). Now reported alongside additional post-processing baselines.
+- Synthetic Linear Unit-Tests (Sec 5.1): unchanged validation of Theorems 1 and 2 environment complexities.
+
+## Relevance to our cold-start low-rank DDI paper
+- RW STREAM: Same Stream A (OOD / DG low-rank) bucket as 2201. This is the definitive / most complete version to cite for the "invariant regularity lives in a provably-recoverable low-dimensional subspace" claim.
+- HOW WE'D CITE: cite THIS (extended) version for the general statement across classification (binary + multi-class) and regression that the transferable/invariant component is a low-dimensional subspace separable from a higher-dim spurious component via moment statistics. The ISR-Multiclass "classes compensate for environments" result is a nice rhetorical parallel to our "shared typed mediators let unseen drugs reuse a small set of interaction bases," but note it is a DIFFERENT mechanism.
+- CONCRETE DELTA vs us (sharper than 2201 because this version is broader):
+  1. Still requires MULTIPLE EXPLICIT ENVIRONMENTS (the extensions add classes/regression, NOT single-domain support shift). Our setting has one KG, no environment index; support shift is endogenous (disjoint train/test drug entities). ISR-Multiclass reduces the NUMBER of environments needed but never to zero — it cannot run with E=1.
+  2. ISR recovers-and-discards a spurious subspace (train in its null space); we ADD a low-rank residual of shared typed-mediator bases. Opposite move (subtract spurious subspace vs add low-rank interaction structure).
+  3. Task object: ISR = per-sample vector classification/regression; ours = relational pairwise DDI on a KG. Even ISR-Multiclass/Regression operate on x-vectors, not on typed relations between entity pairs.
+  4. Provability is under a linear (Gaussian/causal) data model; ours is empirical (effective-rank probe). Do not claim we inherit their guarantees.
+
+## Safe-to-cite claims (with section pointers)
+- ISR-Multiclass: k-class classification lowers environment complexity to ceil(d_s/k)+1; classes trade off against environments by factor 1/k (Theorem 3, Sec 4.2).
+- ISR-Regression: provable invariant-subspace recovery for continuous targets under the causal z_c->y model, E>=d_s+1 (Theorem 4, Sec 4.3; Fig. 2).
+- Summary of all four algorithms and complexities: Table 1 (page 2) — ISR-Mean O(d_s)/Thm1, ISR-Cov O(1)/Thm2, ISR-Multiclass O(d_s/k)/Thm3, ISR-Regression O(d_s)/Thm4.
+- All four are optimization-free (ERM + eigen/SVD) with global convergence (Sec 4.2 "Global Convergence"; Sec 4.3).
+- ISR usable as post-processing on frozen black-box features to raise worst-group accuracy across ERM/IRM/IB-IRM/MixUp/GroupDRO (Sec 5.2, Tables 1,3,4).
+
+## Do-NOT-overclaim / caveats
+- Guarantees are for LINEAR causal/Gaussian data models in the infinite-sample limit; on real non-linear data ISR is a heuristic post-processing layer with no guarantee (authors note high worst-group variance on MC-CMNIST, Table 4 caption).
+- ISR-Regression uses a DIFFERENT (causal z_c->y) data model than the classification algorithms (anti-causal y->z_c). Do not merge the two settings when citing.
+- "Low-rank / low-dimensional" = an invariant feature SUBSPACE of dimension d_c, recovered by (near-)zero-eigenvalue directions or by null space of the spurious subspace. This is NOT a low-rank factorization of a task-adaptation residual (that is Stream B / our M_A M_B). Keep the two notions distinct.
+- The multi-class result does not eliminate the need for environments; it reduces the count. Requires knowing/estimating d_s and k. Not directly applicable to single-domain, environment-less endogenous entity-support shift without substantial reframing.

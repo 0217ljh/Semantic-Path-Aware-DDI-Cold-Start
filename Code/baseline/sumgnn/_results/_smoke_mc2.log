@@ -1,0 +1,66 @@
+[smoke] task=multiclass train=(300, 5) val=(75, 5) test=(120, 5) n_out=165 regime=transductive/S0
+/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/outdated/__init__.py:36: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import parse_version
+17.0
+  0%|          | 0/300 [00:00<?, ?it/s]  0%|          | 0/300 [00:00<?, ?it/s]
+  0%|          | 0/75 [00:00<?, ?it/s]  0%|          | 0/75 [00:00<?, ?it/s]
+  0%|          | 0/120 [00:00<?, ?it/s]  0%|          | 0/120 [00:00<?, ?it/s]
+  0%|          | 0/300 [00:00<?, ?it/s]  0%|          | 1/300 [00:00<00:52,  5.74it/s]  5%|▍         | 14/300 [00:00<00:04, 61.69it/s]  8%|▊         | 24/300 [00:00<00:04, 68.31it/s] 14%|█▎        | 41/300 [00:00<00:02, 93.18it/s] 17%|█▋        | 51/300 [00:00<00:02, 87.58it/s] 20%|██        | 61/300 [00:00<00:02, 89.49it/s] 24%|██▍       | 72/300 [00:00<00:02, 93.22it/s] 27%|██▋       | 82/300 [00:01<00:02, 88.16it/s] 30%|███       | 91/300 [00:01<00:02, 85.80it/s] 33%|███▎      | 100/300 [00:01<00:02, 83.54it/s] 37%|███▋      | 110/300 [00:01<00:02, 87.65it/s] 40%|███▉      | 119/300 [00:01<00:02, 86.55it/s] 43%|████▎     | 128/300 [00:01<00:02, 82.82it/s] 46%|████▌     | 138/300 [00:01<00:02, 76.57it/s] 50%|█████     | 151/300 [00:01<00:01, 86.45it/s] 53%|█████▎    | 160/300 [00:01<00:01, 80.19it/s] 57%|█████▋    | 172/300 [00:02<00:01, 75.45it/s] 63%|██████▎   | 189/300 [00:02<00:01, 86.27it/s] 66%|██████▌   | 198/300 [00:02<00:01, 86.43it/s] 70%|███████   | 211/300 [00:02<00:00, 96.95it/s] 74%|███████▎  | 221/300 [00:02<00:00, 92.87it/s] 77%|███████▋  | 231/300 [00:02<00:00, 77.81it/s] 82%|████████▏ | 245/300 [00:02<00:00, 90.62it/s] 85%|████████▌ | 255/300 [00:03<00:00, 88.64it/s] 88%|████████▊ | 265/300 [00:03<00:00, 83.97it/s] 91%|█████████▏| 274/300 [00:03<00:00, 76.46it/s] 94%|█████████▍| 283/300 [00:03<00:00, 75.97it/s] 98%|█████████▊| 294/300 [00:03<00:00, 76.43it/s]100%|██████████| 300/300 [00:03<00:00, 82.49it/s]
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+  0%|          | 0/75 [00:00<?, ?it/s]  1%|▏         | 1/75 [00:00<00:14,  5.25it/s] 11%|█         | 8/75 [00:00<00:02, 28.77it/s] 27%|██▋       | 20/75 [00:00<00:00, 58.61it/s] 41%|████▏     | 31/75 [00:01<00:01, 29.14it/s] 80%|████████  | 60/75 [00:01<00:00, 68.80it/s]100%|██████████| 75/75 [00:01<00:00, 64.08it/s]
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+  0%|          | 0/120 [00:00<?, ?it/s]  1%|          | 1/120 [00:00<00:26,  4.41it/s] 10%|█         | 12/120 [00:00<00:02, 44.52it/s] 18%|█▊        | 21/120 [00:00<00:01, 60.16it/s] 24%|██▍       | 29/120 [00:00<00:01, 61.73it/s] 31%|███       | 37/120 [00:00<00:01, 62.02it/s] 39%|███▉      | 47/120 [00:00<00:01, 70.31it/s] 46%|████▌     | 55/120 [00:00<00:00, 69.76it/s] 54%|█████▍    | 65/120 [00:01<00:00, 75.75it/s] 63%|██████▎   | 76/120 [00:01<00:00, 84.30it/s] 71%|███████   | 85/120 [00:01<00:00, 80.86it/s] 80%|████████  | 96/120 [00:01<00:00, 88.30it/s] 88%|████████▊ | 106/120 [00:01<00:00, 81.19it/s] 98%|█████████▊| 118/120 [00:01<00:00, 90.70it/s]100%|██████████| 120/120 [00:01<00:00, 73.99it/s]
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+17.0
+number of relations:56
+0it [00:00, ?it/s]/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [0,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [2,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [5,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [6,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [13,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [14,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [23,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [26,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [27,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [29,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [30,0,0] Assertion `t >= 0 && t < n_classes` failed.
+/pytorch/aten/src/ATen/native/cuda/Loss.cu:242: nll_loss_forward_reduce_cuda_kernel_2d: block: [0,0,0], thread: [31,0,0] Assertion `t >= 0 && t < n_classes` failed.
+0it [00:16, ?it/s]
+Traceback (most recent call last):
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 72, in <module>
+    main()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 61, in main
+    model.fit_leaf(sub)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_cls/baseline_unified.py", line 122, in fit_leaf
+    self.fit(leaf.train, leaf.val, resources=leaf.resources, _test=leaf.test)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_cls/baseline_unified.py", line 202, in fit
+    trainer.train()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/managers/trainer.py", line 132, in train
+    loss, auc, auc_pr, weight_norm = self.train_epoch()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/managers/trainer.py", line 76, in train_epoch
+    loss.backward()
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/_tensor.py", line 648, in backward
+    torch.autograd.backward(
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/autograd/__init__.py", line 353, in backward
+    _engine_run_backward(
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/autograd/graph.py", line 824, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+terminate called after throwing an instance of 'dmlc::Error'
+  what():  [14:33:21] /opt/dgl/src/runtime/cuda/cuda_device_api.cc:127: Check failed: e == cudaSuccess || e == cudaErrorCudartUnloading: CUDA: device-side assert triggered
+Stack trace:
+  [bt] (0) /home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/libdgl.so(+0xa75864) [0x74d5bd475864]
+  [bt] (1) /home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/libdgl.so(dgl::runtime::CUDADeviceAPI::FreeDataSpace(DGLContext, void*)+0x12d) [0x74d5bd476d7d]
+  [bt] (2) /home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::Internal::DefaultDeleter(dgl::runtime::NDArray::Container*)+0x24c) [0x74d5bd2f377c]
+  [bt] (3) /home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/libdgl.so(dgl::UnitGraph::COO::~COO()+0xef) [0x74d5bd44aeef]
+  [bt] (4) /home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/libdgl.so(dgl::UnitGraph::~UnitGraph()+0x130) [0x74d5bd44ab20]
+  [bt] (5) /home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/libdgl.so(dgl::HeteroGraph::~HeteroGraph()+0xb5) [0x74d5bd30fc45]
+  [bt] (6) /home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/libdgl.so(DGLObjectFree+0xd5) [0x74d5bd2d37c5]
+  [bt] (7) /home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/_ffi/_cy3/core.cpython-310-x86_64-linux-gnu.so(+0x13468) [0x74d6e1613468]
+  [bt] (8) python() [0x50e906]
+
+

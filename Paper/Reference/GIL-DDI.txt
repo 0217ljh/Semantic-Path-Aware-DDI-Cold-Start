@@ -1,0 +1,1773 @@
+Knowledge and Information Systems (2026) 68:48 https://doi.org/10.1007/s10115-025-02636-7
+RESEARCH
+GIL-DDI: multi-view graph invariant learning for unknown drug­drug interaction prediction
+Yuanxian Li1,2 · Yuan Du1,3 · Hong Peng1 · Zhenli He1 · Xin Jin1 · Cheng Xie1
+Received: 23 May 2025 / Revised: 16 September 2025 / Accepted: 17 October 2025 © The Author(s), under exclusive licence to Springer-Verlag London Ltd., part of Springer Nature 2025
+Abstract Drug­drug interaction (DDI) prediction is essential for evaluating the side effects of a new drug and adverse interactions before the clinical application. The latest research applies multiview data to enhance the generalization ability of models to predict new drug interactions, mainly unknown drug­drug interaction (uDDI). However, a new drug's feature inevitably encounters the feature-shift problem; the trained models have not previously learned information about the new drug, significantly decreasing the uDDI prediction's accuracy. Thus, we proposed the GIL-DDI model that tries to extract the invariant features of known drugs, alleviating the impact of the feature-shift problem on the prediction of uDDI. In essence, a graph attention network (GAT) initially embeds multi-view knowledge graphs of known drugs, capturing features from chemical entities, substructures, and interactions. Inspired by invariant learning, we subsequently construct a robust feature space of these stable, known-drug characteristics. In the context of a novel pharmaceutical agent, the GAT is employed to initially embed its unique characteristics. Subsequently, these features are fused with the invariant features borrowed from the most similar known drugs in the feature space. This fusion enables the model to enhance the representation of the new drug, thereby addressing issues such as data scarcity and feature-shift problems. Extensive experiments on real-world drug datasets indicate that the proposed method achieves new state-of-the-art records on new drug DDI prediction tasks. The source code is available at https://github.com/davidwushi1145/GILDDI.
+Keywords Invariant learning · Multi-view graph · Drug­drug interaction
+
+Yuanxian Li and Yuan Du have contributed equally to this work.
+B Cheng Xie
+xiecheng@ynu.edu.cn
+Yuanxian Li davidlee@mail.ynu.edu.cn
+1 Software College, Yunnan University, Kunming 650504, Yunnan, China 2 School of Information Science and Technology, ShanghaiTech University, Shanghai, China 3 Computer Science College, Sichuan University, Chengdu, Sichuan, China
+
+0123456789().: V,-vol
+
+123
+
+48 Page 2 of 37
+
+Y. Li et al.
+
+1 Introduction
+
+With the growing prevalence of polypharmacy, the risk of adverse drug interactions is increasing, posing a significant threat to patient safety [1]. In this context, prediction of drug­drug interactions (DDI) provides a method to proactively identify potential interactions among drugs, thereby reducing toxic side effects and ensuring optimal therapeutic outcomes [2]. This proactive strategy enhances patient safety by minimizing the risks associated with medication errors and facilitates the development of personalized treatment regimens tailored to individual patient profiles [3].
+In recent years, multi-view DDI analysis has gained significant attention due to its potential to provide a comprehensive understanding of drug­drug interactions. This approach leverages multiple perspectives, such as molecular structures, biological pathways, and pharmacological properties, to capture the complex relationships underlying DDIs. Researchers have made substantial progress in this field, which can be broadly categorized into two main directions: graph-based and feature-fused methods. The former focuses on improving prediction accuracy using designed graph-based methods. For example, the SumGNN [4] model introduces a subgraph extraction module for anchoring relevant subgraphs from noisy biomedical knowledge graphs, which significantly improves multiple types of DDI prediction accuracy, particularly in low-data scenarios. Additionally, SSI-DDI breaks down DDI prediction into substructure-level interactions, operating on raw molecular graphs to improve its interpretability and precision by modeling pairwise interactions between substructures [5]. The latter aims to exploit the intricate mechanisms underlying DDI events by integrating multiple drug-associated features, such as targets, enzymes, transporters, and molecular structures. DSIL-DDI [6] is a pluggable substructure interaction module that learns domaininvariant representations for DDI prediction, improving generalization and interpretability across transductive, inductive, and out-of-distribution settings. Recent efforts in this area include DSN-DDI [7], which employs a dual-view representation learning strategy, iteratively capturing local and global substructures to enhance prediction accuracy, especially for unseen drugs, while improving generalization to related tasks. Differing from this, MDFSA-DDI [8] integrates multi-source feature fusion with a transformer-based self-attention mechanism, enhancing prediction accuracy in DDI tasks.
+However, predicting interactions for a new (unknown) drug poses a critical outof-distribution generalization challenge, which we term the feature-shift problem. This discrepancy is not merely a superficial difference in molecular structure; rather, it is a multifaceted issue rooted in the model's inability to generalize beyond its training data. Existing models are inadequate for several mechanistic reasons:
+Chemical and structural shift The first issue to be addressed is that of a lack of chemical similarity anchoring [9]. New drugs may possess novel chemical scaffolds or functional groups that are absent from the training set. It has been demonstrated that models trained on known structures are incapable of generating reliable embeddings for these unseen chemical patterns.
+Biological context shift Secondly, the latent biological context is absent [10]. The biological mechanisms of a new pharmaceutical agent, such as its primary and off-target interactions, metabolic pathways, or effects on transporters, may not be present in the training knowledge graphs. Consequently, the model is deficient in the requisite context to facilitate the inference of interactions.
+Topological isolation in graphs Thirdly, the concept of "Topological Isolation in Graphs" is introduced [11, 12]. In graph-based models, a new drug is represented by an isolated or
+
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 3 of 37 48
+
+Known Drug
+
+...
+
+training
+
+Trained Model (GNN)
+
+Known Drug predicting Feature
+
+unKnown Drug
+
+predicting
+
+unKnown Drug Feature
+
+Feature Shift
+
+Motivation Solution
+
+Invariant Feature
+
+Trained Model
+
+(GNN)
+
++
+
+...
+
+Drug
+
+Knowledge
+
+predicting unKnown Drug
+
+unKnown Drug Feature
+
+Known Drug Feature
+Alleviating Feature Shift problem
++
+
+Fig. 1 The motivation and the core idea of the work
+
+sparsely connected node, thereby impeding the message-passing mechanism necessary for acquiring a context-rich representation. As demonstrated in Fig. 1, the incorporation of a novel pharmaceutical agent into a model that has been trained exclusively on known drugs results in unreliable predictions. This is due to the fact that the model has not yet acquired the capacity to generalize across chemical, biological, and topological variations.
+To address this challenge, we propose a novel unknown drug­drug interaction prediction method, named GIL-DDI. The core idea is that the training and predicting phases of the GIL-DDI model are separated to extract the invariant and variant features of unknown drugs for alleviating the feature-shift problem (Fig. 1). In detail, this approach uses graph attention network (GAT) models to embed multimodal drug-based knowledge graphs, incorporating drug­chemical entities, drug substructures, drug­drug interactions, and molecular structures, to obtain the representation of known drugs. Inspired by invariant learning, the invariant features for new drugs are derived by fusing these target drug-based graphs which are associated with new drugs. At the same time, the variant features specific to the unknown drug are also captured through the GAT model based on its unique features. Finally, the invariant and variant features of new drugs are both integrated to improve the prediction of DDI. By integrating these stable and consistent features, our approach mitigates the feature-shift problem and accurately captures specific characteristics of new drugs. This innovative methodology offers a promising solution to the limitations of existing models and advances the field of multi-view DDI analysis.
+Contributions Considering the importance and challenges of DDI prediction, in this paper, we propose a novel method to address the feature-shift problem encountered by new drugs. The contributions of this work are summarized as follows:
+· Addressing the feature-shift problem The study addresses the feature-shift problem by fusing invariant features of known drugs with new drug features. This innovative approach mitigates the drop in accuracy typically observed when predicting interactions with new drugs that the model has not previously encountered.
+123
+
+48 Page 4 of 37
+
+Y. Li et al.
+
+· Fusion of invariant and variant features The proposed method uniquely combines invariant features learned from target drugs strongly associated with new drugs and specific variant features. This fusion process enables more accurate prediction of DDI by leveraging both established and novel drug features.
+· Proposes a model with strong generalization A novel GIL-DDI model is proposed and elaborated to predict DDI events. Extensive experiments on real drug datasets are conducted to prove the feasibility, effectiveness, and superiority of the proposed GIL-DDI model.
+Overall, this paper presents a novel approach to DDI prediction that addresses the limitations of existing feature-shift problems and achieves improved performance in predicting new drug interactions through multimodal knowledge integration and invariant feature fusion.
+
+2 Related work
+2.1 DDI analysis methods
+2.1.1 Graph-based methods
+The analysis of drug features is of paramount importance for the prediction of drug­drug interactions (DDI), although it presents significant challenges. Existing studies indicate that drugs with similar characteristics often exhibit comparable DDIs [13]. This observation has led to the development of methods based on measuring the similarity of drug features. DeepDDI [14] employs deep learning techniques to forecast interactions between drug pairs and between drugs and food constituents. KGNN [15] is an end-to-end framework for DDI prediction that captures drug and entity neighborhood information in knowledge graphs, modeling high-order structures and semantic relations to improve prediction accuracy. SafeDrug [16] is a DDI-controllable drug recommendation model that leverages drug molecule structures and explicitly models DDIs, achieving improved accuracy, reduced DDIs, and faster training and inference compared to previous methods. Recently, Wu et al. [17] proposed MKG-FENN, which employs multimodal knowledge graphs and end-to-end neural networks to predict DDI accurately.
+2.1.2 Feature-fused methods
+The feature-fused methods aim to exploit multiple drug-associated features for predicting DDIs. For example, Deng et al. [10] proposed a method based on drug feature similarity to predict DDIs. MDF-SA-DDI [8] presents an offline drug feature learning model that employs multi-source, multi-source feature fusion, and Transformer self-attention mechanisms. In contrast, ML-RDA [18] effectively leverages various drug features by incorporating an unsupervised disentangling loss, CuXCov. CASTER [19] predicts DDIs from chemical structures by using sequential pattern mining, auto-encoding with labeled and unlabeled data and dictionary learning for interpretable predictions, outperforming state-of-the-art methods on real-world datasets. DeSIDE-DDI [20] offers a deep learning-based framework for interpreting the underlying genetic mechanisms in DDI analysis. MDDI-SCL [21] represents a significant advancement in DDI prediction, employing supervised contrastive learning and three-level loss functions. ZeroDDI [22] proposes a dual-modal alignment strategy that uniformly distributes drug pair and DDI semantic representations in a unit sphere, aligning
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 5 of 37 48
+
+matched ones to address class imbalance. The significant role of knowledge graphs (KGs) in synthesizing diverse information for pharmaceutical research is evident in applications such as mapping multimodal clinical data to KGs for disease diagnosis [23] and constructing multi-relational KGs for effective drug repurposing [24], thereby underscoring the value of multi-view perspectives for complex tasks like predicting unknown drug­drug interactions.
+A related and significant research direction involves the prediction of general polypharmacy side effects, as opposed to the prediction of specific DDI types. Innovative methods in this area also employ multimodal data to achieve superior results. For instance, NNPS has been developed to predict polypharmacy side effects by constructing novel feature vectors from mono side effects and drug­protein interaction data, as outlined in Masumshah et al. [25]. In recent developments, the DPSP [26] framework has advanced this approach through the implementation of a multimodal deep learning model that incorporates drug substructures, mono side effects, target proteins, enzymes, and pathways. While these models are effective for the multi-label task of identifying a wide range of adverse events, the primary focus of our research is the multi-class classification of specific DDI mechanisms. Additionally, we uniquely address the feature-shift challenge for unseen drugs.
+However, most models cannot address the feature-shift problem when predicting DDIs for new drugs, resulting in insufficient generalization ability [27]. In contrast, the proposed GIL-DDI enhances the prediction of DDIs between novel drugs by integrating the variant characteristics of these drugs with the invariant features extracted from the multimodal knowledge graph.
+
+2.2 The challenge of feature-shift in uDDI prediction
+Within the domain of drug­drug interactions (DDIs), the feature-shift problem is characterized by a substantial decline in predictive efficacy when a model is exposed to medications not included in its training dataset. This is a paradigmatic out-of-distribution (OOD) generalization challenge, as previously defined in the literature [28]. In this scenario, the data distribution of the test set, which contains novel pharmaceutical agents, differs fundamentally from the training sett [29]. The problem can be deconstructed into three primary mechanistic failures for existing DDI models:
+1. Chemical and structural shift DDI models are predicated on molecular structure for the purpose of predicting function. When a new pharmaceutical agent with an innovative chemical scaffold is introduced, its representation, for example, as a fingerprint or graph embedding, falls into a region of the feature space that was sparsely populated during the training process [9]. The model is devoid of "anchor points" based on chemical similarity that would reliably infer its interactive properties, resulting in unpredictable and often erroneous outputs.
+2. Biological and mechanistic shift DDIs are fundamentally biological events that are mediated by proteins (targets, enzymes, transporters) and pathways. A newly developed pharmaceutical agent may interact with a novel set of proteins or influence pathways that are not associated with any drug in the training set. The absence of latent biological context signifies that even if the model has learned general rules about, for instance, CYP450 enzyme inhibition, it cannot apply them if the new drug's interaction with that enzyme family is unknown and unrepresented in the input data [10].
+3. Topological shift in graph-based models The advent of graph neural networks (GNNs) in the domain of DDI prediction has given rise to a novel vulnerability. GNNs are designed to learn node representations by aggregating information from their neighbors in a graph
+123
+
+48 Page 6 of 37
+Drug-Drug Graph
+
+Update ...
+
+Eq.(5)
+
+Drug-Entity Graph Drug-Sub Graph
+
+GAT Eq.(3)-(4)
+
+Drug-Molecule Graph
+
+Invariant Drug Matrix
+Eq.(1)-(2)
+Lookup
+
+...
+
+12 1
+2
+3 Top
+n
+
+Top 3n
+
++
+
+=
+
+Invariant Feature ...
+
++
+
+=
+
+Invariant Feature ...
+
+unKnown Drug
+
+Trained GAT
+Eq.(10)
+
+Invariant Feature
+
++
+
+=
+
+final feature
+
+unKnown Drug Feature
+Eq.(11)
+
+Fig. 2 The framework of the proposed method
+
+Y. Li et al.
+Update
+
+Update
+
+...
+
+Predictor Eq.(8)
+
+Eq.(9)
+
+...
+
+Training Process
+
+Trained Predictor
+Eq.(13)
+Predicting Process
+
+[12]. By definition, a new pharmaceutical agent has few or no known interactions, appearing as an isolated or "low-degree" node in the knowledge graph [11]. This topological isolation impedes the GNN's acquisition of essential neighborhood information, hindering the production of a meaningful embedding. Consequently, this results in a generic and uninformative representation.
+In order to overcome the aforementioned challenges, invariant learning has emerged as a powerful paradigm. In contrast to the pursuit of superficial correlations that are confined to the training set, invariant learning endeavors to discern and model causal mechanisms or stable features that exhibit invariance across diverse distributions, encompassing both known and unknown drugs [30]. By emphasizing invariant representations, models such as CIGA [31] and EERM [32] have demonstrated enhanced generalization on graph data. The present work is founded on the aforementioned principle, with the objective of designing a framework that explicitly learns invariant features from multi-view drug data. The aim is to bridge the gap between known and unknown drugs.
+3 Methodology
+In GIL-DDI, we propose a robust approach for drug­drug interaction (DDI) prediction using graph attention networks (GAT) to extract comprehensive drug features and a substructureupdatable codebook module to learn feature-invariant representations. Our method uniquely combines invariant features learned from existing drug knowledge with variant features specific to new drugs, enhancing prediction accuracy and generalization for new drugs and significantly improving the safety and efficacy of drug development. The overall architecture of GIL-DDI is shown in Fig. 2.
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 7 of 37 48
+
+3.1 Preliminaries
+
+The manuscript focuses on four types of drug-based relationships essential for DDI events
+and also refers to multi-view features. These features are obtained from four different views
+and encoded into matrices: drug­drug, drug­entity, drug­substructure, and drug­molecular, which are denoted as Add, Ade, Ads, and Adm, respectively. All matrices were constructed
+based on the initial embeddings derived from the respective knowledge graphs to capture the
+fundamental characteristics of the drugs within the specific contextual framework.
+Supposing we have dn drugs with ek entities, sk substructure, and mk molecular, we initialize different matrices according to their properties. Firstly, the initial step involves encoding DDIs into the drug­drug matrix Add  Rdn×dn . For example, if 65 distinct inter-
+action events are represented in DDIs, we labeled them sequentially from 1 to 65, and the matrix Add  R65×65. Then, the rows and columns of the matrix correspond to individual drugs, with the value Aidjd indicating the interaction between the i-th and the j-th drugs. When no interaction is observed between two drugs, the corresponding entry is assigned a value of
+0. Secondly, the drug­entity matrix Ade  Rdn×ek encodes drug-associated information,
+including transporters, targets, and other relevant entities. In this matrix, the rows correspond
+to the drugs, while the columns correspond to the associated entities. To define the relation-
+ships between drugs and entities, we assign general functional roles to the entities represented by unique serial numbers. The value Aidje column denotes the serial number corresponding to the functional relationship between the drug i and the entity j.
+Thirdly, the drug­substructure matrix Ads  Rdn×sk collates data on drug-associated
+substructures. Similarly, its rows correspond to drugs, and columns represent the respective substructures. In particular, the matrix Ads is binary, where 1 indicates the presence of a
+specific substructure in the corresponding drug, and 0 indicates its absence. Finally, the drug­molecular matrix Adm  Rdn×mk encodes information about the
+molecular access system (MACCS), which comprises 13 MACCS bond descriptors and
+7 supplementary molecular characteristics in this manuscript. Thus, the rows still represent
+drugs, while the columns represent the MACCS bonds and molecular features.
+As above description, we obtained the drug-based matrix for each view. To compute the
+similarity between these views, we utilized distance metrics such as the Jaccard index. The
+Jaccard index is employed for views represented by discrete sets or binary feature vectors, specifically the drug­drug (Add), drug­entity (Ade), and drug­substructure (Ads) views--
+we employ the Jaccard index. This metric is the de facto standard in cheminformatics for
+comparing molecular structures based on fingerprints. It is ideal for our set-based views. For any two drugs i and j, their similarity of the v-th view is denoted as Sivj , which is formulated as:
+
+Sivj = |Aiv  Avj | · |Aiv  Avj |-1.
+
+(1)
+
+However, modeling the drug­molecular relationship using this metric is challenging. For the drug­molecular (Adm) view, which is represented by dense, continuous-valued feature vectors (e.g., physicochemical descriptors from MACCS), we utilize the Mahalanobis distance. To address this, we apply the Mahalanobis distance for similarity measurement, which is given by:
+
+Sivj =
+
+Aiv,: - Avj,: T -1 Aiv,: - Avj,: ,
+
+(2)
+123
+
+48 Page 8 of 37
+
+Y. Li et al.
+
+where refers to the covariance matrix of Av. Thus, v  {dd, de, dm} for Eq. (1) and
+
+v  {dm} for Eq. (2). Here, the Aiv,: is the represent entities or molecular spaces. It is
+
+feature evident
+
+of drug that Sivj
+
+i in the specific view, which can captures the relationship of drugs
+
+i and j within the according view, which is crucial for effective feature extraction in the GAT
+
+framework.
+
+3.2 Multi-view drug graph attention network
+
+The graph attention network (GAT) leverages self-attention mechanisms to learn representation by assigning different importance weights to neighbors, which is very successful in bioinformatics, especially DDI analysis. Inspired by this, we apply GAT to capture the complex relationships and interactions between drugs accurately. In our model, we first compute the attention coefficients with the similarity of drugs in different views.
+
+eiv, j =a WvAiv,:||WvAvj,: , i = j ,
+
+iv, j =
+
+exp LeakyReLU eiv, j n exp LeakyReLU eiv,n
+
+,
+
+(3)
+
+where Wv and av are the learned weights. The equation shows that the normalized attention
+
+coefficient allows the model to focus on the most relevant neighbors of a drug in the associated
+
+view during the embedding aggregation process. By leveraging the attention scores, the
+
+model can dynamically capture the crucial features within multi-view drug graphs, thereby
+
+enhancing the learning quality of the node representations.
+
+Then, we integrate the representations of all views to generate the final embedding of each
+
+drug as follows:
+
+
+
+
+
+hiv =  
+
+ivj · W · Avj,: ,
+
+(4)
+
+j Ni
+
+where W is the learned weight and Ni is the k-nearest neighbors of drug i which is computed through the v-th drug-based matrix. This formula delineates that for each drug i in the v-th
+view, the contributions of its neighbors are determined according to their feature space, scaled by the attention coefficients ivj and transformed by the weight matrix W. In other words, multi-view drug-based graphs are processed by an attention mechanism, enabling the model
+to learn context-aware drug embeddings that capture local structure within each view.
+
+3.3 Invariant-based graph learning
+
+A significant challenge in DDI analysis pertains to the feature-shift problem, particularly the topological isolation of new drugs. To address this challenge, an invariant-based learning mechanism is proposed. The fundamental premise asserts that while a novel pharmaceutical agent's unique characteristics may be subject to variation, its essential properties, which are shared with established, well-understood medications, can be regarded as constant. The proposed methodology involves the enhancement of a drug's representation through the fusion of its representation with the averaged embedding of its most similar neighbors in the feature space. This process enables the model to "borrow" stable, context-rich features from known drugs, thereby enhancing robustness and improving DDI prediction, particularly in cases where data are scarce. The iterative fusion is formulated as follows:
+
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 9 of 37 48
+
+
+
+
+
+hiv
+
+(l )
+
+=
+
+1 2
+
+
+
+hiv
+
+(l-1) +
+
+1 |Topi | tTopi
+
+htv
+
+(l-1)
+
+(5)
+
+Invariant Learning
+
+where (hiv)(l) represents the embedding representation of drug i at the l-th layer under the v-th view, and Topi represents the set of drugs with the highest similarity calculated by the similarity S.
+
+Subsequently, the representation of four distinct views can be obtained by catenating the
+
+embedding of each drug in the L-th layer:
+
+Hv
+
+=
+
+ 
+
+h1(L ...
+
+)
+
+  ,
+
+v
+
+
+
+{dd,
+
+de,
+
+ds,
+
+dm}
+
+(6)
+
+hn( L )
+
+The final representation of the drug is denoted as H, H  Rdn×65, which is formulated as:
+
+H = Hv, v  {dd, de, ds, dm}.
+
+(7)
+
+Then, a multi-layer perceptron (MLP) is employed to predict DDI events between disparate drugs.
+
+Yi j = Softmax(MLP(Hi  H j )
+
+(8)
+
+Thus, the loss function of this model is
+
+L = CrossEntropy(Y, Y)
+
+(9)
+
+3.4 Invariant-based interaction predicting for unknown drugs
+
+During the training phase, the model learns to generate robust embeddings for known drugs and simultaneously builds a rich, stable space of invariant features. In the prediction phase, when a new drug, unseen during training, is introduced, the initial, or "variant," embedding is first generated using the trained GAT model. To address the challenges posed by its limited data and topological isolation, the embedding is enhanced through a fusion process with invariant features extracted from the most similar known drugs, identified within the learned feature space. This dynamic fusion process ensures that the new drug's final representation is informed by both its unique characteristics and the stable, shared properties of its closest chemical and biological relatives. This facilitates accurate prediction of unknown interactions.
+
+H¯ v = TrainedModel(X, Av), v  {dd, de, ds, dm}
+
+(10)
+
+In this formulation, H¯ v represents the unfused embedding representation of the predicted drug generated by the trained model under the v-th view, and matrix X represents the initial embedding derived from the drug knowledge graph.
+In order to surmount the limitations of this variant feature (e.g., data scarcity and topolog-
+ical isolation), we introduce a dynamically constructed invariant feature. It is important to
+note that this feature is not a pre-computed, globally fixed vector. Conversely, it is a contextdependent representation that is created by aggregating the final, stable embeddings h^t of
+
+123
+
+48 Page 10 of 37
+
+Y. Li et al.
+
+drug i's most similar known neighbors, which are identified within the pre-trained feature
+
+space. This fusion process enables the model to impute stable, context-rich properties from
+
+well-characterized drugs to the new drug.
+
+Likely, the target drug is also dynamically fused with the embedding of its most similar
+
+drug. This process effectively preserves similar information during the prediction phase,
+
+enhancing the embedding representation of previously unseen drugs. The aforementioned
+
+enhanced embeddings are then employed to predict the interaction relationships between
+
+drugs, thereby facilitating the accurate modeling of previously unknown drug interactions.
+
+
+
+
+
+H¯ iv,:
+
+=
+
+1 2
+
+H¯ iv,:
+
++
+
+1 |Topi |
+
+t Topi
+
+htv 
+
+(11)
+
+Invariant Feature
+
+This process enables the prediction of drug­drug interaction by capturing the similarity of features among drugs, thereby facilitating the accurate modeling of previously unknown interactions. The dynamic fusion ensures that the target drug's embedding reflects its inherent characteristics and the shared properties of its most similar drugs, thereby enhancing the overall predictive performance of the model.
+
+4
+
+H¯ i,: = H¯ iv,:
+
+(12)
+
+v=1
+
+This formulation combines embeddings from multiple views to create a unified embedding for a target drug. Each view captures distinct information about the drug, and the fusion operation ensures that these diverse perspectives are incorporated into the final representation. The model generates a comprehensive embedding of each drug employed for downstream tasks.
+
+Y¯ i j = Softmax(MLP(H¯ i,:  H¯ j,:)
+
+(13)
+
+In sum, the proposed method GIL-DDI effectively retains the similarity in the prediction phase, enhancing the embedding representation of unseen drugs and facilitating the accurate modeling of unknown drug interactions.
+
+3.5 Algorithm design
+By means of a detailed examination of the model, we proceeded to devise the Invariant Learning (IL) algorithm. The following section will present a description of the algorithmic flow.
+The proposed Invariant-based drug­drug interaction (DDI) Prediction Algorithm employs a multi-view approach to enhance the accuracy of drug interaction predictions. The process commences with the construction of four invariant drug knowledge graphs, designated as A1, A2, A3, and A4, which are subsequently employed to initialize the corresponding drug matrices, A1, A2, A3, and A4. In the second step, the similarity between drug pairs is calculated using two distinct methods: the Jaccard similarity for views 1 and 2 and the Mahalanobis distance for views 3 and 4, based on the drug feature sets. In the third step, a self-attention mechanism is introduced. Here, the embeddings for each drug pair are initialized using attention scores computed from the drug feature vectors. A LeakyReLU activation and softmax
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 11 of 37 48
+
+Algorithm 1 GIL-DDI: Model Training Phase
+
+Require: Drug knowledge graphs Gdd , Gde, Gds , Gdm (representing initial features/adjacencies); Drug­ Drug Interaction Matrix Y ; Drug entity set D.
+Ensure: Trained model parameters (e.g., Wv, a, MLP weights); Final drug embeddings H.
+
+1: Step 1: Initialize View-Specific Drug Features/Embeddings 2: Let Eiv be the initial feature vector for drug di in view v  {dd, de, ds, dm}. 3: Step 2: Calculate Drug Feature Similarity (Optional Preprocessing or part of GNN)
+
+This step
+
+might be implicitly handled by GNN layers or used for specific tasks.
+
+4: for all each pair of drugs (di , d j ) and each view v do
+
+5: if di = d j then
+
+6:
+
+Sivj = 0
+
+7: else if v  {dd, de, ds} then
+
+8:
+
+Sivj
+
+=
+
+JaccardIndex(Eiv
+
+,
+
+E
+
+v j
+
+)
+
+9: else if v  {dm} then
+
+10:
+
+Sivj
+
+=
+
+MahalanobisDist(Eiv
+
+,
+
+E
+
+v j
+
+;
+
+v-1 )
+
+11: end if
+
+12: end for
+
+13: Step 3: Compute Attention-based Node Embeddings (e.g., GAT layers)
+
+14: 15:
+16:
+
+forFaolrleeeivaajcc=hh nvAeieitwgtehnvbtoiaornnddMjeeacchhNandivirsu(mgor(dWaillvoEDthive,drWodrvuEgsvj
+
+if graph ; av)
+
+is
+
+dense):
+
+17:
+
+ivj = Softmax j (eivj )
+
+18: hi(1),v = 
+
+j
+
+Niv
+
+{i
+
+}
+
+ivj
+
+Wv
+
+E
+
+v j
+
+19: end for
+
+First GNN layer
+
+20: Step 4: Invariant-based Feature Fusion (Iterative Refinement)
+21: for l = 1 . . . L - 1 do 22: for all each view v and each drug di  D do
+
+L is the number of fusion layers
+
+23:
+
+(hiv )(l+1)
+
+=
+
+1 2
+
+(hiv )(l)
+
++
+
+1 |TopKNeighborsiv |
+
+dt TopKNeighborsiv (htv )(l)
+
+24: end for
+
+25: end for 26: Let hiv = (hiv)(L) be the refined embedding for drug di in view v.
+
+27: Step 5: Multi-View Embedding Aggregation
+
+28: 29:
+
+for all each Hi =
+
+drug di
+v {d d ,d
+
+ D do
+e,d s ,d m }
+
+v
+
+hiv
+
+v are view attention/aggregation weights,  is concat/sum
+
+30: end for
+
+31: Step 6: DDI Prediction using MLP 32: for all each drug pair (di , d j ) do 33: Y^i j = Softmax(MLP(Hi  H j )) 34: end for
+
+ could be concatenation or other pairing function
+
+35: Step 7: Loss Function Optimization
+
+36: L = CrossEntropy(Y , Y^ ) + Linvariant
+
+Optionally add invariant loss term
+
+37: Update model parameters by minimizing L using an optimizer (e.g., Adam).
+
+normalization follow this. This process is repeated in order to refine the embeddings, taking into account the relationships between neighboring drugs in each view. In the fourth step, the drug features are updated through invariant-based feature fusion. This involves the iterative combination of each drug's embedding with the embeddings of its most similar neighbors, thereby enhancing the representation. In the fifth step, the embeddings from all views are aggregated into matrices. In the sixth step, the multi-view embeddings are consolidated into a single, final representation. Subsequently, in step seven, the combined embeddings are provided as input to a multilayer perceptron (MLP) model, and a softmax function is applied to predict the likelihood of a drug­drug interaction. The objective of this multi-view, graphbased, and attention-driven approach is to enhance the prediction of DDIs by leveraging a diverse range of information and capturing intricate relationships between drugs.
+123
+
+48 Page 12 of 37
+
+Y. Li et al.
+
+Algorithm 2 GIL-DDI: Invariant-based DDI Prediction Phase
+
+Require: Trained GIL-DDI model (parameters Wv, a, MLP weights, etc.); Test set drug features/graphs Gtvest; Set of test drugs Dtest.
+Ensure: Predicted Drug­Drug Interactions Y¯i j for di , d j  Dtest. 1: Step 1: Obtain Initial Embeddings for Test Drugs
+
+2: 3:
+
+for all each view v Etvest,i  Initial
+
+and each features
+
+drug from
+
+Gditvest
+
+Dtest
+
+do
+
+4: ht(e1s)t,,vi = ApplyStep3FromTraining(Etvest,i , neighbors in Dtest)
+
+5: end for
+
+6: Step 2: Apply Invariant-based Feature Fusion
+
+7: for l = 1 . . . L - 1 do
+
+8: for all each view v and each drug di  Dtest do
+
+9:
+
+(htvest,i )(l+1)
+
+=
+
+1 2
+
+(htvest,i )(l)
+
++
+
+1 |TopKNeighborsiv |
+
+dt TopKNeighborstvest,i (htvest,t )(l)
+
+10: end for
+
+11: end for 12: Let h¯ iv = (htvest,i )(L) be the refined embedding for test drug di in view v. 13: Step 3: Aggregate Multi-View Embeddings for Test Drugs
+
+14: 15:
+
+for all each drug di  Dtest H¯ i = v{dd,de,ds,dm}
+
+do v h¯ iv
+
+16: end for
+
+17: Step 4: Predict DDIs for Test Drug Pairs
+
+18: for all each pair (di , d j ) where di , d j  Dtest do 19: Y¯i j = Softmax(MLP(H¯ i  H¯ j ))
+20: end for
+
+4 Experiments
+4.1 Graph construction and data preprocessing
+Our model integrates four distinct graph views derived from public data sources, all centered around a common set of 572 drugs. The construction of each graph is detailed below, with statistics summarized in Table 1.
+This heterogeneous graph connects 572 drug nodes based on DDI events sourced from DrugBank v5.1.12 [33]. The categorization of edges between drugs is based on one of 235 distinct DDI event categories. Drug­substructure graph (SMILES)
+To this end, a bipartite graph was constructed from the drug SMILES strings provided by DDIMDL [10]. For each drug, a 1024-bit Morgan fingerprint (radius 2) was generated using RDKit (v2023.09.1). The graph establishes a connection between drug nodes and fingerprint-bit nodes, where an edge signifies the presence of a substructure (i.e., the bit is set to `1'). DDI mechanism graph (DDIMDL)
+The following graph delineates the pharmacological mechanisms of DDIs, employing the pre-processed knowledge graph from DDIMDL. The network is comprised of 572 drug nodes, which are linked by 65 distinct relation types, including "CYP3A4 inhibitor." These relation types are derived from structured "(drug, mechanism, drug)" triples. Drug­molecular feature graph (MACCS)
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Table 1 Statistics of four datasets
+
+Dataset
+
+Drugs
+
+DrugBank
+
+572
+
+SMILES
+
+572
+
+DDI
+
+572
+
+MACCS
+
+572
+
+Entities
+825 583 572 20
+
+Page 13 of 37 48
+
+Relations
+235 1 65
+13
+
+Triples
+6541 70,350 74,528 11,440
+
+In accordance with the approach outlined by Baranwal et al. [34], a bipartite graph was constructed, integrating drug nodes with 20 key molecular feature nodes. The features in question consist of 13 selected MACCS keys and 7 additional molecular properties. The presence of an "edge" in a given drug indicates the presence of a specific feature.
+It is imperative to acknowledge that the resulting DDI graph manifests a substantial class imbalance, a prevalent challenge in pharmacological datasets from real-world contexts. An analysis of the DDI mechanism data reveals a long-tail distribution, where a small number of interaction types are highly prevalent, while many others are rare. Specifically, 43 out of the 65 distinct DDI event types are represented by fewer than 100 labeled instances. This inherent imbalance necessitates the implementation of robust modeling and evaluation strategies, a topic which will be addressed in the following sections.
+4.2 Experimental setups and tasks
+Baselines The proposed GIL-DDI model is compared with seven state-of-the-art related models: MDF-SA-DDI [8], MKG-FENN [17], Lee methods [35], MDDI-SCL [21], MDNN [36], DDIMDL [10], and DeepDDI [14]. The traditional classification method, DNN, is also considered.
+We evaluated the predictive performance of our model on datasets using multi-class classification analysis. All experiments were conducted using Python v3.8.19 and PyTorch v1.12.1, and results were computed on an NVIDIA RTX 2080Ti with 11 GB of memory. For Task 1, we use 10-fold cross-validation (10-CV) on drug­drug interactions (DDIs), partitioning all DDIs into ten subsets. Models are trained using DDI in the training set, and predictions are made for DDI in the test set. For Task 2 and Task 3, we apply 10-CV to the drugs instead of the DDI pairs. The drugs are divided into ten subsets, with nine subsets used as training drugs and the remaining subset used as test drugs. In Task 2, prediction models are developed using the DDI between two training drugs, and predictions are made for DDI events between a training drug and a test drug. In Task 3, prediction models are developed based on the DDI between two training drugs, and then predictions are made for DDI events between two test drugs.
+In this study, three types of DDI prediction were evaluated in three experimental settings: (i) prediction of interactions between new drugs (Task 1); (ii) prediction of interactions between known drugs and new drugs (Task 2); and (iii) prediction of unobserved interactions between known drugs (Task 3). In these tasks, representations of new drugs are absent from the training set but present in the test set [37].
+
+123
+
+48 Page 14 of 37
+
+Y. Li et al.
+
+Fig. 3 The metric scores for different hyperparameters
+
+4.3 Evaluation metric
+
+In order to assess the efficacy of the model, particularly in the context of the substantial class imbalance present in the dataset, a selection of evaluation metrics suitable for multi-class classification was made. Standard accuracy can be misleading when some classes are rare. Consequently, we place emphasis on metrics that provide a more balanced and informative assessment, including the area under the precision­recall curve (AUPR), the area under the ROC curve (AUC), and the macro-averaged F1-score, precision (Pre), and recall (Rec), as suggested by Lyu et al. [36] The implementation of macro-averaging ensures that each class contributes equally to the final score, thereby providing a robust measure of performance across both majority and minority classes. The following formulas have been developed to calculate these key metrics:
+
+ACC =
+
+n=65 i =1
+
+TPi
+
+n=65 i =1
+
+TPi
+
++
+
+n=65 i =1
+
+FNi
+
+(14)
+
+Precision =
+
+n=65 TPi i=1 TPi + FPi
+
+/n
+
+(15)
+
+F1
+
+=
+
+2
+
+
+
+Pecision  Recall Pecision + Recall
+
+(16)
+
+In the context of disease classification, the variable TPi represents the case where the actual disease is the i-th disease, and the prediction is also the i-th disease. Similarly, the variable FNi represents the case where the actual disease is the i-th disease, but it is predicted to be a different disease. Finally, the variable FPi represents the case where the actual disease is different from the i-th disease, but it is predicted to be the i-th disease. A true negative (TNi ) indicates that the actual disease is a different disease and has been correctly identified as such.
+
+4.4 Parameter analysis
+According to Fig. 3, the model's performance exhibits minimal variation in response to changes in hyperparameters, demonstrating the stability of our model. Ultimately, we selected the following hyperparameters: 120 epochs, a learning rate of 0.001, a batch size of 1024, an embedding dimension of 256, a neighborhood sample size of 6, and a weight decay of 1 × 10-8. In addition, the hyperparameters were set as follows: the number of events was 65,
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 15 of 37 48
+
+Table 2 Performance of GIL-DDI and competitors in predicting interaction events between new drugs
+
+Method
+
+ACC (%) AUPR (%) AUC (%) F1 (%)
+
+Precision (%) Recall (%)
+
+DNN
+
+40.87
+
+37.76
+
+95.50
+
+11.52
+
+18.36
+
+10.93
+
+DeepDDI
+
+36.02
+
+27.81
+
+90.59
+
+13.73
+
+15.86
+
+14.50
+
+Lee Methods 40.97
+
+31.84
+
+83.02
+
+20.22
+
+22.16
+
+20.27
+
+DDIMDL 40.75
+
+36.35
+
+95.12*
+
+15.90
+
+24.08
+
+14.52
+
+MDDI-SCL 45.89*
+
+39.38
+
+90.53
+
+19.19
+
+25.85
+
+16.78
+
+MDNN
+
+45.75
+
+42.15
+
+­
+
+16.97
+
+­
+
+17.09
+
+MDF-SA-DDI 43.38
+
+38.73
+
+86.30
+
+23.29*
+
+27.15
+
+22.26*
+
+MKG-FENN 45.52 (2024)
+
+41.62*
+
+91.49
+
+21.86
+
+27.54*
+
+21.31
+
+GIL-DDI (Ours)
+
+54.14 ( 8.25) 47.97 ( 6.35) 90.69 ( 4.81) 28.18 ( 4.89) 36.99 ( 9.45) 25.42 ( 3.16)
+
+Bold values denote the best results, and asterisks (*) indicate the second-best performance in each column
+
+the number of drugs was 572, the random seed was set to 1, and the dropout rate was set to 0.3. The attention mechanism parameters were set as follows: the embedding size determined the input features, the number of heads was 8, and the dropout rate was set to 0.3.
+We fine-tuned these hyperparameters accordingly for different tasks. Specifically, in tasks 2 and 3, we observed that the test set loss converged rapidly but exhibited instability post-convergence during training. We hypothesize that the learning rate might have been excessively high; therefore, we reduced the learning rate for tasks 2 and 3. Moreover, tasks 2 and 3 were more challenging than task 1, necessitating an increase in the number of heads in the self-attention module to enhance the model's generalization capability.
+Task 3 was used to roughly determine initial hyperparameter ranges. Based on these initial settings, subsequent hyperparameter adjustments for other tasks were made.
+Regularization strategy To ensure model generalization and prevent overfitting, particularly given the use of an 8-head attention mechanism on a relatively small dataset, we employed a multi-faceted regularization strategy during training. This strategy integrates a range of well-established techniques, including:
+· Weight decay (L2 regularization) A weight decay of 1 × 10-8 was applied to the Adam optimizer. This penalty is imposed on large model weights, thereby discouraging the development of overly complex models and enhancing the generalization capabilities of the model.
+· Dropout A dropout rate of 0.3 was applied within the graph attention network (GAT) layers. This technique involves the random deactivation of a subset of neurons during the training process. This approach is designed to prevent the model from becoming overly dependent on any specific feature or connection.
+· Early stopping An early stopping criterion was implemented to monitor the model's performance on the validation set of each fold. The training process was terminated if the macro F1-score on the validation set did not demonstrate improvement for 100 consecutive epochs. The model parameters from the epoch with the best validation score were then restored for the final evaluation. This is a critical step in preventing the model from overfitting by halting the training at its point of optimal generalization.
+123
+
+48 Page 16 of 37
+
+Y. Li et al.
+
+In addition to these standard techniques, the core invariant learning mechanism of GIL-DDI, as described in Sect. 3.3, inherently acts as a powerful regularizer by encouraging the model to learn stable and shared features, further enhancing its robustness.
+
+4.5 Experimental results
+4.5.1 The prediction of interaction events between new drugs
+The primary focus of drug­drug interaction (DDI) analysis is on predicting interactions involving new drugs. In this section, we compare the performance of the GIL-DDI model against other baseline methods on Task 1, which involves predicting interactions between new drugs. The results are summarized in Table 2, where the best results are highlighted in bold, and the second-best results are marked with an asterisk (*). From the experimental results, it is clear that the GIL-DDI model outperforms all comparison models across most evaluation metrics. Notably, GIL-DDI shows a significant improvement in precision, with a 9.45% increase over the baselines, which highlights the effectiveness of leveraging invariant learning. However, we also noticed that two DNN-based models, DNN and DDIMDL, achieved better performance in the AUC metric compared to other graph-based methods. The main reason is that the topological information of drug-based graphs is not well-defined, leading to leading to inferior performance of graph-based models compared to DNN-based models. In conclusion, the GIL-DDI model demonstrates clear superiority in predicting interactions between new drugs. Its improved performance across multiple metrics, including precision, accuracy, AUPR, and F1-score, makes it a more reliable tool for drug interaction prediction, contributing to safer drug development and clinical applications.
+4.5.2 The prediction of interaction events between known drugs and new drugs
+Table 3 presents the results for Task 2, which focuses on predicting interactions between known drugs and new drugs. Similarly, the GIL-DDI model consistently outperforms the baseline models in most cases, which can be attributed to its ability to learn invariant features from known drugs effectively. This capability is particularly important in mitigating the feature-shift problem, which occurs when new drugs have unobserved features that degrade the performance of traditional models. GIL-DDI is slightly weaker than MDF-SA-DDI in metric Precision, which is mainly caused by the diverse feature combination of MDF-SADDI. In addition, DDIMDL and Lee's methods outperform GIL-DDI in AUPR because they integrate target gene-associated data. Overall, the GIL-DDI model's ability to generalize well in predicting interactions between new and known drugs gives it a significant advantage over other methods, making it an invaluable tool for pharmaceutical researchers and clinicians.
+4.5.3 The prediction of interaction events between known drugs
+Task 3 focuses on predicting unobserved interaction events between known drugs. This scenario is particularly challenging due to the presence of class imbalance. Prior to the analysis of the results, it is imperative to elucidate the model's methodology in addressing this matter. Explicit data-level balancing techniques, such as oversampling, and algorithmic adjustments, including class-weighted loss functions, are not employed. In contrast, the GIL-DDI model's architecture is engineered to inherently withstand class imbalance. The model's core invariant learning mechanism, as delineated in Sect. 3.3, functions as a robust information-sharing
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 17 of 37 48
+
+Table 3 Performance of GIL-DDI and competitors in predicting interaction events between known and new drugs
+
+Method
+
+ACC (%) AUPR (%) AUC (%) F1 (%)
+
+Precision (%) Recall (%)
+
+DNN
+
+62.39
+
+63.61
+
+79.96
+
+29.97
+
+42.37
+
+28.40
+
+DeepDDI 57.74
+
+55.94
+
+95.75
+
+34.16
+
+36.30
+
+38.90
+
+Lee Methods 64.05
+
+62.44
+
+97.96*
+
+50.39
+
+53.88
+
+48.91
+
+DDIMDL 64.15
+
+65.58
+
+97.99
+
+44.60
+
+56.07
+
+43.19
+
+MDDI-SCL 67.67
+
+69.47
+
+96.34
+
+53.04
+
+62.54
+
+48.14
+
+MDNN
+
+64.95
+
+66.61
+
+­
+
+44.71
+
+­
+
+46.11
+
+MDF-SA-DDI 66.33
+
+67.76
+
+94.97
+
+55.84*
+
+65.47
+
+50.78
+
+MKG-FENN 68.05* (2024)
+
+70.49*
+
+92.47
+
+53.94
+
+60.63
+
+51.06*
+
+GIL-DDI (Ours)
+
+71.60 (3.55) 72.34 ( 1.85) 95.57 ( 1.77) 57.58 ( 1.74) 65.39* ( 0.08) 53.46 ( 2.40)
+
+Bold values denote the best results, and asterisks (*) indicate the second-best performance in each column
+
+Table 4 Performance of GIL-DDI and competitors in predicting unobserved interaction events between known drugs
+
+Method
+
+ACC (%) AUPR (%) AUC (%) F1 (%)
+
+Precision (%) Recall (%)
+
+DNN
+
+87.97
+
+91.34
+
+99.63
+
+72.23
+
+80.47
+
+70.27
+
+DeepDDI
+
+83.71
+
+88.99
+
+99.61
+
+68.48
+
+72.75
+
+66.11
+
+Lee Methods 90.94
+
+95.62
+
+99.61
+
+83.91
+
+85.09
+
+83.39
+
+DDIMDL 88.52
+
+92.08
+
+99.76
+
+75.85
+
+84.71
+
+71.82
+
+MDDI-SCL 93.78
+
+97.82
+
+99.83
+
+87.55
+
+88.04
+
+87.67
+
+MDNN
+
+91.75
+
+96.68
+
+99.84
+
+83.01
+
+86.22
+
+82.02
+
+MDF-SA-DDI 93.01
+
+97.37
+
+99.89
+
+88.78
+
+90.85
+
+87.60
+
+MKG-FENN 94.09* (2024)
+
+97.86*
+
+99.89*
+
+89.58*
+
+91.32*
+
+88.76*
+
+GIL-DDI (Ours)
+
+95.05 ( 0.96) 98.35 ( 0.49) 99.91 (0.02) 92.38 ( 2.80) 93.88 ( 2.59) 91.35 ( 2.92)
+
+Bold values denote the best results, and asterisks (*) indicate the second-best performance in each column
+
+system. For a rare DDI class, even with limited training examples, the model can generate a reliable prediction by "borrowing" stable, shared characteristics from better-characterized neighboring drugs that are known to engage in similar interactions. This process mitigates the data scarcity issue for minority classes, rendering the predictions less susceptible to frequency bias.
+As demonstrated in Table 4, GIL-DDI exhibits superior performance in comparison with all baseline models across the evaluated metrics. To provide a more profound analysis of this exceptional performance, particularly with regard to infrequent occurrences, the Area Under the Curve (AUC) and the Area Under the Precision-Recall Curve (AUPR) were computed for each individual event, as illustrated in Fig. 4. GIL-DDI has been shown to consistently achieve higher AUPR and AUC scores in comparison with baseline models across a multitude of events. This fine-grained analysis confirms that our model's strong aggregate performance is not merely driven by excelling on majority classes but reflects a consistent capability across
+123
+
+48 Page 18 of 37
+
+Y. Li et al.
+
+Fig. 4 The AUC and AUPR scores of all prediction models for each event
+the entire class distribution. This finding suggests that GIL-DDI is not only more accurate but also more robust in handling imbalanced datasets and rare interaction events, which are common in real-world DDI tasks. This enhanced performance is of particular value in the context of unknown or rare drug­drug interactions. By acquiring invariant features from a database of known drugs and leveraging these features to predict new interactions, GIL-DDI demonstrates a high degree of proficiency in identifying previously unobserved interactions without compromising accuracy.
+This robustness in performance is particularly valuable when dealing with unknown or rare drug­drug interactions. By learning invariant features from known drugs and leveraging these to predict new interactions, GIL-DDI excels at identifying previously unobserved interactions without sacrificing accuracy.
+4.6 Ablation studies
+4.6.1 Ablation study on invariant learning
+A comprehensive ablation study was conducted to evaluate the efficacy of invariant learning in the proposed GIL-DDI model. This study evaluated the performance of GIL-DDI across two tasks since the model has no results in predicting DDI without invariant learning when all drugs are known. For clarity, the model with or without invariant learning is denoted as w/IL and w/o IL, respectively. The results presented in Table 5 show that the model with invariant learning consistently yields superior performance across all tasks, indicating that integrating invariant learning in the training and testing phases is necessary. Since invariant learning enhances the model's capacity to accurately predict drug­drug interactions by effectively integrating invariant and variant drug features, these findings provide empirical evidence supporting the robustness of the proposed model and highlight the necessity of integrating diverse analytical methods to achieve enhanced predictive performance.
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 19 of 37 48
+
+Table 5 A study of the effects of invariant learning ablation
+
+Category Set
+
+ACC (%) AUPR (%) AUC (%) F1 (%) Precision (%) Recall (%)
+
+Task 1 Task 2
+
+w/IL Train w/o IL Predict w/o IL w/IL Train w/o IL Predict w/o IL
+
+54.14 53.35 51.72 71.60 71.55 69.96
+
+47.97 47.60 47.72 72.34 72.18 71.69
+
+90.69 89.97 92.93 95.57 95.41 96.29
+
+28.18 27.11 17.08 57.58 57.49 50.77
+
+36.99 34.51 30.76 65.39 66.18 58.90
+
+25.42 25.05 14.00 53.46 52.99 47.23
+
+Task between known drugs was not feasible due to inability to learn invariantly during prediction
+
+4.6.2 Ablation study on multi-view contributions
+To systematically evaluate the influence of each data source and validate our multi-view approach, we conducted a comprehensive ablation study by training our model on all possible combinations of the four knowledge graphs. The results are displayed in Table 6. A thorough examination of these findings reveals that constructing a drug representation from a single perspective is a viable approach. The efficacy of single-view models was demonstrated by the model utilizing solely the DrugBank view (V1), which attained an F1-score of 84.85%. However, when employing a multi-view fusion model, a consistent and significant performance enhancement was observed. The integration of any two views exhibited superior performance in comparison with that of a single view, and this trend persisted as additional views were incorporated. The comprehensive GIL-DDI model, which integrates all four perspectives, yielded optimal outcomes across all metrics, evidenced by a final F1-score of 92.38%.The incorporation of diverse perspectives is intended to encompass a range of dimensions pertaining to the characteristics of drugs, including their interaction history, chemical substructures, pharmacological mechanisms, and molecular properties. This approach has been demonstrated to enhance the process of feature learning by providing a more comprehensive representation. Consequently, the integration of these multi-view drug embeddings is imperative for enhancing the predictive accuracy and generalization capability for DDI events.
+
+4.7 Invariant embedding analysis
+
+Figures 5 and 6 compare the PDF and CDF of prediction errors for methods with and without invariant learning. The invariant learning method exhibits more concentrated errors near zero, reflecting better predictive accuracy and reduced variability. In contrast, the method without invariant learning shows a broader error spread and higher variability, indicating less reliable predictions.
+
+fX (x)
+
+=
+
+1 nh
+
+n i =1
+
+K
+
+x - xi h
+
+(17)
+
+FX (x) =
+
+1 N
+
+N
+1(xi
+i =1
+
+ x) =
+
+x
+f X (t)dt
+-
+
+(18)
+
+123
+
+48 Page 20 of 37
+
+Y. Li et al.
+
+Table 6 A study of the effects of multi-view ablation
+
+Category
+
+ACC (%) AUPR (%) AUC (%)
+
+F1 (%)
+
+Precision (%)
+
+Recall (%)
+
+V1 V2 V3 V4 V1+V2 V1+V3 V1+V4 V2+V3 V2+V4 V3+V4 V1+V2+V3 V1+V2+V4 V1+V3+V4 V2+V3+V4 V1+V2+V3+V4
+
+0.9250 0.9215 0.9223 0.9208 0.9395 0.9402 0.9388 0.9355 0.9340 0.9346 0.9455 0.9448 0.9450 0.9415 0.9505
+
+0.9730 0.9705 0.9712 0.9700 0.9788 0.9791 0.9785 0.9765 0.9758 0.9760 0.9815 0.9810 0.9812 0.9800 0.9835
+
+0.9988 0.9987 0.9987 0.9986 0.9990 0.9990 0.9989 0.9989 0.9988 0.9988 0.9990 0.9990 0.9990 0.9989 0.9991
+
+0.8485 0.8410 0.8432 0.8395 0.8858 0.8875 0.8840 0.8779 0.8755 0.8768 0.9065 0.9050 0.9058 0.8980 0.9238
+
+0.9156 0.9023 0.9088 0.8997 0.9225 0.9280 0.9210 0.9150 0.9120 0.9145 0.9310 0.9295 0.9300 0.9250 0.9388
+
+0.8042 0.7985 0.7955 0.7991 0.8613 0.8605 0.8592 0.8511 0.8497 0.8500 0.8902 0.8888 0.8895 0.8813 0.9135
+
+The designations V1, V2, V3, and V4 are assigned to four distinct views of the dataset. Bold values denote the best results
+
+Fig. 5 PDF comparison of using and not using invariant learning methods in solving feature-shift problems
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 21 of 37 48
+
+Fig. 6 CDF comparison of using and not using invariant learning methods in solving feature-shift problems
+Fig. 7 Clustered normalized confusion matrix heat map comparison of using and not using invariant learning methods in solving feature-shift problems
+Figure 7 presents heatmaps of the cluster-normalized confusion matrices. Without invariant learning, classification errors are more dispersed, with weak clustering and imbalanced data handling. In contrast, with invariant learning, classification performance improves with darker diagonals, stronger clustering, and better inter-category representation.
+123
+
+48 Page 22 of 37
+
+Y. Li et al.
+
+Table 7 Comparison of using and not using invariant learning methods
+
+Aspect
+
+With invariant learning
+
+Without invariant learning
+
+PDF (probability density function) CDF (cumulative distribution function) Confusion matrix-- diagonal area Confusion matrix--offdiagonal area
+Clustering patterns
+Overall observations
+
+More pronounced peak, narrower spread; concentrated errors near zero; reduced variability
+Steeper slope near zero; higher cumulative probability for minor errors; enhanced predictive precision
+Darker diagonal; a higher proportion of correct classifications, especially for low-frequency categories
+Fewer dark off-diagonal regions; improved learning of discriminative features; enhanced generalization
+Compact clusters on diagonal; better representation of inter-category relationships
+Superior robustness, reduced error dispersion, and better generalization across categories
+
+Broader spread, long tail toward positive values; dispersed errors; less reliable predictions
+Gradual ascent; larger deviations from zero; reduced predictive accuracy
+Lighter diagonal; lower correct classification rates, particularly for low-frequency categories
+More dark off-diagonal regions; dispersed errors and weaker generalization, especially for imbalanced data
+Weak clustering patterns; random distribution of highlighted regions outside diagonal
+Greater error variability, weaker performance in imbalanced data scenarios, and reduced classification precision
+
+cm[i, j ] = |{xk | yk = i and y^k = j }|
+
+cm_normalized[i, j] =
+
+cm[i, j] j cm[i, j ]
+
+(19)
+
+cm_clustered[i, j] = cm_normalized[order[i], order[ j]]
+
+color[i ,
+
+j]
+
+=
+
+cm_clustered[i, j] - min(cm_clustered) max(cm_clustered) - min(cm_clustered)
+
+The comparison of the methods is further detailed in Table 7. This table highlights the differences between the two approaches across various aspects, such as the concentration and variability of prediction errors (PDF and CDF), classification accuracy (confusion matrix diagonal), and error distribution (confusion matrix off-diagonal). The results indicate that the invariant learning method consistently outperforms the alternative by providing more precise predictions, better generalization, and enhanced robustness, especially in imbalanced data scenarios.
+Variance and stability analysis Beyond evaluating average performance metrics, it is crucial to assess the stability and performance variance of the model across the diverse range of DDI event types. To this end, a graphical variance analysis was conducted using boxplots, as presented in figure the following text is intended to provide a comprehensive overview of the subject matter (Fig. 8).
+The following plots illustrate the distribution of AUC and AUPR scores for our model and the baselines across all 65 event categories. This distribution includes the median, interquartile range (IQR), and outliers. A higher median is indicative of superior central performance, whereas a more compact IQR signifies reduced performance variability and enhanced stability across various tasks. As demonstrated in Fig. 1, the GIL-DDI model not only attains
+
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 23 of 37 48
+
+Fig. 8 Boxplots displaying the AUPR and AUC of the compared methods for each event
+a superior median performance but also manifests a more concentrated distribution (smaller box) in comparison with competing methods. This result demonstrates the model's enhanced robustness and consistent predictive accuracy across both common and rare DDI events, providing strong evidence for the model's stability and reliability.
+4.8 Statistical analysis
+To rigorously validate our findings and confirm that the observed performance improvements of GIL-DDI are not due to chance, we conducted a comprehensive statistical analysis. Following the recommended best practices for comparing multiple classifiers over multiple datasets (or, in this case, cross-validation folds), we adopted a nonparametric statistical framework [38]. This approach is preferable to parametric tests (e.g., the paired t test) as the performance scores across a small number of folds (k=10) often does not satisfy the normality assumption.
+Our analysis proceeded in two stages. First, we employed the Friedman test as an omnibus test to determine if there were any statistically significant differences among the performance of all compared models. This test was conducted independently on the per-fold results for both the Area Under the Precision-Recall Curve (AUPR) and the Area Under the ROC Curve (AUC) from Task 3. The results for both metrics yielded extremely low p-values (AUPR:  2(9) = 434.55, p < 0.0001; AUC:  2(9) = 457.59, p < 0.0001), thereby enabling us to reject the null hypothesis that all models demonstrate equivalent performance and underscoring the necessity for post hoc analysis.
+Secondly, after determining the overall significance, post hoc tests were conducted to identify specific pairwise differences. In order to directly test our primary hypothesis, we employed the one-sided Wilcoxon signed-rank test to compare GIL-DDI with each baseline method individually. As demonstrated in Table 8, GIL-DDI exhibited a statistically significant superiority over every baseline model on both AUPR and AUC metrics. To visualize the results of all pairwise comparisons simultaneously, the Nemenyi post hoc test was performed,
+123
+
+48 Page 24 of 37
+
+Y. Li et al.
+
+Table 8 The results of statistical significance tests on AUPR and AUC for Task 3 are presented herein
+
+Method Metric
+
+Friedman test (overall comparison) Chi-squared statistic
+
+p value
+
+AUPR AUC
+
+434.55 457.59
+
+< 0.0001 < 0.0001
+
+Method Baseline method
+
+One-sided Wilcoxon signed-rank test (GIL-DDI versus baselines)
+
+p value (AUPR)
+
+p value (AUC)
+
+MDF-SA-DDI DDIMDL Lee et al.' method DNN DeepDDI LR RF KNN MKG-FENN
+
+< 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0001
+
+< 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0001 < 0.0002
+
+A significance level of  = 0.05 was used. A p value below this threshold indicates that GIL-DDI is statistically significantly superior to the baseline model. MKG-FENN corresponds to MKGNN in the test results
+
+Fig. 9 Critical Difference (CD) diagrams using the Nemenyi post-hoc test on Task 3 results. (a) The diagram based on AUPR. The axis represents the average rank across all folds, where our model achieves the lowest rank (best performance). (b) The diagram based on AUC. Consistent with the AUPR results, our GIL-DDI model is positioned at the leftmost side, indicating the best ranking performance among all methods. In both panels, horizontal bars indicate the critical difference; groups of models that are not significantly different are connected. Our GIL-DDI model achieves the best overall rank on both metrics, demonstrating its superiority over the majority of baselines
+and Critical Difference (CD) diagrams were generated for both metrics (see Fig. 9). The CD diagrams plot each model by its average rank; models that are not connected by a common horizontal bar are significantly different. In both diagrams, GIL-DDI is positioned with the highest rank and is not connected to any other model, providing clear visual and statistical evidence of its superior performance.
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 25 of 37 48
+
+4.9 Qualitative analysis and biological validation
+A significant challenge in predictive models for drug­drug interactions (DDI), particularly for graph-based neural networks, is ensuring model interpretability and validating the underlying mechanisms. To address this, and to substantiate the core claim of our paper--that GIL-DDI mitigates the feature-shift problem for unknown drugs by fusing learned invariant features-- we present a qualitative case study. This analysis aims to deconstruct the model's predictive process and connect its learned representations to tangible biological and chemical insights.
+
+4.9.1 Defining invariant features in context
+Firstly, it is imperative to establish a precise definition for the concept of "invariants features" as implemented in GIL-DDI. An invariant feature, in contrast to a globally fixed set of attributes, is a context-dependent representation that is dynamically generated for a specific unknown drug. The process entails the "borrowing" of stable, well-characterized properties from a cohort of drugs with the most similar properties in the learned multi-view feature space. This aggregated representation, which encapsulates the shared chemical motifs and biological functions of these neighbors, serves as the invariant feature. The integration of this with the intrinsic (or "variant") characteristics of the unknown drug serves to enhance the model's representation, thereby providing it with a robust biological context that would otherwise be absent.
+
+4.9.2 Case study: predicting a uDDI for ritonavir
+To illustrate the functionality of the mechanism, an experiment was conducted in which ritonavir was excluded from the training set. This approach emulates a genuine scenario of a drug­drug interaction (uDDI) prediction. The objective of this study was to predict its interaction with Lopinavir. Ground truth
+In clinical practice, Ritonavir is a potent mechanism-based inhibitor of the Cytochrome P450 3A4 (CYP3A4) enzyme. Lopinavir is a known substrate of CYP3A4. The concomitant administration of these medications results in a substantial increase in the DDI, as evidenced by the significant increase in the plasma concentration and therapeutic effect of Lopinavir that is observed when Ritonavir is administered concomitantly. An effective uDDI model must demonstrate the capability to predict this critical interaction without prior exposure to Ritonavir. GIL-DDI's predictive process
+1. Initial variant embedding In the presence of Ritonavir, GIL-DDI initially produces an initial "variant" embedding based exclusively on its intrinsic properties, including its molecular graph and chemical descriptors from the "drug­molecular" perspective. At this stage, the representation is topologically isolated and lacks the relational context necessary for accurate DDI prediction.
+2. Invariant feature extraction Subsequently, the model queries the feature space of known drugs to identify Ritonavir's nearest neighbors. The model identifies other potent CYP3A4 inhibitors, such as the antifungal drugs Ketoconazole and Itraconazole, as its closest analogs based on the presence of similarities in the drug­substructure and drug­entity views.
+123
+
+48 Page 26 of 37
+
+Y. Li et al.
+
+3. Biological and chemical insight The similarity identified by the model is not superficial but is rooted in fundamental biochemical principles.
+· Chemical rationale A salient shared characteristic among these drugs is the presence of a nitrogen-containing heterocyclic ring, exemplified by a thiazole ring in ritonavir and imidazole/triazole rings in antifungals. This specific chemical moiety is mechanistically crucial, as its nitrogen atom directly coordinates with the heme iron in the active site of CYP450 enzymes, causing potent inhibition. This shared structural element constitutes the chemical basis of the invariant feature.
+· Biological rationale By identifying Ketoconazole and Itraconazole as neighbors, GILDDI effectively recognizes that Ritonavir belongs to a class of drugs that strongly inhibit CYP3A4. The model proceeds to aggregate the embeddings of these neighbors to form the "invariant feature" for Ritonavir, which now encodes this critical biological property.
+4. Feature fusion and prediction Finally, the initial variant embedding of Ritonavir is fused with this borrowed invariant feature. Consequently, the resulting enriched representation now comprehends Ritonavir not as an isolated entity, but as a potent CYP3A4 inhibitor. When tasked with predicting its interaction with Lopinavir (a known CYP3A4 substrate), the model correctly identifies the high-risk "inhibitor-substrate" pattern and predicts a significant DDI event.
+
+This case study substantiates the hypothesis that GIL-DDI learns to associate specific, mechanistically relevant chemical substructures with their functional consequences in DDI events. The "invariant feature" for Ritonavir is a tangible representation of its CYP3A4 inhibitory function, which was learned by analogy from known drugs. This finding indicates that the model's approach offers a comprehensible solution to the feature-shift problem, thereby facilitating reliable predictions, even for novel pharmaceutical agents. To provide visual evidence for this claim, a t-SNE projection of the feature space was employed to illustrate the embedding of Ritonavir. It was observed that Ritonavir shifted from a sparse region to a densely populated cluster of known CYP3A4 inhibitors post-fusion, thereby confirming the successful transfer of this learned property (Fig. 10).
+4.10 Invariant embedding time complexity analysis
+In order to evaluate the computational efficiency of the model, the time complexity of the invariant embedding process was subjected to analysis (Table 9).
+4.11 Computational complexity analysis
+In order to address the efficiency of the proposed GIL-DDI model, a theoretical analysis of its computational complexity is provided herein. The model is then deconstructed into its fundamental components, which are then subjected to a comparative analysis against the architectural families of the baseline models. Let N denote the number of drugs, M denote the number of features in a given view (e.g., entities, substructures), K denote the number of nearest neighbors for invariant fusion, L denote the number of fusion layers, and d denote the dimensionality of the feature embeddings.
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 27 of 37 48
+
+Fig. 10 t-SNE visualization of invariant feature fusion for ritonavir
+
+Table 9 Time complexity analysis of the invariant embedding process
+
+Process
+
+Time complexity
+
+Description
+
+Matrix construction
+
+O(N × M)
+
+Self-attention layer Embedding fusion
+
+O(N2) O(N × K)
+
+Iteration through drug interactions, entity relationships, substructures, and molecular features to construct four invariant matrices. N is the number of drugs, and M is the number of distinct features
+Computation of attention scores for each drug or node. Aggregation is dependent on the number of neighbors in the graph
+Incorporation of features from top-K similar drugs during embedding fusion. K is the number of most similar drugs
+
+4.11.1 Complexity of GIL-DDI components
+The computational cost of GIL-DDI can be analyzed in three main stages:
+1. Graph construction and similarity calculation The initial construction of the four viewspecific matrices involves processing the raw data for all N drugs. The complexity of this step is proportional to the size of the input data, exhibiting an approximate linear relationship. This can be expressed as follows: O(N · Mavg), where Mavg denotes the
+123
+
+48 Page 28 of 37
+
+Y. Li et al.
+
+average number of features across views. The subsequent similarity calculation (e.g., Jaccard or Mahalanobis distance) between all pairs of drugs to form similarity matrices Sv has a complexity of O(N 2 · Mavg). 2. Multi-view graph attention network (GAT) The core of our feature extraction process is the GAT module. In contrast to GNNs, which operate on a pre-defined sparse graph structure, our model computes attention coefficients between all pairs of drugs to capture a global relationship context within each view. The calculation of attention scores for all drugs against all others results in a time complexity of O(N 2 · d) per GAT layer. This particular aspect of the model, namely the quadratic scaling with the number of drugs, is the most computationally intensive. 3. Invariant-based feature fusion This iterative process enhances node embeddings by aggregating features from the top-K most similar neighbors. Assuming that the top-K neighbors have been identified from the pre-computed similarity matrix, each of the L fusion steps involves the aggregation of features for N drugs from their respective K neighbors. This results in a complexity of O(L · N · K · d). Given that K is a small hyperparameter (e.g., K = 6), this stage is significantly more efficient than the GAT layer.
+The predominant factor contributing to GIL-DDI's complexity is the GAT's pairwise attention mechanism, which renders the model's runtime scale quadratically with the number of drugs, i.e., O(N 2 · d).
+
+4.11.2 Architectural comparison and scalability
+The efficacy of GIL-DDI can be contextualized through a comparative analysis of its architectural design with that of the baselines:
+· DNN-based models (e.g., DeepDDI) These models generally process a fixed-size feature vector for each drug pair through a series of fully connected layers. The complexity of these networks is primarily determined by the network's depth and width, rather than by the number of drugs, N . While they are computationally efficient per-pair, they cannot directly model high-order relationships across the entire drug graph without explicit feature engineering.
+· Standard GNN-based models (e.g., MKG-FENN) A significant number of GNNs function within the context of sparse biological knowledge graphs, characterized by a substantially smaller number of edges, |E|, relative to the total number of edges, N 2. The complexity of a message-passing layer in such models is typically O(|E|·d), which is highly scalable for large, sparse graphs. The model's utilization of a dense, dynamically computed attention graph constitutes a deliberate trade-off, prioritizing expressive power to capture global inter-drug relationships over the scalability of sparse GNNs.
+· Transformer-based models (e.g., MDF-SA-DDI) These models utilize a self-attention mechanism that, in a manner analogous to our GAT, computes pairwise interactions between all input elements. The complexity of a standard transformer encoder is O(S2·d), where S is the sequence length. Within the context of drug administration, the treatment of all drugs as a set of tokens results in an O(N 2 · d) complexity. Consequently, GIL-DDI shares its primary computational bottleneck with Transformer-based architectures. These architectures are both powerful but face scalability challenges with a very large number of drugs.
+In summary, the design of GIL-DDI prioritizes the rich, global modeling of drug­drug relationships through a dense attention mechanism. While this results in a quadratic time
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 29 of 37 48
+
+complexity with respect to the number of drugs, it is a well-reasoned trade-off for enhancing predictive accuracy on datasets of moderate size, such as those commonly used in DDI research. In the context of future endeavors involving datasets comprising tens of thousands of drugs, scalability enhancements can be realized through the incorporation of sampling techniques or more advanced sparse attention mechanisms.
+
+5 Conclusion
+5.1 Summary
+This study proposes a novel GIL-DDI model for predicting drug­drug interactions (DDI). The GIL-DDI model addresses the feature-shift problem by integrating invariant features of known drugs with variant features specific to new drugs. The model employs graph neural networks (GNNs) to embed multiview knowledge graphs into comprehensive drug features, including drug­chemical entities, drug substructures, drug­drug interactions, and molecular structures.
+The model employs a self-attention mechanism to fuse these features, enhancing its generalization capability and improving prediction accuracy. Extensive experiments on real-world drug datasets demonstrate that the GIL-DDI model achieves state-of-the-art performance, consistently outperforming existing approaches across various metrics.
+In conclusion, the GIL-DDI model provides a robust solution for accurately predicting drug interactions, thereby contributing to enhanced patient safety and the development of more personalized treatment regimens.
+5.2 Limitations and future work
+Notwithstanding the substantial advancements achieved by the proposed GIL-DDI model in addressing the feature-shift problem in novel drug­drug interaction (DDI) prediction, several limitations persist. These limitations also reveal promising avenues for future research.
+5.2.1 Current work limitations
+Simplification of static and binary interactions In accordance with the majority of contemporary computational models, GIL-DDI conceptualizes DDIs as static, context-independent occurrences, as previously outlined by Wang et al. [39]. However, in clinical practice, the actual effects of drug combinations are highly dependent on various factors, including dosage, administration regimen, patient genetic background, and co-existing disease states. Additionally, the primary focus of our model is the prediction of binary variables. DDIs do not model higher-order interactions involving three or more drugs, which are increasingly common in polypharmacy patients [40].
+Task formulation and dataset specificity The present study has been meticulously engineered to address the multi-class classification of pharmacological DDI mechanisms, a task for which curated knowledge bases such as DrugBank are regarded as the gold standard. Consequently, the generalizability of our model has been validated on datasets aligned with this task. However, the performance of the model on datasets structured for different tasks, such as the multi-label prediction of clinical polypharmacy side effects (e.g., TWOSIDES, Decagon), remains to be evaluated. A direct application of these datasets would constitute
+123
+
+48 Page 30 of 37
+
+Y. Li et al.
+
+a task-transfer challenge, requiring significant reformulation of the model architecture and prediction objective.
+Inherent data challenges The model's reliance on public databases is predicated on the recognition that these databases are inherently limited in scope and depth. A class imbalance problem is first noted, with a paucity of known interacting drug pairs relative to unreported ones. This imbalance potentially causes the model to bias predictions toward the majority class, i.e., "no interaction" [41]. Secondly, the absence of an empirically validated "gold standard" negative DDI dataset compels the assumption that unlabeled drug pairs are negative, which may introduce label noise.
+Model interpretability Despite the demonstrated efficacy of GIL-DDI in terms of predictive accuracy, the underlying graph neural networks (GNNs) persist in their "black box" configuration, thereby impeding comprehensive understanding and analysis. While the model can predict potential interactions between two drugs, it cannot explicitly elucidate the key molecular substructures or biological pathways that inform its predictions. This deficiency in interpretability represents a significant impediment to the comprehensive reliance and implementation of sophisticated computational models within clinical practice [41].
+5.2.2 Future research directions
+The aforementioned limitations indicate clear and impactful directions for future research, aiming to advance DDI prediction from general models toward truly personalized precision medicine.
+Developing context-aware and personalized DDI prediction frameworks A fundamental future direction entails the development of multimodal fusion models with the capacity to integrate diverse, heterogeneous data sources, as outlined in the study by Tong et al. [42]. The following methods have been demonstrated to achieve this objective:
+· Integrating clinical context The construction of patient-specific profiles from longitudinal Electronic Health Records (EHRs) has been demonstrated to facilitate the prediction of DDI risks within the context of a patient's comprehensive medical history and medication regimen, as evidenced by the work of Chen et al. [43].
+· Incorporating genomic information The integration of patient pharmacogenomic (PGx) data has emerged as a critical approach in the prediction of complex drug­drug­gene interactions (DDGIs). This approach will facilitate the accounting for variations in DDI risk attributable to individual genetic polymorphisms in drug-metabolizing enzymes (e.g., CYP450) [44].
+· Advanced fusion architectures The integration of molecular structure data of drugs, electronic health record (EHR) data of patients, and genomic variation data into a unified prediction model through the utilization of heterogeneous graph neural networks (HGNNs) or attention-based fusion models represents a pivotal technical approach to achieving this objective [45].
+Extending to polypharmacy side-effect prediction A promising direction for future research is to adapt the core principles of GIL-DDI to the multi-label task of predicting polypharmacy side effects. This would entail the modification of the model to accommodate the distinct structure of datasets such as TWOSIDES and Decagon. The invariant learning mechanism, which involves the utilization of features from known entities to characterize new ones, has the potential to be highly effective in predicting the side-effect profiles of new drugs when employed in conjunction with existing medications.
+Enhancing methodological robustness and interpretability
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 31 of 37 48
+
+· Addressing data imbalance In future studies, researchers should consider adopting more advanced strategies to address the class imbalance problem. These strategies may include the implementation of Focal Loss functions or the development of Graph Contrastive Learning frameworks. The objective of these frameworks would be to learn drug representations that are more robust to class imbalance [46].
+· Improving model interpretability The integration of explainable artificial intelligence (XAI) techniques, such as GNNExplainer, to identify key molecular fragments or biological targets that contribute most to a drug­drug interaction (DDI) prediction will be a crucial step in enhancing model transparency and clinical trustworthiness [47].
+Enriching drug representations for higher fidelity The prevailing models in the field primarily rely on two-dimensional (2D) molecular structures. In the future, research endeavors may yield more sophisticated and context-aware molecular embeddings. These advancements may be achieved through two approaches. Firstly, the integration of three-dimensional (3D) conformational information could be employed to enhance molecular embeddings. Secondly, large-scale biochemical language models (e.g., MoLlama) could be utilized for pre-training, thereby ensuring the capture of geometric and electronic properties that are crucial for interactions. This approach is outlined in detail in Liu et al. [48].
+By addressing these challenges, it is hypothesized that the field of computational DDI prediction will be able to provide more precise, personalized, and trustworthy support for clinical decision-making, ultimately enhancing patient medication safety.
+
+A Symbols and notations
+For clarification, we summarize the complete symbols and notations employed in Table 10.
+
+123
+
+48 Page 32 of 37
+
+Y. Li et al.
+
+Table 10 Glossary of major symbols and notations used in this paper
+
+Symbol
+
+Definition
+
+First introduced
+
+Graph and data notations
+
+Add
+
+Adjacency matrix for drug­drug interactions view
+
+Ade
+
+Feature matrix for drug­entity relationships view
+
+Ads
+
+Feature matrix for drug­substructure relationships view
+
+Adm
+
+Feature matrix for drug­molecular properties (MACCS) view
+
+dn , ek , sk , mk Sivj
+v
+
+Number of drugs, entities, substructures, and molecular features Similarity score between drug i and drug j in view v Index for a specific data view, v  {dd, de, ds, dm}
+
+D
+
+The set of all drug entities
+
+G Y, Y, Y¯
+
+A drug-related knowledge graph Matrices for ground-truth, predicted (train), and predicted (test) DDIs
+
+GIL-DDI model notations
+
+hiv
+(hiv )(l) H¯ iv,: Hv
+
+Embedding (representation vector) of drug i in view v Embedding of drug i in view v at the l-th fusion layer The initial "variant" embedding of a new drug i from the GAT Matrix containing embeddings of all drugs for view v
+
+H Wv, W
+
+Final aggregated multi-view embedding matrix for all drugs Learnable weight matrices in the GAT layers
+
+a
+
+Learnable weight vector for the attention mechanism
+
+eivj
+
+Un-normalized attention score between drug i and j in view v
+
+ivj
+
+Normalized attention coefficient (weight) between drugs i and j
+
+Ni
+
+The set of k-nearest neighbors of drug i
+
+Topi
+
+The set of known drugs with the highest similarity to drug i
+
+L
+
+Total number of invariant learning fusion layers
+
+Sect. 3.1 Sect. 3.1 Sect. 3.1 Sect. 3.1 Sect. 3.1 Sect. 3.1 Sect. 3.1 Sect. 3.5 Sect. 3.5 Sects. 3.3 and 3.4
+Sect. 3.2 Sect. 3.3 Sect. 3.4 Sect. 3.3 Sect. 3.3 Sect. 3.2 Sect. 3.2 Sect. 3.2 Sect. 3.2 Sect. 3.2 Sect. 3.3 Sect. 3.3
+
+Table 10 continued Symbol
+
+Definition
+
+Operators and functions
+
+||
+
+Concatenation operator for vectors
+
+
+
+Aggregation operator, typically concatenation or summation
+
+, 
+
+Set intersection and set union operators
+
+Covariance matrix used in Mahalanobis distance calculation
+
+ (·)
+
+A nonlinear activation function (e.g., ELU, ReLU)
+
+LeakyReLU(·)
+
+Leaky rectified linear unit activation function
+
+Softmax(·)
+
+Softmax function for converting scores to probabilities
+
+MLP(·)
+
+Multi-layer perceptron used as the final predictor
+
+L
+
+The overall loss function for model training
+
+CrossEntropy(·) The cross-entropy loss function
+
+First introduced
+Sect. 3.2 Sect. 3.3 Sect. 3.1 Sect. 3.1 Sect. 3.2 Sect. 3.2 Sect. 3.3 Sect. 3.3 Sect. 3.3 Sect. 3.3
+
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 33 of 37 48
+
+Author Contributions Yuanxian Li and Yuan Du helped in conceptualization, methodology, software, validation, formal analysis, investigation, data curation, writing--original draft, visualization. Hong Peng contributed to conceptualization, resources, supervision, project administration. Zhenli He and Xin Jin helped in resources, supervision. Cheng Xie contributed to conceptualization, methodology, resources, writing--review and editing, supervision, project administration, funding acquisition. All authors read and approved the final manuscript.
+Funding This work was supported in part by the National Natural Science Foundation of China under Grant Nos. 62106216, 62162064, and 62502421; and the Key Laboratory of Software Engineering of Yunnan (No. 2023SE104).
+Data availability The datasets generated during and/or analyzed during the current study are available from the corresponding author on reasonable request. The source code is available at https://github.com/ davidwushi1145/GILDDI.
+Code availability The source code is available at https://github.com/davidwushi1145/GIL-DDI.
+Declarations
+Conflict of interest The authors declare that they have no conflict of interest.
+Ethics approval and consent to participate Not applicable. This study does not involve human participants or animals.
+Consent for publication Not applicable. This study does not contain any individual person's data.
+
+References
+1. Percha B, Altman RB (2013) Informatics confronts drug­drug interactions. Trends Pharmacol Sci 34(3):178­184
+2. Magro L, Moretti U, Leone R (2012) Epidemiology and characteristics of adverse drug reactions caused by drug­drug interactions. Expert Opin Drug Saf 11(1):83­94
+3. Rodrigues AD (2019) Drug­drug Interactions. CRC Press, Boca Raton 4. Yu Y, Huang K, Zhang C, Glass LM, Sun J, Xiao C (2021) SumGNN: multi-typed drug interaction
+prediction via efficient knowledge graph summarization. Bioinformatics 37(18):2988­2995 5. Nyamabo AK, Yu H, Shi J-Y (2021) SSI-DDI: substructure­substructure interactions for drug­drug
+interaction prediction. Brief Bioinform 22(6):133 6. Tang Z, Chen G, Yang H, Zhong W, Chen CY-C (2023) DSIL-DDI: a domain-invariant substructure
+interaction learning for generalizable drug­drug interaction prediction. IEEE Trans Neural Netw Learn Syst 35:10552­10560 7. Li Z, Zhu S, Shao B, Zeng X, Wang T, Liu T-Y (2023) DSN-DDI: an accurate and generalized framework for drug­drug interaction prediction by dual-view representation learning. Brief Bioinform 24(1):597 8. Lin S, Wang Y, Zhang L, Chu Y, Liu Y, Fang Y, Jiang M, Wang Q, Zhao B, Xiong Y et al (2022) MDFSA-DDI: predicting drug­drug interaction events based on multi-source drug fusion, multi-source feature fusion and transformer self-attention mechanism. Brief Bioinform 23(1):421 9. Tossou P, Wognum C, Craig M, Mary H, Noutahi E (2024) Real-world molecular out-of-distribution: specification and investigation. J Chem Inf Model 64(3):697­711 10. Deng Y, Xu X, Qiu Y, Xia J, Zhang W, Liu S (2020) A multimodal deep learning framework for predicting drug­drug interaction events. Bioinformatics 36(15):4316­4322 11. Pan D, Lu P, Wu Y, Kang L, Huang F, Lin K, Yang F (2024) Prediction of multiple types of drug interactions based on multi-scale fusion and dual-view fusion. Front Pharmacol 15:1354540 12. Tan X, Fan S, Duan K, Xu M, Zhang J, Sun P, Ma Z (2023) A novel drug­drug interactions prediction method based on a graph attention network. Electron Res Arch 31(9):5632­5648 13. Zhao L, Au JL, Wientjes MG (2010) Comparison of methods for evaluating drug­drug interaction. Front Biosci (Elite Ed) 2:241 14. Ryu JY, Kim HU, Lee SY (2018) Deep learning improves prediction of drug­drug and drug­food interactions. Proc Natl Acad Sci 115(18):4304­4311
+
+123
+
+48 Page 34 of 37
+
+Y. Li et al.
+
+15. Lin X, Quan Z, Wang Z-J, Ma T, Zeng X (2020) KGNN: knowledge graph neural network for drug­drug interaction prediction. IJCAI 380:2739­2745
+16. Yang C, Xiao C, Ma F, Glass L, Sun J (2021) SafeDrug: Dual molecular graph encoders for recommending effective and safe drug combinations. Arxiv Preprint Arxiv:2105.02711
+17. Wu D, Sun W, He Y, Chen Z, Luo X (2024) MKG-FENN: a multimodal knowledge graph fused end-to-end neural network for accurate drug-drug interaction prediction. In: Proceedings of the AAAI Conference on Artificial Intelligence, vol 38, pp 10216­10224
+18. Chu X, Lin Y, Wang Y, Wang L, Wang J, Gao J (2019) MLRDA: a multi-task semi-supervised learning framework for drug­drug interaction prediction. In: Proceedings of the 28th international joint conference on artificial intelligence, pp 4518­4524
+19. Huang K, Xiao C, Hoang T, Glass L, Sun J (2020) CASTER: predicting drug interactions with chemical substructure representation. In: Proceedings of the AAAI conference on artificial intelligence, vol 34, pp 702­709
+20. Kim E, Nam H (2022) DeSIDE-DDI: interpretable prediction of drug­drug interactions using druginduced gene expressions. J Cheminform 14(1):9
+21. Lin S, Chen W, Chen G, Zhou S, Wei D-Q, Xiong Y (2022) MDDI-SCL: predicting multi-type drug­drug interactions via supervised contrastive learning. J. Cheminform. 14(1):81
+22. Wang Z, Xiong Z, Huang F, Liu X, Zhang W (2024) Zeroddi: a zero-shot drug-drug interaction event prediction method with semantic enhanced learning and dual-modal uniform alignment. Arxiv Preprint Arxiv:2407.00891
+23. Bedi P, Thukral A, Dhiman S (2025) XLR-KGDD: leveraging LLM and RAG for knowledge graph-based explainable disease diagnosis using multimodal clinical information. Knowl Inf Syst 67:1­21
+24. Li S, Wong KW, Zhu D, Fung CC (2023) Drug-CoV: a drug-origin knowledge graph discovering drug repurposing targeting covid-19. Knowl Inf Syst 65(12):5289­5308
+25. Masumshah R, Aghdam R, Eslahchi C (2021) A neural network-based method for polypharmacy side effects prediction. BMC Bioinform. 22(1):385
+26. Masumshah R, Eslahchi C (2023) DPSP: a multimodal deep learning framework for polypharmacy side effects prediction. Bioinform Adv 3(1):110
+27. Zhang Z, Wang X, Zhang Z, Qin Z, Wen W, Xue H, Li H, Zhu W (2024) Spectral invariant learning for dynamic graphs under distribution shifts. Adv Neural Inf Process Syst 36:6619­6633
+28. Krueger D, Caballero E, Jacobsen J-H, Zhang A, Binas J, Zhang D, Le Priol R, Courville A (2021) Out-of-distribution generalization via risk extrapolation (rex). In: International conference on machine learning. PMLR, pp 5815­5826
+29. Ji Y, Zhang L, Wu J, Wu B, Huang L-K, Xu T, Rong Y, Li L, Ren J, Xue D et al (2022) Drugood: Outof-distribution (OOD) dataset curator and benchmark for AI-aided drug discovery--a focus on affinity prediction problems with noise annotations. Arxiv Preprint Arxiv:2201.09637
+30. Arjovsky M, Bottou L, Gulrajani I, Lopez-Paz D (2019) Invariant risk minimization. Arxiv Preprint Arxiv:1907.02893
+31. Chen Y, Zhang Y, Bian Y, Yang H, Kaili M, Xie B, Liu T, Han B, Cheng J (2022) Learning causally invariant representations for out-of-distribution generalization on graphs. Adv Neural Inf Process Syst 35:22131­22148
+32. Wu Q, Zhang H, Yan J, Wipf D (2022) Handling distribution shifts on graphs: an invariance perspective. Arxiv Preprint Arxiv:2202.02466
+33. Knox C, Wilson M, Klinger CM, Franklin M, Oler E, Wilson A, Pon A, Cox J, Chin NE, Strawbridge SA et al (2024) Drugbank 60: the drugbank knowledgebase for 2024. Nucleic Acids Res 52(D1):1265­1275
+34. Baranwal M, Magner A, Elvati P, Saldinger J, Violi A, Hero AO (2020) A deep learning architecture for metabolic pathway prediction. Bioinformatics 36(8):2547­2553
+35. Lee G, Park C, Ahn J (2019) Novel deep learning model for more accurate prediction of drug­drug interaction effects. BMC Bioinform 20:1­8
+36. Lyu T, Gao J, Tian L, Li Z, Zhang P, Zhang J (2021) MDNN: a multimodal deep neural network for predicting drug­drug interaction events. Ijcai 2021:3536­3542
+37. Prichard MN, Shipman C Jr (1990) A three-dimensional model to analyze drug­drug interactions. Antiviral Res 14(4­5):181­205
+38. Demsar J (2006) Statistical comparisons of classifiers over multiple data sets. J Mach Learn Res 7:1­30 39. Wang N-N, Zhu B, Li X-L, Liu S, Shi J-Y, Cao D-S (2023) Comprehensive review of drug­drug interaction
+prediction based on machine learning: current status, challenges, and opportunities. J Chem Inf Model 64(1):96­109 40. Luo H, Yin W, Wang J, Zhang G, Liang W, Luo J, Yan C (2024) Drug­drug interactions prediction based on deep learning and knowledge graph: a review. Iscience 27(3):109148
+
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 35 of 37 48
+
+41. Gheorghita F-I, Bocanet V-I, Iantovics LB (2025) Machine learning-based drug­drug interaction prediction: a critical review of models, limitations, and data challenges. Front Pharmacol 16:1632775
+42. Tong L, Shi W, Isgut M, Zhong Y, Lais P, Gloster L, Sun J, Swain A, Giuste F, Wang MD (2023) Integrating multi-omics data with EHR for precision medicine using advanced artificial intelligence. IEEE Rev Biomed Eng 17:80­97
+43. Chen J, Yin C, Wang Y, Zhang P (2024) Predictive modeling with temporal graphical representation on electronic health records. In: IJCAI: proceedings of the conference, 2024, p 763
+44. Dowd D, Williams G, VanDorn D, Clarke S, Krause DS, Botbyl J, Saklad SR (2022) Predicting drug­drug and drug-gene interactions in a community pharmacy population. Am J Manag Care 28(11)
+45. Kim S, Lee N, Lee J, Hyun D, Park C (2023) Heterogeneous graph learning for multi-modal medical data analysis. In: Proceedings of the AAAI conference on artificial intelligence, vol 37, pp 5141­5150
+46. Gao Z, Ma H, Zhang X, Wang Y, Wu Z (2023) Similarity measures-based graph co-contrastive learning for drug-disease association prediction. Bioinformatics 39(6):357
+47. Alizadehsani R, Oyelere SS, Hussain S, Jagatheesaperumal SK, Calixto RR, Rahouti M, Roshanzamir M, De Albuquerque VHC (2024) Explainable artificial intelligence for drug discovery and development: a comprehensive survey. IEEE Access 12:35796­35812
+48. Liu Z, Luo Y, Huang H, Zhang E, Li S, Fang J, Shi Y, Wang X, Kawaguchi K, Chua T-S (2025) Next-mol: 3d diffusion meets 1d language modeling for 3d molecule generation. arXiv preprint arXiv:2502.12638
+
+Publisher's Note Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.
+Springer Nature or its licensor (e.g. a society or other partner) holds exclusive rights to this article under a publishing agreement with the author(s) or other rightsholder(s); author self-archiving of the accepted manuscript version of this article is solely governed by the terms of such publishing agreement and applicable law.
+
+Yuanxian Li is currently a Master's student at the School of Information Science and Technology, ShanghaiTech University. He received his B.S. degree from Yunnan University in 2025. His research interests focus on knowledge graphs and AI for Science (AI4S).
+
+123
+
+48 Page 36 of 37
+
+Y. Li et al.
+Yuan Du received the B.S. degree in Software Engineering from Yunnan University, Kunming, China, in 2025. His current research interests include graph representation learning and neural network pruning. He is currently pursuing his master's degree at the College of Computer Science, Sichuan University, Chengdu, China.
+
+Hong Peng received her B.S. degree in applied mathematics from Jiangsu University, Jiangsu, China, in 2016, and the M.S. and PhD degrees in computer science and engineering from South China University of technology, Guangzhou, China, in 2017 and 2021, respectively. She completed the postdoctoral research at the academy of mathematics and systems science, Chinese academy of sciences, Beijing, China, in 2023. She is currently a lecturer in the department of software engineering at the school of software, Yunnan university, Kunming, China. Her research interests include high-order information modeling, data mining, graph neural networks, and spatial transcriptomics analysis.
+Zhenli He (Senior Member, IEEE) received the B.S. degree in Software Engineering from Yunnan University, Kunming, China, in 2010, and the M.S. and PhD degrees in Software Engineering and Systems Analysis and Integration, respectively, from the same university in 2012 and 2015. From 2019 to 2021, he was a postdoctoral researcher at Hunan University, Changsha, China. He is currently an Associate Professor and Head of the Department of Software Engineering, School of Software, Yunnan University. Dr. He was selected as a Young Talent of the Yunnan Provincial "Xingdian Talent Support Program" and is a recipient of the Hongyun Gardener Award for teaching excellence. His research interests include edge computing, energy-efficient computing, heterogeneous computing, and edge-AI techniques.
+
+123
+
+GIL-DDI: multi-view graph invariant learning for unknown...
+
+Page 37 of 37 48
+
+Xin Jin received the B.S. degree in Electronic Information Engineering from Henan Normal University, Xinxiang, China, in 2013, and the PhD degree in Information and Communication Engineering from Yunnan University, Kunming, China, in 2018. From 2018 to 2020, he conducted postdoctoral research at the School of Software, Yunnan University. He is currently an Associate Professor and a Master's Supervisor with Yunnan University. He has been selected for the "Young Talents of the Xingdian Talent Support Program" and is the principal investigator of the Yunnan Provincial Outstanding Youth Fund.
+
+Cheng Xie (Senior Member, IEEE) received a B.S. degree in software engineering from Minzu University of China, Beijing, China, in 2009 and M.S. and PhD degrees in software engineering from Shanghai Jiao Tong University, Shanghai, China, in 2012 and 2017, respectively. From 2015 to 2016, he was a Visiting Scholar with the Data and Web Science Group at the University of Mannheim, Mannheim, Germany. He is a full professor at the School of Software, Yunnan University, Kunming, China. His research interests include industrial informatics and knowledge graph. Dr. Xie received the Shanghai Science and Technology Progress Award (Second Prize) and Yunnan Science Award (Second Prize) in 2014 and 2022, respectively. The Youth Talent Project of China Association for Science and Technology and the High-level Talent Program of Yunnan in 2018 and Donglu Young Scholars in 2021.
+
+123
+
+

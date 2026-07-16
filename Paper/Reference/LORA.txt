@@ -1,0 +1,53 @@
+Title: LoRA: Low-Rank Adaptation of Large Language Models
+Authors: Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu Chen (Microsoft)
+Venue+Year: ICLR 2022 (paper is arXiv v2, Oct 2021)
+arXiv-or-DOI: arXiv:2106.09685
+PDF filename: LORA.pdf
+
+## TL;DR
+LoRA freezes a pretrained weight matrix W0 and learns only a rank-r factorized update BA, so the adapted weight is W = W0 + BA. On GPT-3 175B this cuts trainable params up to 10,000x and VRAM ~3x while matching or beating full fine-tuning, with zero added inference latency (BA can be merged into W0). Motivated by the hypothesis that the weight *change* during adaptation has low intrinsic rank; empirically ranks as small as 1-2 suffice for GPT-3.
+
+## Problem & Contributions
+- Full fine-tuning of large LMs is prohibitively expensive to store/deploy per task (each copy = full |Phi0|, e.g. 175B for GPT-3). Prior efficient methods (adapters, prefix/prompt tuning) either add inference latency, consume usable sequence length, or fail to match FT quality (Sec. 1, Sec. 3).
+- Contribution 1: Propose LoRA, a low-rank reparametrization of the weight update injected into (chosen) dense/attention layers, freezing W0 (Sec. 4.1).
+- Contribution 2: Key practical properties: mergeable at deploy (no latency), task-switch by swapping small BA, 25% training speedup on GPT-3, generalizes full FT as r -> rank(W0) (Sec. 4.1, 4.2).
+- Contribution 3: Empirical study of rank-deficiency in adaptation: shows the optimal update Delta_W is genuinely low-rank and amplifies task-relevant directions already latent (but under-emphasized) in W0 (Sec. 7).
+
+## Method / Core mechanism
+- For a frozen pretrained weight matrix W0 in R^{d x k}, constrain its adaptation update Delta_W to a low-rank product: W0 + Delta_W = W0 + B A, where B in R^{d x r}, A in R^{r x k}, and rank r << min(d, k) (Sec. 4.1, Eq. 3).
+- Forward pass: h = W0 x + Delta_W x = W0 x + B A x (Eq. 3). Both W0 and BA multiply the same input; outputs are summed coordinate-wise.
+- Initialization: A ~ random Gaussian, B = 0, so Delta_W = BA = 0 at start of training (adapted model = pretrained model initially).
+- Scaling: Delta_W x is scaled by alpha / r, where alpha is a constant (set to the first r tried and not retuned); this reduces the need to re-tune hyperparameters when varying r (Sec. 4.1).
+- Deploy: explicitly compute W = W0 + BA and run inference as usual -> no added latency. To switch tasks, subtract BA and add B'A' (Sec. 4.1, "No Additional Inference Latency").
+- In Transformers, applied (in most experiments) only to attention projection matrices Wq and Wv, freezing MLP; trainable-param count |Theta| = 2 * L_LoRA * d_model * r (Sec. 4.2, 5.1).
+
+## Key results & numbers
+- GLUE (Table 2): RoBERTa-base LoRA (0.3M params) avg 87.2 vs FT (125M) 86.4; RoBERTa-large LoRA (0.8M) avg 89.0 vs FT (355M) 88.9; DeBERTa-XXL LoRA (4.7M) avg 91.3 vs FT (1.5B) 91.1. LoRA matches/exceeds FT with orders fewer params.
+- GPT-2 E2E NLG (Table 3): LoRA (0.35M) BLEU 70.4 vs FT 68.2, beating AdapterL/PreLayer at comparable or fewer params.
+- GPT-3 175B (Table 4): LoRA (4.7M) WikiSQL 73.4 / MNLI-m 91.7; LoRA (37.7M) WikiSQL 74.0 / MNLI-m 91.6, vs FT (175,255.8M) WikiSQL 73.8 / MNLI-m 89.5. LoRA matches or exceeds FT. Prefix methods degrade non-monotonically with more tokens (Fig. 2).
+- Efficiency: up to 10,000x fewer trainable params, ~3x lower VRAM (1.2TB -> 350GB on GPT-3), checkpoint 350GB -> 35MB (r=4 on Wq,Wv), 25% training speedup, no inference latency (Sec. 4.2; adapter latency in Table 1).
+- Which weights (Table 5, budget 18M): adapting {Wq, Wv} (r=4 each) beats concentrating budget on Wq or Wk alone; WikiSQL 73.7, MNLI 91.7.
+- Optimal rank (Table 6): rank r=1 already competitive for {Wq,Wv} (WikiSQL 73.4 at r=1); increasing r yields little gain -> update has very small "intrinsic rank". Subspace-similarity (Grassmann, Eq. 4; Figs. 3-4): top singular direction of A_{r=8} and A_{r=64} overlap strongly (dim-1 subspace, normalized sim > 0.5), explaining why r=1 works.
+- Delta_W vs W (Table 7, Sec. 7.3): Delta_W correlates with W more than a random matrix but amplifies directions NOT emphasized in W0; amplification factor ~21.5 for r=4 (6.91/0.32). Interpretation: LoRA amplifies task-specific features latent but under-weighted in pretraining.
+
+## Relevance to our cold-start low-rank DDI paper
+- RW bucket: Stream B foundation / parameter-efficient adaptation. This is THE source paper for the factorization FORM our method adopts: H = H_base + M_A . M_B is exactly W = W0 + BA (H_base <-> W0, M_A <-> B, M_B <-> A). Cite as the origin of the "frozen base + low-rank factorized residual" construction and the "adaptation has low intrinsic rank" hypothesis (Sec. 1, 4.1, 7.2).
+- How we'd cite: (1) attribute the additive low-rank residual construction; (2) borrow the empirical grounding that a very low rank suffices to capture the useful update subspace (Table 6, Fig. 3); (3) reuse the interpretation that low-rank updates AMPLIFY under-emphasized-but-latent directions (Table 7) to frame our typed mediators as a diagnosed transferable subspace.
+- Concrete DELTA vs our method: LoRA's low rank is an EFFICIENCY/intrinsic-dimension observation for warm single-task fine-tuning where BOTH the base and the adapted domain share the same task distribution; A and B are free dense factors learned per task. OURS makes low rank a TRANSFER INDUCTIVE BIAS for cold-start (both drugs unseen): M_B is a small set of shared *typed-mediator bases per KG relation type* (not arbitrary dense factors), M_A is *per-pair block-sparse* selection coefficients, and drugs only SELECT shared mediators -> cold-safe by construction. LoRA has no notion of unseen-entity generalization, no typed/structured factor, and no block-sparsity; its rank is chosen for compute, ours to match a diagnosed low-rank *transferable* structure. LoRA is also purely per-layer weight adaptation in a Transformer, not a relation-typed edge-scoring residual over a biomedical KG.
+
+## Safe-to-cite claims (section pointers)
+- W = W0 + BA, B in R^{d x r}, A in R^{r x k}, r << min(d,k); forward h = W0 x + BAx (Sec. 4.1, Eq. 3).
+- Init A Gaussian, B=0; scale by alpha/r (Sec. 4.1).
+- Mergeable, no inference latency; task switch by swapping BA (Sec. 4.1).
+- Generalizes full fine-tuning as r -> rank of pretrained matrices (Sec. 4.1).
+- Up to 10,000x fewer trainable params and ~3x VRAM reduction on GPT-3 175B (Abstract, Sec. 4.2).
+- Matches/exceeds FT on RoBERTa/DeBERTa/GPT-2/GPT-3 (Tables 2-4).
+- r as low as 1-2 suffices for GPT-3 {Wq,Wv}; update has low intrinsic rank (Sec. 7.2, Table 6).
+- Delta_W amplifies directions latent but under-emphasized in W0, amplification ~21.5x at r=4 (Sec. 7.3, Table 7).
+
+## Do-NOT-overclaim / caveats
+- LoRA does NOT prove low rank suffices for every task; authors explicitly caveat (footnote 6, Sec. 7.2) that a small r may fail when the downstream task is far from pretraining (e.g. different language). Do not cite it as a universal low-rank guarantee.
+- The "low intrinsic rank of the update" is a HYPOTHESIS + empirical observation on specific LMs/tasks, not a theorem. For rank-sufficiency theory, cite the ICLR-2024 expressive-power paper instead.
+- Rank findings (r=1) are strongest for {Wq,Wv} on WikiSQL/MNLI; Wq-alone needs larger r (Table 6). Do not generalize the "r=1" number.
+- No cold-start / unseen-entity setting anywhere in this paper. Do not imply LoRA addresses generalization to unseen entities; it addresses parameter/storage efficiency of single-task adaptation.
+- Numbers cited are from the arXiv v2 (Oct 2021). Some rows in Tables 3-4 were hard to parse from the extracted layout; the load-bearing numbers above (GLUE avgs, GPT-3 WikiSQL/MNLI, rank tables) are the reliable ones.

@@ -1,0 +1,56 @@
+[smoke] task=multilabel train=(300, 5) val=(75, 5) test=(120, 5) n_out=200 regime=transductive/S0
+/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/outdated/__init__.py:36: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import parse_version
+222.0
+  0%|          | 0/300 [00:00<?, ?it/s]  0%|          | 0/300 [00:00<?, ?it/s]
+  0%|          | 0/75 [00:00<?, ?it/s]  0%|          | 0/75 [00:00<?, ?it/s]
+  0%|          | 0/120 [00:00<?, ?it/s]  0%|          | 0/120 [00:00<?, ?it/s]
+  0%|          | 0/300 [00:00<?, ?it/s]  5%|▍         | 14/300 [00:00<00:02, 139.94it/s] 15%|█▍        | 44/300 [00:00<00:01, 231.96it/s] 23%|██▎       | 70/300 [00:00<00:00, 233.31it/s] 33%|███▎      | 99/300 [00:00<00:00, 254.39it/s] 44%|████▎     | 131/300 [00:00<00:00, 277.15it/s] 55%|█████▌    | 166/300 [00:00<00:00, 300.70it/s] 67%|██████▋   | 202/300 [00:00<00:00, 318.81it/s] 78%|███████▊  | 234/300 [00:00<00:00, 305.74it/s] 88%|████████▊ | 265/300 [00:00<00:00, 306.54it/s] 99%|█████████▊| 296/300 [00:01<00:00, 301.79it/s]100%|██████████| 300/300 [00:01<00:00, 286.56it/s]
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+  0%|          | 0/75 [00:00<?, ?it/s] 12%|█▏        | 9/75 [00:00<00:00, 71.05it/s] 47%|████▋     | 35/75 [00:00<00:00, 169.15it/s] 80%|████████  | 60/75 [00:00<00:00, 203.54it/s]100%|██████████| 75/75 [00:00<00:00, 198.83it/s]
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+  0%|          | 0/120 [00:00<?, ?it/s]  2%|▎         | 3/120 [00:00<00:03, 29.62it/s] 33%|███▎      | 40/120 [00:00<00:00, 227.33it/s] 55%|█████▌    | 66/120 [00:00<00:00, 239.99it/s] 82%|████████▏ | 98/120 [00:00<00:00, 270.01it/s]100%|██████████| 120/120 [00:00<00:00, 254.37it/s]
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+222.0
+number of relations:1
+/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/_reduction.py:51: UserWarning: size_average and reduce args will be deprecated, please use reduction='none' instead.
+  warnings.warn(warning.format(ret))
+0it [00:00, ?it/s]/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/core.py:82: DGLWarning: The input graph for the user-defined edge function does not contain valid edges
+  dgl_warning(
+0it [00:02, ?it/s]
+Traceback (most recent call last):
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 72, in <module>
+    main()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 61, in main
+    model.fit_leaf(sub)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_label_cls/baseline_unified.py", line 121, in fit_leaf
+    self.fit(leaf.train, leaf.val, resources=leaf.resources, _test=leaf.test)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_label_cls/baseline_unified.py", line 191, in fit
+    trainer.train()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/managers/trainer.py", line 132, in train
+    loss, auc, auc_pr, weight_norm = self.train_epoch()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/managers/trainer.py", line 67, in train_epoch
+    score_pos = self.graph_classifier(data_pos)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/model/dgl/graph_classifier.py", line 44, in forward
+    g.ndata['h'] = self.gnn(g)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/model/dgl/rgcn_model.py", line 119, in forward
+    layer(g, self.attn_rel_emb)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/model/dgl/layers.py", line 65, in forward
+    node_repr = g.ndata['h']
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/view.py", line 80, in __getitem__
+    return self._graph._get_n_repr(self._ntid, self._nodes)[key]
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/frame.py", line 688, in __getitem__
+    return self._columns[name].data
+KeyError: 'h'

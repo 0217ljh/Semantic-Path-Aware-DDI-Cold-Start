@@ -1,0 +1,407 @@
+
+====================================================================================================
+Sample 1  pair: DB01097 (Leflunomide) ↔ DB08868 (Fingolimod)
+ddi_type: may increase the immunosuppressive activities of
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1839 chars, 11 sentences)]:
+The use of leflunomide with other immunosuppressive agents such as fingolimod may increase the risk of infections. The risk is thought to extend to teriflunomide, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of teriflunomide. Serious infections including sepsis, as well as opportunistic infections like Pneumocystis jiroveci pneumonia, pulmonary and extrapulmonary tuberculosis, and aspergillosis have been reported with the use of leflunomide, particularly in patients on concomitant immunosuppressive therapy. Rare cases of pancytopenia, agranulocytosis, and thrombocytopenia have also occurred with leflunomide alone, but were most frequent in the presence of concomitant or recent use of methotrexate or other myelotoxic agents. No specific data are available regarding use in combination with fingolimod, an agent that causes reversible sequestration of lymphocytes in lymphoid tissues. The concomitant or sequential use (without the recommended leflunomide washout period or procedure) of other agents known to induce hepatotoxicity may potentiate the risk of liver injury associated with leflunomide. The risk is thought to extend to teriflunomide, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of teriflunomide. Elevated liver transaminases, hepatitis, jaundice/cholestasis, hepatic failure, and acute hepatic necrosis have been reported with leflunomide. Liver enzyme elevations were generally mild (2-fold ULN or less) and resolved while continuing treatment. Marked elevations (greater than 3-fold ULN) occurred infrequently and reversed with dose reduction or discontinuation of treatment. However, fatalities associated with severe liver injury have also been reported rarely.
+----------------------------------------------------------------------------------------------------
+[FILTERED (834 chars, 6 sentences kept)]:
+The risk is thought to extend to <OTHER_DRUG>, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of <OTHER_DRUG>. The risk is thought to extend to <OTHER_DRUG>, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of <OTHER_DRUG>. Elevated liver transaminases, hepatitis, jaundice/cholestasis, hepatic failure, and acute hepatic necrosis have been reported with <DRUG_A>. Liver enzyme elevations were generally mild (2-fold ULN or less) and resolved while continuing treatment. Marked elevations (greater than 3-fold ULN) occurred infrequently and reversed with dose reduction or discontinuation of treatment. However, fatalities associated with severe liver injury have also been reported rarely.
+----------------------------------------------------------------------------------------------------
+[REMOVED (5 sentences)]:
+The use of <DRUG_A> with other immunosuppressive agents such as <DRUG_B> may increase the risk of infections.
+  • Serious infections including sepsis, as well as opportunistic infections like Pneumocystis jiroveci pneumonia, pulmonary and extrapulmonary tuberculosis, and aspergillosis have been reported with the use of <DRUG_A>, particularly in patients on concomitant immunosuppressive therapy.
+  • Rare cases of pancytopenia, agranulocytosis, and thrombocytopenia have also occurred with <DRUG_A> alone, but were most frequent in the presence of concomitant or recent use of <OTHER_DRUG> or other myelotoxic agents.
+  • No specific data are available regarding use in combination with <DRUG_B>, an agent that causes reversible sequestration of lymphocytes in lymphoid tissues.
+  • The concomitant or sequential use (without the recommended <DRUG_A> washout period or procedure) of other agents known to induce hepatotoxicity may potentiate the risk of liver injury associated with <DRUG_A>.
+
+====================================================================================================
+Sample 2  pair: DB08868 (Fingolimod) ↔ DB08880 (Teriflunomide)
+ddi_type: may increase the immunosuppressive activities of
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1839 chars, 11 sentences)]:
+The use of leflunomide with other immunosuppressive agents such as fingolimod may increase the risk of infections. The risk is thought to extend to teriflunomide, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of teriflunomide. Serious infections including sepsis, as well as opportunistic infections like Pneumocystis jiroveci pneumonia, pulmonary and extrapulmonary tuberculosis, and aspergillosis have been reported with the use of leflunomide, particularly in patients on concomitant immunosuppressive therapy. Rare cases of pancytopenia, agranulocytosis, and thrombocytopenia have also occurred with leflunomide alone, but were most frequent in the presence of concomitant or recent use of methotrexate or other myelotoxic agents. No specific data are available regarding use in combination with fingolimod, an agent that causes reversible sequestration of lymphocytes in lymphoid tissues. The concomitant or sequential use (without the recommended leflunomide washout period or procedure) of other agents known to induce hepatotoxicity may potentiate the risk of liver injury associated with leflunomide. The risk is thought to extend to teriflunomide, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of teriflunomide. Elevated liver transaminases, hepatitis, jaundice/cholestasis, hepatic failure, and acute hepatic necrosis have been reported with leflunomide. Liver enzyme elevations were generally mild (2-fold ULN or less) and resolved while continuing treatment. Marked elevations (greater than 3-fold ULN) occurred infrequently and reversed with dose reduction or discontinuation of treatment. However, fatalities associated with severe liver injury have also been reported rarely.
+----------------------------------------------------------------------------------------------------
+[FILTERED (822 chars, 6 sentences kept)]:
+The risk is thought to extend to <DRUG_B>, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of <DRUG_B>. The risk is thought to extend to <DRUG_B>, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of <DRUG_B>. Elevated liver transaminases, hepatitis, jaundice/cholestasis, hepatic failure, and acute hepatic necrosis have been reported with <OTHER_DRUG>. Liver enzyme elevations were generally mild (2-fold ULN or less) and resolved while continuing treatment. Marked elevations (greater than 3-fold ULN) occurred infrequently and reversed with dose reduction or discontinuation of treatment. However, fatalities associated with severe liver injury have also been reported rarely.
+----------------------------------------------------------------------------------------------------
+[REMOVED (5 sentences)]:
+The use of <OTHER_DRUG> with other immunosuppressive agents such as <DRUG_A> may increase the risk of infections.
+  • Serious infections including sepsis, as well as opportunistic infections like Pneumocystis jiroveci pneumonia, pulmonary and extrapulmonary tuberculosis, and aspergillosis have been reported with the use of <OTHER_DRUG>, particularly in patients on concomitant immunosuppressive therapy.
+  • Rare cases of pancytopenia, agranulocytosis, and thrombocytopenia have also occurred with <OTHER_DRUG> alone, but were most frequent in the presence of concomitant or recent use of <OTHER_DRUG> or other myelotoxic agents.
+  • No specific data are available regarding use in combination with <DRUG_A>, an agent that causes reversible sequestration of lymphocytes in lymphoid tissues.
+  • The concomitant or sequential use (without the recommended <OTHER_DRUG> washout period or procedure) of other agents known to induce hepatotoxicity may potentiate the risk of liver injury associated with <OTHER_DRUG>.
+
+====================================================================================================
+Sample 3  pair: DB00757 (Dolasetron) ↔ DB01182 (Propafenone)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1685 chars, 8 sentences)]:
+Dolasetron can cause dose-related prolongation of the QT interval via its pharmacologically active metabolite, hydrodolasetron. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death. In general, the risk of an individual agent or a combination of agents causing ventricular arrhythmia in association with QT prolongation is largely unpredictable but may be increased by certain underlying risk factors such as congenital long QT syndrome, cardiac disease, and electrolyte disturbances (e.g., hypokalemia, hypomagnesemia). In addition, the extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). Dolasetron has been shown to cause dose-dependent prolongation of the PR and QRS intervals. There have been reports of second- and third-degree atrioventricular block, cardiac arrest, and serious ventricular arrhythmias including fatalities in both adult and pediatric patients. Theoretically, coadministration with other agents that prolong the PR interval (e.g., beta blockers; calcium channel blockers; some protease inhibitors such as atazanavir, lopinavir and saquinavir; digitalis; lacosamide; mefloquine; moricizine) or QRS interval (e.g., flecainide; moricizine; quinidine) may result in additive effects and increased risk of bradycardia and heart block. Other risk factors include underlying structural heart disease, preexisting conduction abnormalities, advanced age, sick sinus syndrome, atrial fibrillation with slow ventricular response, and myocardial ischemia.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1089 chars, 6 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval via its pharmacologically active metabolite, hydrodolasetron. In general, the risk of an individual agent or a combination of agents causing ventricular arrhythmia in association with QT prolongation is largely unpredictable but may be increased by certain underlying risk factors such as congenital long QT syndrome, cardiac disease, and electrolyte disturbances (e.g., hypokalemia, hypomagnesemia). In addition, the extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). <DRUG_A> has been shown to cause dose-dependent prolongation of the PR and QRS intervals. There have been reports of second- and third-degree atrioventricular block, cardiac arrest, and serious ventricular arrhythmias including fatalities in both adult and pediatric patients. Other risk factors include underlying structural heart disease, preexisting conduction abnormalities, advanced age, sick sinus syndrome, atrial fibrillation with slow ventricular response, and myocardial ischemia.
+----------------------------------------------------------------------------------------------------
+[REMOVED (2 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+  • Theoretically, coadministration with other agents that prolong the PR interval (e.g., beta blockers; calcium channel blockers; some protease inhibitors such as <OTHER_DRUG>, <OTHER_DRUG> and <OTHER_DRUG>; digitalis; <OTHER_DRUG>; <OTHER_DRUG>; <OTHER_DRUG>) or QRS interval (e.g., <OTHER_DRUG>; <OTHER_DRUG>; <OTHER_DRUG>) may result in additive effects and increased risk of bradycardia and heart block.
+
+====================================================================================================
+Sample 4  pair: DB00757 (Dolasetron) ↔ DB01232 (Saquinavir)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1685 chars, 8 sentences)]:
+Dolasetron can cause dose-related prolongation of the QT interval via its pharmacologically active metabolite, hydrodolasetron. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death. In general, the risk of an individual agent or a combination of agents causing ventricular arrhythmia in association with QT prolongation is largely unpredictable but may be increased by certain underlying risk factors such as congenital long QT syndrome, cardiac disease, and electrolyte disturbances (e.g., hypokalemia, hypomagnesemia). In addition, the extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). Dolasetron has been shown to cause dose-dependent prolongation of the PR and QRS intervals. There have been reports of second- and third-degree atrioventricular block, cardiac arrest, and serious ventricular arrhythmias including fatalities in both adult and pediatric patients. Theoretically, coadministration with other agents that prolong the PR interval (e.g., beta blockers; calcium channel blockers; some protease inhibitors such as atazanavir, lopinavir and saquinavir; digitalis; lacosamide; mefloquine; moricizine) or QRS interval (e.g., flecainide; moricizine; quinidine) may result in additive effects and increased risk of bradycardia and heart block. Other risk factors include underlying structural heart disease, preexisting conduction abnormalities, advanced age, sick sinus syndrome, atrial fibrillation with slow ventricular response, and myocardial ischemia.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1089 chars, 6 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval via its pharmacologically active metabolite, hydrodolasetron. In general, the risk of an individual agent or a combination of agents causing ventricular arrhythmia in association with QT prolongation is largely unpredictable but may be increased by certain underlying risk factors such as congenital long QT syndrome, cardiac disease, and electrolyte disturbances (e.g., hypokalemia, hypomagnesemia). In addition, the extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). <DRUG_A> has been shown to cause dose-dependent prolongation of the PR and QRS intervals. There have been reports of second- and third-degree atrioventricular block, cardiac arrest, and serious ventricular arrhythmias including fatalities in both adult and pediatric patients. Other risk factors include underlying structural heart disease, preexisting conduction abnormalities, advanced age, sick sinus syndrome, atrial fibrillation with slow ventricular response, and myocardial ischemia.
+----------------------------------------------------------------------------------------------------
+[REMOVED (2 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+  • Theoretically, coadministration with other agents that prolong the PR interval (e.g., beta blockers; calcium channel blockers; some protease inhibitors such as <OTHER_DRUG>, <OTHER_DRUG> and <DRUG_B>; digitalis; <OTHER_DRUG>; <OTHER_DRUG>; <OTHER_DRUG>) or QRS interval (e.g., <OTHER_DRUG>; <OTHER_DRUG>; <OTHER_DRUG>) may result in additive effects and increased risk of bradycardia and heart block.
+
+====================================================================================================
+Sample 5  pair: DB00757 (Dolasetron) ↔ DB01195 (Flecainide)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1685 chars, 8 sentences)]:
+Dolasetron can cause dose-related prolongation of the QT interval via its pharmacologically active metabolite, hydrodolasetron. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death. In general, the risk of an individual agent or a combination of agents causing ventricular arrhythmia in association with QT prolongation is largely unpredictable but may be increased by certain underlying risk factors such as congenital long QT syndrome, cardiac disease, and electrolyte disturbances (e.g., hypokalemia, hypomagnesemia). In addition, the extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). Dolasetron has been shown to cause dose-dependent prolongation of the PR and QRS intervals. There have been reports of second- and third-degree atrioventricular block, cardiac arrest, and serious ventricular arrhythmias including fatalities in both adult and pediatric patients. Theoretically, coadministration with other agents that prolong the PR interval (e.g., beta blockers; calcium channel blockers; some protease inhibitors such as atazanavir, lopinavir and saquinavir; digitalis; lacosamide; mefloquine; moricizine) or QRS interval (e.g., flecainide; moricizine; quinidine) may result in additive effects and increased risk of bradycardia and heart block. Other risk factors include underlying structural heart disease, preexisting conduction abnormalities, advanced age, sick sinus syndrome, atrial fibrillation with slow ventricular response, and myocardial ischemia.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1089 chars, 6 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval via its pharmacologically active metabolite, hydrodolasetron. In general, the risk of an individual agent or a combination of agents causing ventricular arrhythmia in association with QT prolongation is largely unpredictable but may be increased by certain underlying risk factors such as congenital long QT syndrome, cardiac disease, and electrolyte disturbances (e.g., hypokalemia, hypomagnesemia). In addition, the extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). <DRUG_A> has been shown to cause dose-dependent prolongation of the PR and QRS intervals. There have been reports of second- and third-degree atrioventricular block, cardiac arrest, and serious ventricular arrhythmias including fatalities in both adult and pediatric patients. Other risk factors include underlying structural heart disease, preexisting conduction abnormalities, advanced age, sick sinus syndrome, atrial fibrillation with slow ventricular response, and myocardial ischemia.
+----------------------------------------------------------------------------------------------------
+[REMOVED (2 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+  • Theoretically, coadministration with other agents that prolong the PR interval (e.g., beta blockers; calcium channel blockers; some protease inhibitors such as <OTHER_DRUG>, <OTHER_DRUG> and <OTHER_DRUG>; digitalis; <OTHER_DRUG>; <OTHER_DRUG>; <OTHER_DRUG>) or QRS interval (e.g., <DRUG_B>; <OTHER_DRUG>; <OTHER_DRUG>) may result in additive effects and increased risk of bradycardia and heart block.
+
+====================================================================================================
+Sample 6  pair: DB00358 (Mefloquine) ↔ DB00757 (Dolasetron)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1685 chars, 8 sentences)]:
+Dolasetron can cause dose-related prolongation of the QT interval via its pharmacologically active metabolite, hydrodolasetron. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death. In general, the risk of an individual agent or a combination of agents causing ventricular arrhythmia in association with QT prolongation is largely unpredictable but may be increased by certain underlying risk factors such as congenital long QT syndrome, cardiac disease, and electrolyte disturbances (e.g., hypokalemia, hypomagnesemia). In addition, the extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). Dolasetron has been shown to cause dose-dependent prolongation of the PR and QRS intervals. There have been reports of second- and third-degree atrioventricular block, cardiac arrest, and serious ventricular arrhythmias including fatalities in both adult and pediatric patients. Theoretically, coadministration with other agents that prolong the PR interval (e.g., beta blockers; calcium channel blockers; some protease inhibitors such as atazanavir, lopinavir and saquinavir; digitalis; lacosamide; mefloquine; moricizine) or QRS interval (e.g., flecainide; moricizine; quinidine) may result in additive effects and increased risk of bradycardia and heart block. Other risk factors include underlying structural heart disease, preexisting conduction abnormalities, advanced age, sick sinus syndrome, atrial fibrillation with slow ventricular response, and myocardial ischemia.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1089 chars, 6 sentences kept)]:
+<DRUG_B> can cause dose-related prolongation of the QT interval via its pharmacologically active metabolite, hydrodolasetron. In general, the risk of an individual agent or a combination of agents causing ventricular arrhythmia in association with QT prolongation is largely unpredictable but may be increased by certain underlying risk factors such as congenital long QT syndrome, cardiac disease, and electrolyte disturbances (e.g., hypokalemia, hypomagnesemia). In addition, the extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). <DRUG_B> has been shown to cause dose-dependent prolongation of the PR and QRS intervals. There have been reports of second- and third-degree atrioventricular block, cardiac arrest, and serious ventricular arrhythmias including fatalities in both adult and pediatric patients. Other risk factors include underlying structural heart disease, preexisting conduction abnormalities, advanced age, sick sinus syndrome, atrial fibrillation with slow ventricular response, and myocardial ischemia.
+----------------------------------------------------------------------------------------------------
+[REMOVED (2 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+  • Theoretically, coadministration with other agents that prolong the PR interval (e.g., beta blockers; calcium channel blockers; some protease inhibitors such as <OTHER_DRUG>, <OTHER_DRUG> and <OTHER_DRUG>; digitalis; <OTHER_DRUG>; <DRUG_A>; <OTHER_DRUG>) or QRS interval (e.g., <OTHER_DRUG>; <OTHER_DRUG>; <OTHER_DRUG>) may result in additive effects and increased risk of bradycardia and heart block.
+
+====================================================================================================
+Sample 7  pair: DB00630 (Alendronic acid) ↔ DB00991 (Oxaprozin)
+ddi_type: The risk or severity of adverse effects can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1621 chars, 8 sentences)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa. Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as pamidronic acid and zoledronic acid, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1070 chars, 6 sentences kept)]:
+Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as <OTHER_DRUG> and <OTHER_DRUG>, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[REMOVED (2 sentences)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa.
+  • Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney.
+
+====================================================================================================
+Sample 8  pair: DB00630 (Alendronic acid) ↔ DB00812 (Phenylbutazone)
+ddi_type: The risk or severity of adverse effects can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1621 chars, 8 sentences)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa. Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as pamidronic acid and zoledronic acid, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1070 chars, 6 sentences kept)]:
+Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as <OTHER_DRUG> and <OTHER_DRUG>, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[REMOVED (2 sentences)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa.
+  • Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney.
+
+====================================================================================================
+Sample 9  pair: DB00630 (Alendronic acid) ↔ DB00788 (Naproxen)
+ddi_type: The risk or severity of adverse effects can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1621 chars, 8 sentences)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa. Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as pamidronic acid and zoledronic acid, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1070 chars, 6 sentences kept)]:
+Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as <OTHER_DRUG> and <OTHER_DRUG>, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[REMOVED (2 sentences)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa.
+  • Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney.
+
+====================================================================================================
+Sample 10  pair: DB00465 (Ketorolac) ↔ DB00884 (Risedronic acid)
+ddi_type: The risk or severity of gastrointestinal bleeding can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1621 chars, 8 sentences)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa. Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as pamidronic acid and zoledronic acid, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1070 chars, 6 sentences kept)]:
+Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as <OTHER_DRUG> and <OTHER_DRUG>, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[REMOVED (2 sentences)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa.
+  • Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney.
+
+====================================================================================================
+Sample 11  pair: DB00365 (Grepafloxacin) ↔ DB06288 (Amisulpride)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (276 chars, 2 sentences)]:
+Grepafloxacin can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (64 chars, 1 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+
+====================================================================================================
+Sample 12  pair: DB00365 (Grepafloxacin) ↔ DB06663 (Pasireotide)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (276 chars, 2 sentences)]:
+Grepafloxacin can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (64 chars, 1 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+
+====================================================================================================
+Sample 13  pair: DB00365 (Grepafloxacin) ↔ DB06699 (Degarelix)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (276 chars, 2 sentences)]:
+Grepafloxacin can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (64 chars, 1 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+
+====================================================================================================
+Sample 14  pair: DB00365 (Grepafloxacin) ↔ DB06788 (Histrelin)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (276 chars, 2 sentences)]:
+Grepafloxacin can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (64 chars, 1 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+
+====================================================================================================
+Sample 15  pair: DB00365 (Grepafloxacin) ↔ DB06825 (Triptorelin)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (276 chars, 2 sentences)]:
+Grepafloxacin can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (64 chars, 1 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+
+====================================================================================================
+Sample 16  pair: DB00365 (Grepafloxacin) ↔ DB08871 (Eribulin)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (276 chars, 2 sentences)]:
+Grepafloxacin can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (64 chars, 1 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+
+====================================================================================================
+Sample 17  pair: DB00365 (Grepafloxacin) ↔ DB08893 (Mirabegron)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (411 chars, 3 sentences)]:
+Coadministration with inhibitors of CYP450 3A4 may increase the plasma concentrations of mirabegron, which has been shown in vitro to be a substrate of the isoenzyme. However, in vivo results indicate that CYP450 3A4 may play a limited role in the overall elimination. No dosage adjustment is recommended when mirabegron is administered in combination with ketoconazole and probably other CYP450 3A4 inhibitors.
+----------------------------------------------------------------------------------------------------
+[FILTERED (101 chars, 1 sentences kept)]:
+However, in vivo results indicate that CYP450 3A4 may play a limited role in the overall elimination.
+----------------------------------------------------------------------------------------------------
+[REMOVED (2 sentences)]:
+Coadministration with inhibitors of CYP450 3A4 may increase the plasma concentrations of <DRUG_B>, which has been shown in vitro to be a substrate of the isoenzyme.
+  • No dosage adjustment is recommended when <DRUG_B> is administered in combination with <OTHER_DRUG> and probably other CYP450 3A4 inhibitors.
+
+====================================================================================================
+Sample 18  pair: DB00365 (Grepafloxacin) ↔ DB09082 (Vilanterol)
+ddi_type: The risk or severity of QTc prolongation and ventricular arrhythmias can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (309 chars, 2 sentences)]:
+Beta-2 adrenergic agonists can cause dose-related prolongation of the QT interval and potassium loss.  Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (101 chars, 1 sentences kept)]:
+Beta-2 adrenergic agonists can cause dose-related prolongation of the QT interval and potassium loss.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+
+====================================================================================================
+Sample 19  pair: DB00365 (Grepafloxacin) ↔ DB12245 (Triclabendazole)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (276 chars, 2 sentences)]:
+Grepafloxacin can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (64 chars, 1 sentences kept)]:
+<DRUG_A> can cause dose-related prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences)]:
+Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+
+====================================================================================================
+Sample 20  pair: DB00365 (Grepafloxacin) ↔ DB00593 (Ethosuximide)
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (263 chars, 2 sentences)]:
+Based on in vitro inhibition data, coadministration with grepafloxacin may increase the plasma concentrations of drugs that are substrates of the CYP450 3A4 isoenzyme. The mechanism is decreased clearance due to inhibition of CYP450 3A4 activity by grepafloxacin.
+----------------------------------------------------------------------------------------------------
+[FILTERED (90 chars, 1 sentences kept)]:
+The mechanism is decreased clearance due to inhibition of CYP450 3A4 activity by <DRUG_A>.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences)]:
+Based on in vitro inhibition data, coadministration with <DRUG_A> may increase the plasma concentrations of drugs that are substrates of the CYP450 3A4 isoenzyme.
+
+====================================================================================================
+Sample 21  pair: DB00921 (Buprenorphine) ↔ DB08875 (Cabozantinib)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_B> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+
+
+====================================================================================================
+Sample 22  pair: DB00904 (Ondansetron) ↔ DB08875 (Cabozantinib)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_B> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+
+
+====================================================================================================
+Sample 23  pair: DB00196 (Fluconazole) ↔ DB08875 (Cabozantinib)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_B> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+
+
+====================================================================================================
+Sample 24  pair: DB01087 (Primaquine) ↔ DB08875 (Cabozantinib)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_B> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+
+
+====================================================================================================
+Sample 25  pair: DB00321 (Amitriptyline) ↔ DB08875 (Cabozantinib)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_B> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+
+
+====================================================================================================
+Sample 26  pair: DB08875 (Cabozantinib) ↔ DB11718 (Encorafenib)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_A> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+
+
+====================================================================================================
+Sample 27  pair: DB00472 (Fluoxetine) ↔ DB08875 (Cabozantinib)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_B> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+
+
+====================================================================================================
+Sample 28  pair: DB01069 (Promethazine) ↔ DB08875 (Cabozantinib)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_B> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+
+
+====================================================================================================
+Sample 29  pair: DB08875 (Cabozantinib) ↔ DB12245 (Triclabendazole)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_A> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+
+
+====================================================================================================
+Sample 30  pair: DB00665 (Nilutamide) ↔ DB08875 (Cabozantinib)
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (55 chars, 1 sentences)]:
+Cabozantinib can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[FILTERED (51 chars, 1 sentences kept)]:
+<DRUG_B> can cause prolongation of the QT interval.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences)]:
+

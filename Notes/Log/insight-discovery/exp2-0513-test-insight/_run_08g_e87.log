@@ -1,0 +1,46 @@
+[E8.7] loaded key (len 108)
+[E8.7] loading KG ...
+[E8] cold-start G2 drugs (unseen at train): 634;  G1 (seen): 1266
+[E8] after S2 closedness filter: positives=54369  negatives=54369
+[E8] feature-filtered pool sizes:  PD-pos=8418  PK-pos=7972  neg=8823
+[E8.7] PD-pos=60  PK-pos=60  NEG=60  total=180
+[E8.7] selector cache: 0
+[E8.7] === Stage 1: selector (forced-pair, no NONE allowed) ===
+  [1/180] PD-pos-DB00806_DB01166 sel=[('Blood fibrinogen decreased', 'Bleeding tendency')] fb=False elapsed=2s ETA=360s
+  [30/180] PD-pos-DB00193_DB01080 sel=[('Arthralgia of temporomandibular joint', 'Developmental coordination disorder')] fb=False elapsed=59s ETA=294s
+  [60/180] PD-pos-DB00988_DB01238 sel=[('Ventricular arrhythmia', 'ECG signs of myocardial ischaemia')] fb=False elapsed=117s ETA=235s
+  [90/180] PK-pos-DB00757_DB08820 sel=[('Serum transaminase increased', 'Transaminases increased')] fb=False elapsed=175s ETA=175s
+  [120/180] PK-pos-DB00631_DB01124 sel=[('Death', 'Hypoglycaemia')] fb=False elapsed=236s ETA=118s
+  [150/180] NEG-DB00207_DB00988 sel=[('Prolonged menses', 'Prolonged menses')] fb=False elapsed=295s ETA=59s
+  [180/180] NEG-DB00491_DB01065 sel=[('Gastrointestinal symptom NOS', 'Gastrointestinal tract irritation')] fb=False elapsed=352s ETA=0s
+[E8.7] selector fallback used: 0/180
+
+[E8.7] === SELECTOR OUTPUTS preview (5 PD-pos, 3 NEG) ===
+  [PD] Pentoxifylline + Cilostazol
+    raw: Pair1: A_effect="Blood fibrinogen decreased" | B_effect="Bleeding tendency"
+    selected: [('Blood fibrinogen decreased', 'Bleeding tendency')]  fallback=False
+  [PD] Ropinirole + Iloprost
+    raw: Pair1: A_effect="Cerebral atrophy" | B_effect="Intracranial hemorrhage"
+    selected: [('Cerebral atrophy', 'Intracranial hemorrhage')]  fallback=False
+  [PD] Phentermine + Miglitol
+    raw: Pair1: A_effect="Abdominal cramps" | B_effect="Abdominal distension"
+    selected: [('Abdominal cramps', 'Abdominal distension')]  fallback=False
+  [PD] Desmopressin + Prazosin
+    raw: Pair1: A_effect="Water retention" | B_effect="Urinary incontinence"
+    selected: [('Water retention', 'Urinary incontinence')]  fallback=False
+  [PD] Trandolapril + Methsuximide
+    raw: Pair1: A_effect="Potassium increased" | B_effect="Eosinophilia"
+    selected: [('Potassium increased', 'Eosinophilia')]  fallback=False
+  [NEG] Galantamine + Lincomycin
+    raw: Pair1: A_effect="Lower gastrointestinal haemorrhage" | B_effect="Pseudomembranous colitis"
+    selected: [('Lower gastrointestinal haemorrhage', 'Pseudomembranous colitis')]  fallback=False
+  [NEG] Tolazamide + Itraconazole
+    raw: Pair1: A_effect="Jaundice cholestatic" | B_effect="Hepatic impairment"
+    selected: [('Jaundice cholestatic', 'Hepatic impairment')]  fallback=False
+  [NEG] Carteolol + Docetaxel
+    raw: Pair1: A_effect="Lacrimation increased" | B_effect="Lacrimal duct obstruction"
+    selected: [('Lacrimation increased', 'Lacrimal duct obstruction')]  fallback=False
+
+[E8.7] reasoner cache: 0
+[E8.7] === Stage 2: reasoner (neutral prompt) ===
+  [1/180] PD-pos-DB00806_DB01166 score=0.65 elapsed=4s ETA=740s

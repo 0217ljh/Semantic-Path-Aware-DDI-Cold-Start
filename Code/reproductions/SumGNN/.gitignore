@@ -1,0 +1,6 @@
+# Generated / regenerable artifacts for the SumGNN reproduction.
+# _Original-Dataset/ is ignored by the repo-root .gitignore.
+data                 # symlink -> _Original-Dataset (created at first run)
+experiments/         # training logs + checkpoints
+__pycache__/
+_results/_gate_run*.log

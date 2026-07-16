@@ -1,0 +1,187 @@
+{
+  "existence": {
+    "n_pairs_ge2": 3591,
+    "strict_any_frac_overall": 0.9548872180451128,
+    "strict_any_frac_by_supp": {
+      "2-4": 0.02830188679245283,
+      "5-9": 0.09259259259259259,
+      "10-19": 0.7894736842105263,
+      "20-49": 0.9887640449438202,
+      "50+": 0.9996973365617433
+    },
+    "median_n_strict_when_pos": 748.0,
+    "n_strict_mean": 1586.914508493456,
+    "cross_frac_mean": 0.012491645683571657,
+    "same_frac_mean": 0.9875083543164284
+  },
+  "discriminativity": {
+    "strict_any": {
+      "auroc": 0.4998,
+      "ci": [
+        0.4993,
+        0.5001
+      ],
+      "perm_p": 0.5748
+    },
+    "strict_density": {
+      "auroc": 0.4948,
+      "ci": [
+        0.4752,
+        0.5151
+      ],
+      "perm_p": 0.6877
+    },
+    "strict_wdensity": {
+      "auroc": 0.4973,
+      "ci": [
+        0.4773,
+        0.5172
+      ],
+      "perm_p": 0.6013
+    }
+  },
+  "underuse": {
+    "strict_any": {
+      "auroc": 0.5,
+      "ci": [
+        0.5,
+        0.5
+      ]
+    },
+    "strict_density": {
+      "auroc": 0.6147,
+      "ci": [
+        0.4601,
+        0.7537
+      ]
+    },
+    "strict_wdensity": {
+      "auroc": 0.614,
+      "ci": [
+        0.456,
+        0.7537
+      ]
+    }
+  },
+  "go": {
+    "existence": true,
+    "discriminativity": false,
+    "underuse": false
+  },
+  "config": {
+    "max_pairs": 4000,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "n_ge2": 3591
+  },
+  "top_typepairs": [
+    [
+      [
+        "anatomy",
+        "protein_gene"
+      ],
+      4628609
+    ],
+    [
+      [
+        "disease",
+        "protein_gene"
+      ],
+      252666
+    ],
+    [
+      [
+        "cellular_component",
+        "protein_gene"
+      ],
+      245837
+    ],
+    [
+      [
+        "molecular_function",
+        "protein_gene"
+      ],
+      153748
+    ],
+    [
+      [
+        "protein_gene",
+        "protein_gene"
+      ],
+      70788
+    ],
+    [
+      [
+        "biological_process",
+        "protein_gene"
+      ],
+      54435
+    ],
+    [
+      [
+        "disease",
+        "side_effect"
+      ],
+      48878
+    ],
+    [
+      [
+        "compound",
+        "side_effect"
+      ],
+      40470
+    ],
+    [
+      [
+        "disease",
+        "disease"
+      ],
+      30315
+    ],
+    [
+      [
+        "compound",
+        "compound"
+      ],
+      29577
+    ],
+    [
+      [
+        "exposure",
+        "exposure"
+      ],
+      22359
+    ],
+    [
+      [
+        "compound",
+        "disease"
+      ],
+      19276
+    ],
+    [
+      [
+        "protein_gene",
+        "side_effect"
+      ],
+      16776
+    ],
+    [
+      [
+        "disease",
+        "exposure"
+      ],
+      15120
+    ],
+    [
+      [
+        "pathway",
+        "protein_gene"
+      ],
+      11796
+    ]
+  ]
+}

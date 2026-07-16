@@ -1,0 +1,61 @@
+Title: Low-Rank Subspace Override for Unsupervised Domain Adaptation
+Authors: Christoph Raab, Frank-Michael Schleif (University of Applied Sciences Wurzburg-Schweinfurt)
+Venue+Year: arXiv preprint (cs.LG), v3 dated 8 Jul 2020. NOTE: extracted text shows only "arXiv:1907.01343v3"; no peer-reviewed venue is stated on the PDF itself.
+arXiv-or-DOI: arXiv:1907.01343v3
+PDF filename: Low-Rank Subspace Override for Unsupervised.pdf
+
+## TL;DR
+A closed-form, non-deep unsupervised domain adaptation (UDA) method. It "overrides" the source domain's orthogonal subspace basis with the target basis so that source and target are FORCED to lie in the same (single) subspace by construction, then trains a classifier in that shared subspace. A Nystrom low-rank approximation (NSO) makes it need only a small class-wise sample ("snapshot") of the data and run in O(l^2) time, l << n,m,d (Abstract; Sec. 3, Eqs. 5-7; Sec. 3.1, Eqs. 9-10; Sec. 3.3).
+
+## Problem & Contributions
+- Problem: unsupervised DA where p(x_s) != p(x_t); prior least-squares subspace alignment fails when source and target do NOT already share a common subspace (Shao et al. observation) (Sec. 1; Sec. 2; Sec. 3).
+- Contribution 1: Subspace Override (SO) -- a closed-form orthogonal projection operator M = U_t^l (U_s^l)^T that maps source data onto the TARGET subspace basis, guaranteeing both domains occupy the same subspace (no residual subspace gap by construction) (Sec. 3, Eq. 7).
+- Contribution 2: Nystrom Subspace Override (NSO) -- first use of a Nystrom SVD approximation for subspace DA; needs only a landmark "snapshot", O(l^2) complexity, and denoises by zeroing near-zero singular values (Sec. 3.1; Sec. 3.3).
+- Contribution 3: class-wise sampling strategy for landmarks + post-hoc standardization correction for the Nystrom scaling mismatch (Sec. 3.2).
+- Contribution 4: a proved approximation-error bound (Appendix A, Thm 1).
+
+## Method / Core mechanism (equations in words + notation)
+Notation: X_s in R^{mxd} source, X_t in R^{nxd} target, C classes. U,Sigma,V from SVD; subscript l = truncated top-l components.
+- Base objective (Eqs. 1-2): argmin_M ||M X_s - X_t||_F^2 s.t. M M^T = I -- learn an ORTHOGONAL map aligning source to target. Two flaws: (i) needs m=n (fixed by Gaussian up-sampling / random down-sampling, Sec. 3); (ii) plain M may project into different spaces (Shao et al.), so M is tied directly to the target subspace.
+- Low-rank subspace form (Eqs. 3-5): rewrite PCA via SVD (X^T X = V Sigma^2 V^T), truncate to top-l -> X_l = U_l Sigma_l. Then argmin_M ||M U_s^l Sigma_s^l - U_t^l Sigma_t^l||_F^2 s.t. MM^T=I.
+- Key assumption: singular values are similar across domains, Sigma_s^l ~ Sigma_t^l, and are FIXED. Under this, closed-form solution M = U_t^l (U_s^l)^T (Sec. 3).
+- Override (Eq. 7): X_s^l = M U_s^l Sigma_s^l = U_t^l Sigma_s^l -- source data is re-expressed on the TARGET's left singular vectors (basis override). Classifier trained on X_s^l, evaluated on X_t^l = U_t^l Sigma_t^l. Geometrically a rotation of source onto the target basis angles.
+- Nystrom (NSO) (Sec. 3.1, Eqs. 8-10): partition matrix into blocks [[A,B],[C,F]], A = landmark matrix (l random rows/cols); reconstruct full SVD from A and C. M = U_tilde_t U_tilde_s^{-1}; X_tilde_s^l = U_tilde_t Sigma_s. Only SVDs of the small landmark matrices A_s, A_t are needed. Zeroing near-zero singular values reduces noise (Sec. 3.1).
+- Sampling + correction (Sec. 3.2): class-wise row sampling on labeled source, uniform on unlabeled target; post-process standardization to mean 0 / var 1 to fix the Nystrom scaling mismatch (Gerschgorin bound argument). Full pseudocode in Algorithm 1.
+- Error bound (Appendix A, Thm 1, Eq. 12-13): E_SO = ||X_s^l - X_t^l||_F^2 < sum_{i=1}^{l+1}(sigma_i(X_s) - sigma_i(X_t))^2 <= ||X_s - X_t||_F^2. Because U_t^{lT} U_t^l = I, the difference reduces to a difference of singular values only.
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Datasets: Reuters-21578 (text, TFIDF), 20-Newsgroup (text), Caltech-Office (OC) with SURF and DeCaf features (Sec. 4.1, Table 1). 20 test runs, mean accuracy.
+- Baselines: TCA, JDA, GFK, SA, CORAL, CGCA/SCA, EasyTL, JGSA, MEDA (traditional); Alexnet, DDC-MMD, JAN, DAN, Deep-CORAL (deep DA) (Sec. 4).
+- Newsgroup (Table 2): NSO mean accuracy 96.2, best; next best JGSA 82.8, SA 81.1.
+- Reuters (Table 3): NSO mean 98.1, tied-best with SA 98.1; both far above others (e.g. TCA 68.7).
+- Caltech-Office SURF (Table 4): NSO mean 79.3, best; next best MEDA 52.7, JGSA 49.8. Large margin.
+- Caltech-Office DeCaf + deep DA (Table 5): NSO mean 79.4 -- "midfield"; MEDA 92.3 and JGSA 88.9 beat it; deep methods JAN/DAN 86.6. Authors attribute weak DeCaf result to dense features where low-rank truncation is contra-productive (Sec. 4.2).
+- Time (Table 6): NSO is fastest subspace DA method; overall mean 0.9 s vs SA 16.2, MEDA 887.9, JGSA 962.4, CGCA 3077.2. Complexity O(l^2) (Sec. 3.3; Sec. 4.3).
+- Component study (Appendix C, Table 7): exact SO 86.2 overall < NSO_uniform 88.1 < NSO_classwise 88.4; kernelized NSO_ker 77.0 (worst). So the Nystrom approximation HELPS (denoising) and class-wise sampling slightly helps.
+
+## Relevance to our cold-start low-rank DDI paper (RW bucket; how we'd cite; concrete DELTA vs our method)
+- RW bucket: Stream A (OOD / transfer / domain adaptation + low-rank subspace). This is a low-rank SUBSPACE-alignment UDA method: the transferable structure is captured in a low-rank shared subspace (top-l singular directions), and low-rank truncation denoises.
+- How we'd cite: as a Stream-A instance where the cross-domain shared structure lives in a LOW-RANK subspace and where low-rank truncation removes domain-idiosyncratic (small-singular-value) noise. Supports the Stream-A intuition that "the component transferring across the distribution gap is low-rank / small-intersection." Also a clean example of the shared-subspace / basis-override device.
+- Concrete DELTAs vs ours:
+  1. Transductive & target-data-required: NSO NEEDS target-domain samples (unlabeled) AT TRAINING to compute the target basis U_t. Our cold-start setting has NO test-pair drugs / no unseen-drug supervision at training; both drugs are unseen. NSO's mechanism (override source basis with target basis) is unavailable in true cold start -- fundamental applicability gap.
+  2. Exogenous vs endogenous shift: NSO is classic UDA with an exogenous domain gap (Reuters subcategories, camera domains). Ours is endogenous support shift on ONE biomedical KG, no external domains -> Stream B leaning. NSO is firmly Stream A.
+  3. Linear closed-form subspace vs learned typed residual: NSO is a shallow, closed-form SVD/Nystrom rotation with the strong assumption Sigma_s ~ Sigma_t. Ours is a LEARNED low-rank residual H = H_base + M_A*M_B with M_B = few typed mediator bases per KG relation type and M_A = per-pair block-sparse coefficients over relation-typed KG mediators. No SVD, no singular-value-equality assumption, and relation-typed rather than global.
+  4. Cold-safety: NSO has no notion of unseen-node identity; it aligns whole feature matrices. Our cold-safety comes from drugs only SELECTING shared typed mediators (common KG neighbors), never a per-drug DDI embedding. NSO does not address this.
+  5. No rank-divergence diagnostic: NSO fixes rank l as a hyperparameter (number of landmarks) and shows accuracy is stable in l (Fig. 3). It does NOT compare effective rank of warm vs cold fitting -- our core diagnostic (warm ~4x higher effective rank than cold via an unconstrained GCN probe) is absent.
+
+## Safe-to-cite claims (section pointers)
+- UDA fails when source/target do not already lie in a common subspace (motivation from Shao et al.) (Sec. 1; Sec. 2; Sec. 3).
+- Subspace Override forces both domains into one subspace via M = U_t^l (U_s^l)^T (closed form, orthogonal) (Sec. 3, Eq. 7).
+- Nystrom low-rank approximation gives O(l^2) complexity and denoises by dropping near-zero singular values (Sec. 3.1; Sec. 3.3).
+- Approximation-error bound E_SO < sum(sigma diffs)^2 <= ||X_s - X_t||_F^2 (Appendix A, Thm 1, Eqs. 12-13).
+- NSO is best on Reuters (98.1, tied SA), Newsgroup (96.2), OC-SURF (79.3); midfield on OC-DeCaf (79.4); fastest overall (0.9 s) (Tables 2-6). These numbers ARE machine-readable in this PDF and verified.
+- Component study: Nystrom approximation + class-wise sampling improve over exact SO (Table 7).
+
+## Do-NOT-overclaim / caveats
+- Venue: PDF only shows arXiv:1907.01343v3 (2020). Do NOT assert a specific conference/journal without external verification.
+- NSO is TRANSDUCTIVE and REQUIRES target data at training -- it is UDA, not domain generalization and NOT applicable to strict cold start where test entities are unseen. Be explicit about this if citing for cold-start motivation.
+- Strong assumption Sigma_s^l ~ Sigma_t^l (equal singular values across domains); authors themselves note it "does not always hold" (Sec. 3). The corrective standardization is a heuristic patch.
+- It is a shallow linear-subspace method on image/text classification; no graph, no KG, no DDI, no node-level tasks.
+- On dense DeCaf features NSO underperforms (low-rank truncation "contra-productive"), so its low-rank benefit is data-dependent, not universal (Sec. 4.2).
+- The Frobenius-norm bound shows matrices become numerically MORE SIMILAR; authors explicitly caution this does NOT guarantee better classification accuracy (Sec. 3.3, text after Eq. 12).

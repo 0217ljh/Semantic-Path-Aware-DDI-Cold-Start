@@ -1,0 +1,24 @@
+[smoke] task=multiclass train=(300, 5) val=(75, 5) test=(120, 5) n_out=165 regime=transductive/S0
+/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/outdated/__init__.py:36: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import parse_version
+17.0
+Traceback (most recent call last):
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 72, in <module>
+    main()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 61, in main
+    model.fit_leaf(sub)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_cls/baseline_unified.py", line 122, in fit_leaf
+    self.fit(leaf.train, leaf.val, resources=leaf.resources, _test=leaf.test)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_cls/baseline_unified.py", line 174, in fit
+    generate_subgraph_datasets(params)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/subgraph_extraction/datasets.py", line 25, in generate_subgraph_datasets
+    adj_list, triplets, entity2id, relation2id, id2entity, id2relation, rel = process_files_ddi(params.file_paths, triple_file, saved_relation2id)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/utils/data_utils.py", line 129, in process_files_ddi
+    adj_list.append(csc_matrix((np.ones(len(idx), dtype=np.uint8), (kg_triple[:, 0][idx].squeeze(1), kg_triple[:, 1][idx].squeeze(1))), shape=(len(entity2id), len(entity2id))))
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/scipy/sparse/_compressed.py", line 56, in __init__
+    coo = self._coo_container(arg1, shape=shape, dtype=dtype)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/scipy/sparse/_coo.py", line 101, in __init__
+    self._check()
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/scipy/sparse/_coo.py", line 222, in _check
+    raise ValueError(f'axis {i} index {idx.max()} exceeds '
+ValueError: axis 1 index 15411 exceeds matrix dimension 15388

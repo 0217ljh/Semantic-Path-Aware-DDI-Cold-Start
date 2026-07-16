@@ -1,0 +1,139 @@
+{
+  "experiment": "E1c node-name readability",
+  "merged_kg": "Code/data/KG/_merged_kg/nodes__drugbank_hetionet_primekg.parquet",
+  "n_nodes_total": 178029,
+  "overall_readable_pct": 96.58,
+  "per_kind": {
+    "Drug": {
+      "n": 1900,
+      "readable_pct": 100.0
+    },
+    "Protein": {
+      "n": 2482,
+      "readable_pct": 0.0
+    },
+    "Pathway": {
+      "n": 2487,
+      "readable_pct": 73.26
+    },
+    "Anatomy": {
+      "n": 402,
+      "readable_pct": 100.0
+    },
+    "Biological Process": {
+      "n": 11381,
+      "readable_pct": 100.0
+    },
+    "Cellular Component": {
+      "n": 1391,
+      "readable_pct": 100.0
+    },
+    "Compound": {
+      "n": 294,
+      "readable_pct": 100.0
+    },
+    "Disease": {
+      "n": 137,
+      "readable_pct": 100.0
+    },
+    "Gene": {
+      "n": 20945,
+      "readable_pct": 92.05
+    },
+    "Molecular Function": {
+      "n": 2884,
+      "readable_pct": 100.0
+    },
+    "Pharmacologic Class": {
+      "n": 345,
+      "readable_pct": 100.0
+    },
+    "Side Effect": {
+      "n": 5734,
+      "readable_pct": 100.0
+    },
+    "Symptom": {
+      "n": 438,
+      "readable_pct": 100.0
+    },
+    "drug": {
+      "n": 5854,
+      "readable_pct": 98.48
+    },
+    "gene/protein": {
+      "n": 27610,
+      "readable_pct": 95.72
+    },
+    "disease": {
+      "n": 17080,
+      "readable_pct": 100.0
+    },
+    "effect/phenotype": {
+      "n": 15311,
+      "readable_pct": 100.0
+    },
+    "exposure": {
+      "n": 818,
+      "readable_pct": 100.0
+    },
+    "molecular_function": {
+      "n": 11169,
+      "readable_pct": 100.0
+    },
+    "cellular_component": {
+      "n": 4176,
+      "readable_pct": 100.0
+    },
+    "biological_process": {
+      "n": 28642,
+      "readable_pct": 100.0
+    },
+    "pathway": {
+      "n": 2516,
+      "readable_pct": 100.0
+    },
+    "anatomy": {
+      "n": 14033,
+      "readable_pct": 100.0
+    }
+  },
+  "kinds_meeting_i4_threshold": [
+    "Drug",
+    "Anatomy",
+    "Biological Process",
+    "Cellular Component",
+    "Compound",
+    "Disease",
+    "Gene",
+    "Molecular Function",
+    "Pharmacologic Class",
+    "Side Effect",
+    "Symptom",
+    "drug",
+    "gene/protein",
+    "disease",
+    "effect/phenotype",
+    "exposure",
+    "molecular_function",
+    "cellular_component",
+    "biological_process",
+    "pathway",
+    "anatomy"
+  ],
+  "kinds_failing_i4_threshold": [
+    "Protein",
+    "Pathway"
+  ],
+  "biomedical_relevant_kinds": [
+    "Drug",
+    "Side Effect",
+    "Gene",
+    "Protein",
+    "Disease",
+    "Anatomy",
+    "Pathway",
+    "drug_effect",
+    "Phenotype",
+    "Compound"
+  ]
+}

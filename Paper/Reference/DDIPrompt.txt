@@ -1,0 +1,50 @@
+Title: DDIPrompt: Drug-Drug Interaction Event Prediction based on Graph Prompt Learning
+Authors: Yingying Wang, Yun Xiong (corresponding), Xixi Wu, Xiangguo Sun, Jiawei Zhang, GuangYong Zheng (corresponding)
+Venue+Year: CIKM '24 (33rd ACM Int. Conf. on Information and Knowledge Management), Boise, ID, USA, Oct 21-25, 2024
+arXiv-or-DOI: DOI 10.1145/3627673.3679645
+PDF filename: DDIPrompt.pdf
+
+## TL;DR
+DDIPrompt casts DDI EVENT-type prediction (multi-class edge classification over drug nodes) as a "pre-train, prompt" graph problem. It hierarchically pre-trains two GNN encoders (molecular-graph similarity + binary DDI link prediction), then freezes them and tunes lightweight per-class "prototype" prompt vectors on only ~20% of labeled samples, targeting imbalanced/rare DDI-event types in a few-shot (weak-supervision) regime. It is a node-level embedding method on the DDI graph (drugs as nodes, molecular graph per drug), NOT a KG-path/subgraph reasoner and NOT a cold-start emerging-drug method.
+
+## Problem & Contributions
+- Problem (Abstract, Intro pp. 1-2): DDI event prediction is a multi-class edge-classification task suffering (1) highly imbalanced event distributions and (2) label scarcity for rare events. Existing GNN methods need heavy supervision.
+- Approach: apply NLP-style "pre-train, prompt" to the drug domain; claimed as the first prompting method in the drug domain (Contributions, p. 2).
+- Contributions (p. 2): (i) DDIPrompt, a pre-train+prompt framework for few-shot DDI event prediction; (ii) a hierarchical pre-training method capturing intra-molecular structure and inter-molecular (binary) relations to reduce label bias; (iii) a prototype-enhanced prompting mechanism for few-shot inference; (iv) SOTA on two benchmarks, especially rare events.
+
+## Method / Core mechanism (equations in words + notation)
+Task formulation (§3.1): multi-relational DDI event graph G=(V,E,R), drugs V as nodes, event types R as relations, edges E={(u,v,r)}. Each drug v is also a molecular graph M_v (atoms=nodes, bonds=edges). Goal f: V x V -> R.
+Two-phase paradigm: pre-train encoders, then freeze and prompt-tune.
+Hierarchical pre-training (§3.2):
+- Pretext 1: Molecule similarity-score prediction (§3.2.1). A dual-view Graph Attention Network (message passing with attention alpha_ij = softmax over neighbors, then attentive readout gamma_i pooling) encodes each drug molecular graph to x_v. An MLP predicts pairwise Tanimoto similarity; MSE loss L_pretrain1 = mean (s_uv - hat s_uv)^2. Similar/dissimilar drugs selected by Tanimoto coefficient.
+- Pretext 2: Link prediction (§3.2.2). Initialize each drug h^(0)_v = [x_v || k_v] where k_v is a pre-trained biomedical-KG molecular embedding; a GraphSAGE DDI-GNN propagates over the (binary) DDI graph to h_v; an MLP predicts link existence, cross-entropy loss L_pretrain2 with negative sampling. Pre-training on BINARY interactions (link existence), not on concrete event categories, to avoid label-distribution bias.
+Prompt-based learning/inference (§3.3): freeze encoders. For each event class k, initialize a class prompt (prototype) p_k = mean of edge embeddings e_uv over labeled edges of class k, where e_uv = Mean-Pooling(h_u, h_v) (§3.3.1). Prompt tuning: MLP_theta3([e_uv || p_k]) predicts class-k probability; cross-entropy over few-shot labels (§3.3.2). Only prompts + a small MLP are trained: O(K*d + L*d^2) parameters. Inference: hat r_uv = argmax_k MLP_theta3([e_uv || p_k]) (§3.3.3).
+
+## Key results & numbers (with Table/Fig/Section pointers)
+Datasets (§4.1): Deng's dataset (567 drugs, 37,159 DDIs, 65 event types) and DrugBank (1,689 drugs, 191,075 DDIs, 86 event types). Events split into Common/Fewer/Rare by frequency (Table 1, §4.1). Few-shot protocol: use only 20% of samples per event class for prompt tuning (or training for baselines), 80% for testing.
+Baselines (§4.1): DeepDDI, SSI-DDI, MUFFIN, MRCGNN (DDI-event methods); META-DDIE, D2PT (few-shot); TransE, BioBridge (drug pre-training, adapted with the prototype prompt). Metrics: Accuracy, Macro-F1, Macro-Recall, Macro-Precision.
+Table 2 (§4.2, p. 6), best/2nd-best in bold/underline, values in %:
+- Deng, All Events: DDIPrompt Acc 78.58 (Improv +2.04), F1 48.74 (+6.86), Rec 45.33, Pre 57.65 (+19.90). Strong baselines: MRCGNN Acc 77.01 / F1 44.64, TransE Acc 75.78 / F1 44.02.
+- Deng, Rare: DDIPrompt Acc 64.94, F1 63.60 (+24.69 relative to 2nd-best META-DDIE F1 51.01), Rec 65.08, Pre 72.20. (The headline "24.69% F1 improvement on rare events, Deng" claim in §4.2 corresponds to F1 63.60 vs 51.01.)
+- Deng, Fewer: DDIPrompt Acc 88.62, F1 87.58; Common: Acc 80.41, F1 64.03.
+- DrugBank, All Events: DDIPrompt Acc 89.64 (+2.40), F1 74.89 (+1.05), Rec 71.46, Pre 82.91 (+8.32). Strong baseline MRCGNN Acc 86.54 / F1 73.11.
+Ablation (§4.3, Table 3, values not cleanly extracted): removing molecular pre-training (w/o Mol), link-prediction pre-training (w/o LP), or the prototype prompting (w/o Prompt) each degrades performance; each component contributes.
+Sensitivity (§4.4): varying prompt-tuning ratio 10%-40%; DDIPrompt stays ahead of MRCGNN and best few-shot baseline.
+
+## Relevance to our cold-start low-rank DDI paper (§2.1 taxonomy slot: node/path/subgraph; warm vs cold; how we'd cite / whether it's a baseline)
+- Taxonomy slot: NODE-based. Drugs are nodes on the DDI graph; each drug also encoded from its own molecular graph. Predictions use pooled node/edge embeddings and class prototypes; there is NO KG path extraction or enclosing-subgraph reasoning between drug pairs. Place it in the node-embedding branch of §2.1.
+- Warm vs cold: WARM-START (transductive over the SAME drug set) but few-shot / weak-supervision in the LABEL dimension. It reduces label scarcity for rare EVENT TYPES, not drug-level cold-start. Both drugs are seen during pre-training; it does not evaluate unseen (emerging) drugs or an S1/S2-style drug split. Do NOT cite it as a cold-start / emerging-drug method.
+- Use in our paper: cite as a node-based DDI-event method addressing event-type imbalance / few-shot via graph prompt learning, to contrast the "few-shot in labels" problem (theirs) against the "cold-start in drugs" problem (ours). It is NOT a baseline for our unseen-drug setting because its evaluation is warm-start over a fixed drug pool. Useful as a related-work contrast for the prototype/prompt line and for the imbalanced-event motivation.
+
+## Safe-to-cite claims (section pointers)
+- DDIPrompt is a "pre-train, prompt" framework for DDI event prediction; claimed first prompting method in the drug domain (Abstract; Contributions p. 2).
+- Hierarchical pre-training: molecular-graph similarity prediction (Pretext 1, §3.2.1) + binary DDI link prediction (Pretext 2, §3.2.2); prototype class prompts tuned in few-shot (§3.3).
+- Only 20% of per-class samples used for tuning; 80% for testing (§4.1).
+- On Deng rare events, Macro-F1 improves 24.69% over the second-best method (§4.2; Table 2, F1 63.60 vs 51.01).
+- Two benchmarks: Deng (567 drugs / 65 event types) and DrugBank (1,689 drugs / 86 event types) (§4.1).
+
+## Do-NOT-overclaim / caveats
+- This is DDI-EVENT-TYPE prediction (multi-class), not cold-start emerging-drug prediction. Do not conflate its "few-shot" with drug-level cold-start.
+- Table 2 numbers were recovered from pypdf text (page 6); the multi-column grid extracted with some header wrapping. Values above (78.58/48.74/89.64/74.89/63.60 etc.) matched cleanly but reconfirm exact decimals against the PDF before quoting.
+- The "24.69%" is the Improv% column for Deng-Rare F1 (relative improvement over 2nd-best), consistent with F1 63.60 vs 51.01; state it as such, not as an absolute-point gain.
+- Pre-training uses a biomedical-KG molecular embedding (k_v) only as an initialization concatenated to molecular features; it is not KG-path reasoning. Do not describe DDIPrompt as a KG-based path/subgraph method.

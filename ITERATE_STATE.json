@@ -1,0 +1,159 @@
+{
+  "stage": "analyze-iterate",
+  "round": 1,
+  "status": "in_progress",
+  "phase": "A-1",
+  "target_metric": "combined AUROC >= 0.78 (ideal >= 0.79) on test_s2 seed42, single seed, with non-readout-only architectural difference from EmerGNN",
+  "current_best": 0.7804,
+  "current_best_run_id": "2026-05-29_22-02-27__run_v2i4__v2i4_main_seed42__seed42",
+  "current_best_note": "v2i4 anchor; readout-only architecture (i2 count + i4 LLM-pair head); does NOT satisfy 'non-readout-only architectural diff' requirement",
+  "theoretical_ceiling": null,
+  "ceiling_note": "Phase A-2 Theorist to estimate. Round4 plan §1 set ideal at 0.79; assume ceiling within [0.79, 0.82] until Theorist updates.",
+  "max_rounds_per_architecture": 5,
+  "current_architecture": "D2_meet_mask",
+  "architecture_attempts_used": 1,
+  "architecture_attempts_left": 4,
+  "user_workflow_rules": [
+    "5 codex-reviewed adjustments per architecture (micro-tweaks + hyperparam)",
+    "All 5 fail -> meta-review failures -> design new architecture -> repeat",
+    "Autonomous loop, no interruption for confirmation",
+    "Hard rules: WSL conda project_1, no edits to baseline/emergnn/* / mnah_trainer.py / v2i4_trainer.py, verify all numbers file:line or run_id, co-locate review reports to Code/my_code/models/screen_s2_v3_multimodal/_reviews/"
+  ],
+  "blockers": {
+    "codex_mcp_unavailable": {
+      "verified": "2026-06-02",
+      "tried_models": ["gpt-5.3-codex (default)", "gpt-5-codex", "gpt-5", "gpt-5.2-codex", "gpt-4o", "gpt-4", "o1", "codex"],
+      "all_returned": "model not supported when using Codex with a ChatGPT account",
+      "fallback": "Use general-purpose Agent for Theorist + Reviewer roles, with explicit Independent reviewer = 'general-purpose Agent (codex MCP unavailable for ChatGPT account, 2026-06-02 verified)' disclosure per CLAUDE.md review archive规范"
+    }
+  },
+  "threads": {},
+  "history": [
+    {
+      "architecture": "D2_meet_mask",
+      "attempt": 1,
+      "design_doc": "Notes/Log/d2_meet_mask_design.md",
+      "cp1_review": "Code/my_code/models/screen_s2_v3_multimodal/_reviews/2026-06-01__d2_design__round1.md",
+      "cp1_verdict": "PASS_WITH_NITS (codex 3 rounds)",
+      "cp2_review": "Code/my_code/models/screen_s2_v3_multimodal/_reviews/2026-06-01__d2_implementation__round1.md",
+      "cp2_verdict": "PASS_WITH_NITS (codex 4 rounds; Path B vocab pivot)",
+      "runs": {
+        "main": {
+          "run_id": "2026-06-01_15-46-08__run_v3_meet_mask__d2_main_seed42__seed42",
+          "combined_auc": 0.7780,
+          "auc_emergnn": 0.7344,
+          "auc_count_only": 0.7172,
+          "auc_i4_only": 0.5506,
+          "nll": 1.3227,
+          "delta_vs_anchor_pp": -0.24
+        },
+        "K1_shuf": {
+          "run_id": "2026-06-02_00-51-59__run_v3_meet_mask__d2_shuf_mediators_seed42__seed42",
+          "combined_auc": 0.7784,
+          "auc_emergnn": 0.7331,
+          "delta_vs_d2_main_pp": "+0.04 (FAIL design §3 K1 expected drop >= 1.5pp)"
+        },
+        "K3_freeze_alpha": {
+          "run_id": "2026-06-02_00-52-02__run_v3_meet_mask__d2_freeze_alpha_seed42__seed42",
+          "combined_auc": 0.7843,
+          "auc_emergnn": 0.7497,
+          "delta_vs_anchor_pp": "+0.39",
+          "interpretation": "alpha_meet=0 frozen -> bonus = 0 mathematically -> K3 forward equals v2i4 forward, except (a) --deterministic seeding, (b) extra frozen Parameters in optimizer state. Lift likely from deterministic seeding."
+        }
+      },
+      "cp3_verdict": "NOT_PASS (codex unavailable, but data-level evidence: K1 shuffle-invariant + K3 > D2_main both refute D2 mechanism)",
+      "failure_modes": [
+        "shuffle-invariant lift in alpha_meet bonus (same as D1)",
+        "alpha_meet bonus actively harmful (K3 > D2 main by 0.63pp)",
+        "i4_only branch destabilized under D2 training regime (D2 main 0.5506 vs K1 0.6088, K3 0.6023)",
+        "Path B vocab reality: 70% pairs have zero shared 5-bucket mediator -> mask is sparse",
+        "additive logit fusion saturation (count_only +4.84pp compensation; D1 same pattern)"
+      ],
+      "alpha_meet_trajectory": {
+        "ep_1": [0.022, 0.006, 0.0],
+        "ep_10": [0.182, 0.064, 0.0],
+        "ep_50": [0.163, -0.037, 0.0],
+        "ep_100": [0.147, -0.033, 0.0],
+        "note": "layer 0 learned positive (~0.15), layer 1 sign-flipped to negative (~-0.03), layer 2 stayed at 0.0"
+      },
+      "archived_observation": "Notes/Log/round4_d2_seed42_observation.md"
+    }
+  ],
+  "rejected_ideas": [
+    "D1 LLM-edge type injection (round 3 archived NOT_PASS; same shuffle-invariant failure)",
+    "Path A merged-KG mediator universe for D2 (98% vocab mismatch; see round4_d2_vocab_mismatch_discovery.md)"
+  ],
+  "d2_candidate_adjustments_pending_theorist_review": [
+    {
+      "id": "D2.2_replace_not_augment",
+      "name": "D2 + drop-i4-head (replace v2i4 i4 readout, not augment)",
+      "rationale": "K3 evidence suggests i4 readout is destabilized by D2 bonus; replacing it (β_i4=0 fixed) might let backbone-routed signal carry alone without saturation"
+    },
+    {
+      "id": "D2.3_layer_selective",
+      "name": "Restrict alpha_meet to layer 0 only (lock layer 1+2 at 0)",
+      "rationale": "Verified alpha_meet[2]=0 unlearned anyway; layer-1 sign-flip suggests bonus damage there. Force layer 0 only."
+    },
+    {
+      "id": "D2.4_gated_pair_conditional",
+      "name": "Replace scalar alpha_meet with gate(pair_feat): alpha_meet * sigmoid(MLP(pair_feat)) * mask",
+      "rationale": "Make the bonus genuinely pair-conditional (was shuffle-invariant with scalar alpha)"
+    },
+    {
+      "id": "D2.5_mediator_embedding_replace_count",
+      "name": "Replace v2i4 22-d count_head with mediator-pooled embedding from backbone",
+      "rationale": "If mediators are conditioned via D2 backbone path, the i2 22-d count head becomes redundant; replacing eliminates fusion-saturation"
+    },
+    {
+      "id": "D2.6_alternative_mask_definition",
+      "name": "Build n2 over drugbank 5-bucket via shared-pathway expansion (currently bipartite, so n2 empty)",
+      "rationale": "Path B intrinsic sparsity (70% zero mask) limits D2 reach; extend mediator universe within 5-bucket vocab"
+    }
+  ],
+  "phase_history": {
+    "A-1": {"agent": "Research", "verdict": "3 directions delivered + D2.2-D2.6 pre-screen", "artifact": "Notes/Log/ANALYSIS_REPORT.md"},
+    "A-2": {"agent": "Theorist", "verdict": "F1 ceiling ~0.785 single seed without fusion reform; R3 P(>=0.79)=28% R1 expected 0.785+-0.004", "artifacts": ["Notes/Log/ANALYSIS_REPORT.md §Theorist Assessment", "Notes/Log/THEORIST_VERDICT.md"]},
+    "A-3": {"agent": "PI", "decision": "Select R1+R3 parallel; defer R2 to attempt 4 conditional on R1+R3 results"}
+  },
+  "selected_proposals": [
+    {
+      "id": "R1_gated_fusion",
+      "name": "Gated REPLACEMENT fusion (softmax 3-way gate over pair_feat)",
+      "rationale": "Theorist: strictly dominates softplus-additive when Bayes-optimal weights non-constant across pairs (D2 K3 q1/q2 gap proves this). Expected combined 0.785+-0.004 single seed. Cheap (~150 LOC, 35min).",
+      "implementation_target": "Code/my_code/models/screen_s2_v3_multimodal/v3_gated_fusion_trainer.py + run_v3_gated_fusion.py",
+      "expected_p_above_0_79": 0.18,
+      "expected_p_above_0_785": 0.58,
+      "controls": ["K1 shuf-pair-feat (shuffle gate input)", "K2 freeze-gate-uniform (gate = uniform 1/3)", "K3 zero-gate-emergnn-only"],
+      "ml_engineer_priority": "P0"
+    },
+    {
+      "id": "R3_pmp_replace_readout",
+      "name": "PMP-style REPLACEMENT readout (mediator-pooled + concat-MLP_score; drops count + i4 heads)",
+      "rationale": "Theorist: R3 superset v2i4 when input augmented with [emergnn_logit, m_pool, pair_feat, feats22, m_present_bit]. P(>=0.79) = 28%. Aligned with paper Section 4 commitment.",
+      "implementation_target": "Code/my_code/models/screen_s2_v3_multimodal/v3_pmp_trainer.py + run_v3_pmp.py",
+      "expected_p_above_0_79": 0.28,
+      "expected_p_above_0_785": 0.65,
+      "controls": ["K1 shuf-mediator-pool (shuffle m_pool input)", "K2 zero-m-pool (drop m_pool input from MLP)", "K3 v2i4-additive-fallback (MLP_score init as additive sum)"],
+      "ml_engineer_priority": "P0"
+    }
+  ],
+  "deferred_proposals": [
+    {
+      "id": "R2_hypernet_message_function",
+      "name": "Hypernetwork-conditioned per-relation weights at every propagation layer (low-rank)",
+      "deferral_reason": "Higher param risk; defer to attempt 4 (if R1+R3 both miss 0.785). Theorist budget: 258r+448 params, r=8 default, sweep {4,8,16}",
+      "estimated_effort_loc": 300,
+      "estimated_runtime_min": 60
+    }
+  ],
+  "round_1_d2_attempt_budget": {
+    "architecture": "D2",
+    "attempts_used": 1,
+    "this_round_attempts": 2,
+    "attempts_used_after_round_1": 3,
+    "attempts_remaining_after_round_1": 2
+  },
+  "ml_engineer_handoff_ready": true,
+  "timestamp": "2026-06-02T02:30:30",
+  "last_user_input_read": "2026-06-02T01:00:00"
+}

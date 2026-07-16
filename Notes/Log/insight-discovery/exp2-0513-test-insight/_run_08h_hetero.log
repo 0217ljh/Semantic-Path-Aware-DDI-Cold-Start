@@ -1,0 +1,48 @@
+[E8.7-hetero] loaded keys (Claude=108, OpenAI=164)
+[E8.7-hetero] Stage 1 model: claude-opus-4-6
+[E8.7-hetero] Stage 2 model: gpt-4o-2024-08-06
+[E8] cold-start G2 drugs (unseen at train): 634;  G1 (seen): 1266
+[E8] after S2 closedness filter: positives=54369  negatives=54369
+[E8] feature-filtered pool sizes:  PD-pos=8418  PK-pos=7972  neg=8823
+[E8.7-hetero] PD-pos=60  PK-pos=60  NEG=60  total=180
+
+[Stage 1] Opus 4.5 selector. Cache: 0
+  [1/180] PD-pos-DB00806_DB01166 sel=[('Blood fibrinogen decreased', 'Bleeding tendency')] fb=False err=N elapsed=2s ETA=294s
+  [Anthropic] HTTP 500, retry in 1s: {"type":"error","error":{"type":"api_error","message":"Internal server error"},"request_id":"req_011Cb1ECYBnsV5WiRQ81nK7t"}
+  [20/180] PD-pos-DB00438_DB00605 sel=[('Nephropathy', 'Nephritic syndrome')] fb=False err=N elapsed=242s ETA=1935s
+  [40/180] PD-pos-DB00547_DB00877 sel=[('Secondary infection', 'Infection susceptibility increased')] fb=False err=N elapsed=278s ETA=972s
+  [60/180] PD-pos-DB00988_DB01238 sel=[('Angina pectoris', 'ECG signs of myocardial ischaemia')] fb=False err=N elapsed=314s ETA=629s
+  [80/180] PK-pos-DB00624_DB00656 sel=[('Male orgasmic disorder', 'Orgasm abnormal')] fb=False err=N elapsed=357s ETA=446s
+  [100/180] PK-pos-DB00351_DB01274 sel=[('Cardiomyopathy', 'Tachyarrhythmia')] fb=False err=N elapsed=394s ETA=315s
+  [120/180] PK-pos-DB00631_DB01124 sel=[('Death', 'Aplastic anaemia')] fb=False err=N elapsed=433s ETA=216s
+  [140/180] NEG-DB00744_DB01586 sel=[('Liver disorder', 'Hepatic cirrhosis')] fb=False err=N elapsed=470s ETA=134s
+  [160/180] NEG-DB00807_DB00904 sel=[('Mydriasis', 'Blindness transient')] fb=False err=N elapsed=507s ETA=63s
+  [180/180] NEG-DB00491_DB01065 sel=[('Gastrointestinal symptom NOS', 'Gastric disorder')] fb=False err=N elapsed=540s ETA=0s
+[Stage 1] fallback used: 0/180; errors: 0
+
+[Stage 2] GPT-5.4 reasoner. Cache: 0
+  [1/180] PD-pos-DB00806_DB01166 score=0.7 err=N elapsed=2s ETA=299s
+  [20/180] PD-pos-DB00438_DB00605 score=0.2 err=N elapsed=21s ETA=168s
+  [40/180] PD-pos-DB00547_DB00877 score=0.6 err=N elapsed=39s ETA=137s
+  [60/180] PD-pos-DB00988_DB01238 score=0.7 err=N elapsed=61s ETA=122s
+  [80/180] PK-pos-DB00624_DB00656 score=0.2 err=N elapsed=78s ETA=97s
+  [100/180] PK-pos-DB00351_DB01274 score=0.3 err=N elapsed=96s ETA=77s
+  [120/180] PK-pos-DB00631_DB01124 score=0.2 err=N elapsed=114s ETA=57s
+  [140/180] NEG-DB00744_DB01586 score=0.3 err=N elapsed=135s ETA=39s
+  [160/180] NEG-DB00807_DB00904 score=0.1 err=N elapsed=153s ETA=19s
+  [180/180] NEG-DB00491_DB01065 score=0.1 err=N elapsed=171s ETA=0s
+[Stage 2] errors: 0
+
+[E8.7-hetero] === AUROC ===
+  PD  AUROC=0.737 [CI 0.650,0.821]  pos_mean=0.36 neg_mean=0.18  n=60/60
+  PK  AUROC=0.696 [CI 0.611,0.783]  pos_mean=0.30 neg_mean=0.18  n=60/60
+
+[Cost] Opus sel: in=96234 out=5651 ~$1.87
+[Cost] GPT-5.4 reas: in=27380 out=5323 ~$0.12
+[Cost] Total ~$1.99
+
+[E8.7-hetero] === vs E8.6 single-Sonnet (n=30/cl) ===
+  PD  E8.6 Sonnet single = 0.739  E8.7-hetero (Opus+GPT5.4) = 0.737  Δ=-0.001
+  PK  E8.6 Sonnet single = 0.619  E8.7-hetero (Opus+GPT5.4) = 0.696  Δ=+0.077
+
+[E8.7-hetero] saved → e87_hetero_results.json

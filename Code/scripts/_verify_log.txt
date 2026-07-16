@@ -1,0 +1,95 @@
+[setup] project root: /mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start
+[setup] data PKL: /mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/data/coldddi_legacy/800drug/seed42.pkl
+
+=================================================================
+Loading dataset
+=================================================================
+  loaded: drugs=800  train=53743  val_s2=1918  test_s2=1919
+
+=================================================================
+Check 1: Split drug disjointness
+=================================================================
+  [PASS] 1.train∩val_s2_drug: drugs disjoint: |train|=640 ∩ |val_s2|=159
+  [PASS] 1.train∩test_s2_drug: drugs disjoint: |train|=640 ∩ |test_s2|=159
+    [info] val_s2 ∩ test_s2 drug overlap = 159 (expected: shared G2 pool, ~159)
+  [PASS] 1.val_s2∩test_s2_pair: PAIR-level disjoint: |val|=1918 ∩ |test|=1919
+
+=================================================================
+Check 2: Negative sampling correctness
+=================================================================
+  [PASS] 2.val_s0_1to1: |neg|==2986 vs |pos|=2986
+  [PASS] 2.val_s0_no_pos_overlap: neg ∩ all_pos == empty
+  [PASS] 2.val_s0_no_dup: no duplicate neg pairs  --  dup=0
+  [PASS] 2.val_s1_1to1: |neg|==15257 vs |pos|=15257
+  [PASS] 2.val_s1_no_pos_overlap: neg ∩ all_pos == empty
+  [PASS] 2.val_s1_no_dup: no duplicate neg pairs  --  dup=0
+  [PASS] 2.val_s2_1to1: |neg|==1918 vs |pos|=1918
+  [PASS] 2.val_s2_no_pos_overlap: neg ∩ all_pos == empty
+  [PASS] 2.val_s2_no_dup: no duplicate neg pairs  --  dup=0
+  [PASS] 2.test_s0_1to1: |neg|==2986 vs |pos|=2986
+  [PASS] 2.test_s0_no_pos_overlap: neg ∩ all_pos == empty
+  [PASS] 2.test_s0_no_dup: no duplicate neg pairs  --  dup=0
+  [PASS] 2.test_s1_1to1: |neg|==15258 vs |pos|=15258
+  [PASS] 2.test_s1_no_pos_overlap: neg ∩ all_pos == empty
+  [PASS] 2.test_s1_no_dup: no duplicate neg pairs  --  dup=0
+  [PASS] 2.test_s2_1to1: |neg|==1919 vs |pos|=1919
+  [PASS] 2.test_s2_no_pos_overlap: neg ∩ all_pos == empty
+  [PASS] 2.test_s2_no_dup: no duplicate neg pairs  --  dup=0
+  [PASS] 2.train_1to1: |train_neg|==53743 vs |train_pos|=53743
+  [PASS] 2.train_no_pos_overlap: train_neg ∩ all_pos == empty
+
+=================================================================
+Check 3: Same pair universe across models
+=================================================================
+    train hash: b70aa38b330a4877
+    val_s2 hash: 9e999afe33fe8f4b
+    test_s2 hash: ccc188e05dc92337
+  [PASS] 3.hash_recorded: pair-universe hashes recorded (for cross-model consistency on re-load)
+
+=================================================================
+Check 4: Modality contract per baseline
+=================================================================
+  [PASS] 4.HDN_init: HDN-DDI instantiated without KG arg
+  [PASS] 4.TIGER_init: TIGER instantiated without KG arg
+  [PASS] 4.EmerGNN_init: EmerGNN instantiated without KG arg
+  [PASS] 4.smiles_coverage: non-null smiles 1994/1994 (split drugs covered 800/800)
+  [PASS] 4.KG_enzymes: kg.enzymes present, n=5807
+  [PASS] 4.KG_targets: kg.targets present, n=8665
+  [PASS] 4.KG_transporters: kg.transporters present, n=3396
+  [PASS] 4.KG_carriers: kg.carriers present, n=747
+  [PASS] 4.KG_pathways: kg.pathways present, n=1775
+
+=================================================================
+Check 6: Reproducibility (data layer)
+=================================================================
+  [PASS] 6.train_neg_reproducible: hash match: a02fee85f61193b5 == a02fee85f61193b5
+
+=================================================================
+Check 5: fit/predict_proba I/O contract (smoke 1 epoch)
+=================================================================
+
+  --- EmerGNN smoke fit (1 epoch) ---
+[emergnn] 193 drugs lacked parseable SMILES and were zero-filled.
+  [PASS] 5.EmerGNN_shape: predict_proba 1-D ndarray, len match
+  [PASS] 5.EmerGNN_finite: all finite
+  [PASS] 5.EmerGNN_range: in [0,1]: min=0.0258 max=1.0000
+    [time] fit+predict: 254.8s
+
+  --- HDN-DDI smoke fit (1 epoch) ---
+  [PASS] 5.HDN-DDI_shape: predict_proba 1-D ndarray, len match
+  [PASS] 5.HDN-DDI_finite: all finite
+  [PASS] 5.HDN-DDI_range: in [0,1]: min=0.1192 max=0.8429
+    [time] fit+predict: 63.1s
+
+  --- TIGER smoke fit (1 epoch) ---
+[tiger] 1 drugs skipped (no parseable SMILES).
+  [PASS] 5.TIGER_shape: predict_proba 1-D ndarray, len match
+  [PASS] 5.TIGER_finite: all finite
+  [PASS] 5.TIGER_range: in [0,1]: min=0.3139 max=0.6884
+    [time] fit+predict: 141.2s
+
+=================================================================
+Summary
+=================================================================
+  Overall: ALL PASS
+  Total elapsed: 466.0s

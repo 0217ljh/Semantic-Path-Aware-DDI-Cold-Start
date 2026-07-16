@@ -1,0 +1,54 @@
+Title: A generalized method toward drug-target interaction prediction via low-rank matrix projection (LMP)
+Authors: Ratha Pech, Dong Hao, Yan-Li Lee, Maryna Po, Tao Zhou
+Venue+Year: Preprint, arXiv:1706.01876v2 (v2 dated 3 May 2018). No journal venue printed on this PDF.
+arXiv-or-DOI: arXiv:1706.01876v2 [cs.LG]
+PDF filename: A generalized method toward drug-target interaction prediction via low-rank matrix projection.pdf
+
+## TL;DR
+LMP predicts drug-target interactions (DTI) by imposing low-rank structure on a similarity/projection matrix derived from the drug-target ADJACENCY matrix. It decomposes A = A X + E (X low-rank, E sparse noise) via nuclear-norm + L2,1 optimization (Inexact ALM), builds drug-side and target-side low-rank similarity matrices X_D, X_T, and scores candidate interactions by projecting A onto them (Z = A X). It works with interactions only, optionally folds in chemical/sequence similarity, and can predict for new drugs/targets ONLY when their characteristic (chemical/sequence) similarity to known entities is supplied.
+
+## Problem & Contributions
+- Problem: DTI prediction (drug x protein-target), i.e., recover missing edges of a bipartite drug-target network. Framed as matrix completion / link prediction on the interaction matrix (Sec. 1, 2).
+- Gap addressed (Sec. 1): ML DTI methods need negative samples and rich features; similarity-based topological methods (CN, Jaccard, Katz, CRA, CJC) use only local info and cannot handle entities with zero known interactions. LMP needs no negative samples and can optionally use side information.
+- Contributions: (1) a low-rank-matrix-projection formulation that generalizes robust PCA (Eq. 3 reduces to RPCA when the A multiplying X is set to identity); (2) works with interaction-only data (e.g., MATADOR, which has no features); (3) can integrate chemical-structure (SIMCOMP) and protein-sequence (Smith-Waterman) similarity to boost performance; (4) can predict for NEW drugs/targets given their characteristic similarity to known ones.
+
+## Method / Core mechanism (equations in words + notation)
+- Adjacency matrix A in R^{m x n}, A_ij = 1 if drug i interacts with target j else 0 (Eq. 1).
+- Core decomposition (Eq. 2): A = A X + E. So the model projects A THROUGH a learned matrix X plus a sparse residual E. Relaxed objective (Eq. 3): min_{X,E} ||X||_* + lambda ||E||_{2,1} s.t. A = A X + E, where ||.||_* is the nuclear (trace) norm favoring LOW RANK of X and ||.||_{2,1} is a column-sparse noise norm; lambda balances them. Explicitly noted as a generalization of robust PCA (set the inner A to identity -> RPCA) (Sec. 2).
+- Solved by Inexact Augmented Lagrange Multiplier (ALM) with auxiliary J=X (Eq. 4-5, Table 2 / Algorithm 1); iterative updates of J, X, E and multipliers Y1, Y2.
+- Two similarity matrices: applying the solver to A gives X_T in R^{n x n} (protein-protein similarity); applying to A^T gives X_D in R^{m x m} (drug-drug similarity). These are square similarity matrices over KNOWN entities.
+- Scoring by projection (Eq. 6): Z_AD = A^T X_D and Z_AT = A X_T. Combine as Z_A = (Z_AD + Z_AT)/2 (Eq. 7). Known interactions are zeroed out and remaining scores ranked (Sec. 2, Algorithm 2 / Table 3).
+- Optional side info (Sec. 2, "Working with Heterogeneous Data"): compute low-rank versions X_SD, X_ST of the chemical similarity S_D (SIMCOMP) and sequence similarity S_T (Smith-Waterman) by the SAME Eq. 3 solver, project A onto them to get Z_D, Z_T, and combine Z_ADT = w1 Z_A + w2 Z_D + w3 Z_T with weights 0.5/0.25/0.25 (Eq. 8).
+- New drug/target prediction (Sec. 2, "Predicting the New Drugs and Targets"): for an entity with NO known interactions, LMP CANNOT use A alone; it must compute that entity's low-rank characteristic-similarity (X_SD or X_ST) to known entities and project A onto it. I.e., cold-start here strictly requires side-information similarity to seen entities.
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Datasets (Table 1): MATADOR (801 drugs, 2901 targets, 15843 interactions, no features), enzyme (445/664/2926), ion channel (210/204/1476), GPCR (223/95/635), nuclear receptors (54/26/90). 5x10-fold CV, metrics AUC and AUPR (Sec. "Evaluation").
+- Interaction-only setting (Table 4, first block): LMP-ZA avg AUC 0.868 / AUPR 0.657, beating CN (0.854/0.549), Katz (0.827/0.497), Jaccard (0.856/0.555), CJC (0.855/0.562), CRA (0.860/0.612). LMP wins on MATADOR, GPCR, ion channel (AUC+AUPR) and on enzyme AUPR (Sec. 3).
+- With characteristic info (Table 4, second block): LMP-ZADT competitive with BLM/LapRLS/NetLapRLS; results garbled in extracted text (rows/labels misaligned) -- LMP best on some (e.g., AUC on nuclear receptor, GPCR), NetLapRLS best on some AUPR. Verify exact cells in PDF Table 4.
+- New drugs / new targets (Table 5, Fig. 2): among methods using side info, LMP-ZT / LMP-ZD reported best AUC/AUPR on GPCR, ion channel, enzyme for predicting new targets; competitive on new drugs. Table 5 rows are also OCR-scrambled -- treat specific numbers as "verify in PDF."
+- Parameter lambda tuned by grid search, ~[0.1,0.25] for interaction-only, ~[0.1,2] with side info (Sec. "Parameter Settings", Fig. 2).
+
+## Relevance to our cold-start low-rank DDI paper (bucket; how we'd cite; concrete DELTA vs our method)
+Bucket: §2.1 -- the BIOMEDICAL LOW-RANK bridge citation (low-rank matrix completion/projection for biomedical interaction prediction). This is the paper we cite to position our low-rank claim within biomedical DTI/DDI, then sharply differentiate.
+- What matrix is low-rank: the low-rank constraint is on X, a SIMILARITY / PROJECTION matrix over the ENTITY set (drug-drug X_D in R^{m x m} or target-target X_T in R^{n x n}), used to reconstruct the INTERACTION adjacency matrix A via A = A X + E (Eq. 2-3). So low-rank lives on the entity-similarity operator that regenerates the interaction MATRIX -- effectively a low-rank structure on the interaction matrix / its row-column similarity space. It is NOT low-rank on an interaction FUNCTION over frozen node representations.
+- Transductive vs inductive / cold-start: LMP is fundamentally TRANSDUCTIVE for the interaction-only mode -- X_D, X_T are indexed by the known drug/target set, and scoring Z = A X only fills missing entries among SEEN rows/columns. For a fully-unseen entity with NO known interactions, LMP has no row/column in A and MUST be supplied external characteristic similarity (chemical/sequence) to seen entities to place it in X_SD/X_ST (Sec. "Predicting the New Drugs and Targets"). It cannot handle an entity that is unseen AND featureless. There is no notion of BOTH endpoints being simultaneously new.
+- Concrete DELTA vs OUR method (make this sharp in the paper):
+  * Object of low-rank: THEY put low-rank on the entity-similarity matrix X that reconstructs the interaction adjacency matrix A. WE put low-rank on the mediator RESIDUAL interaction FUNCTION, H = H_base + M_A.M_B, over FROZEN node representations -- the rank is on the transfer/residual operator, not on the interaction matrix.
+  * Setting: THEY are transductive (both endpoints effectively seen; cold-start only via external features to seen entities, and only single-sided new drug OR new target). WE target COLD-START with BOTH drugs unseen.
+  * Thesis: THEY use low-rank as a denoising/matrix-completion prior (RPCA generalization). OUR thesis is a rank-COMPARISON claim -- transferable-to-unseen signal admits a LOWER-RANK realization than warm fitting needs -- which LMP neither states nor tests.
+  * Task: DTI (drug x protein) here vs DDI (drug x drug) for us; and matrix factorization/optimization vs learned frozen-KG representations + low-rank residual.
+- How we'd cite: one sentence in §2.1 acknowledging low-rank matrix-completion has a long history in biomedical interaction prediction (LMP as exemplar), immediately followed by our delta: those methods impose low-rank on the interaction matrix and are transductive, whereas we impose low-rank on a residual interaction function over frozen node reps to handle the both-unseen cold-start regime.
+
+## Safe-to-cite claims (section pointers)
+- LMP imposes low rank on X in A = A X + E, minimizing nuclear norm + L2,1 sparse noise (Eq. 2-3), a generalization of robust PCA (Sec. 2).
+- Two similarity matrices X_D (drug), X_T (target); scoring by projection Z = A X, combined and ranked (Eq. 6-7).
+- LMP works interaction-only (needs no negative samples, no features) and optionally integrates chemical/sequence similarity (Eq. 8, Sec. 2).
+- New drug/target prediction REQUIRES characteristic (side-info) similarity to known entities; not possible from interactions alone (Sec. "Predicting the New Drugs and Targets").
+- Interaction-only avg: LMP-ZA AUC 0.868 / AUPR 0.657 > similarity baselines (Table 4, first block).
+
+## Do-NOT-overclaim / caveats
+- Do NOT claim LMP does BOTH-unseen cold-start. It handles single-sided new drug OR new target, and only when external chemical/sequence similarity to seen entities is available. A fully-unseen, featureless entity is out of scope.
+- Do NOT equate LMP's low-rank with ours. Theirs is low-rank on the entity-similarity/interaction-matrix reconstruction (transductive matrix completion); ours is low-rank on a residual interaction function over frozen node reps. This distinction is the paper's key delta -- state it precisely.
+- This is an arXiv preprint (1706.01876v2, 2018); no peer-reviewed venue is printed on the PDF. Cite as preprint unless a published version is confirmed.
+- Table 4 (second block) and Table 5 came out row/label-scrambled in text extraction; verify any specific AUC/AUPR cell against the original PDF before quoting. LMP-ZADT and per-dataset winners are only partially legible.
+- Task is DTI (drug-protein), not DDI; do not present as a DDI baseline.

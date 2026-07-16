@@ -1,0 +1,58 @@
+Title: RankFeat: Rank-1 Feature Removal for Out-of-distribution Detection
+Authors: Yue Song, Nicu Sebe (University of Trento), Wei Wang (Beijing Jiaotong University; corresponding author)
+Venue+Year: NeurIPS 2022 (36th Conference on Neural Information Processing Systems)
+arXiv-or-DOI: Not printed on the PDF body. Code: https://github.com/KingJamesSong/RankFeat (stated in Sec. 2 / p.2)
+PDF filename: RankFeat.pdf
+
+## TL;DR
+A post-hoc out-of-distribution (OOD) DETECTION method. Observation: the high-level feature matrix of a network has a much LARGER dominant (top) singular value for OOD inputs than for in-distribution (ID) inputs, and this rank-1 component drives OOD over-confidence. RankFeat SVD-decomposes each per-sample feature map and SUBTRACTS its rank-1 matrix (s1 u1 v1^T), then feeds the perturbed feature forward and uses the energy score of the resulting logits as the OOD score. Removing rank-1 perturbs OOD predictions much more than ID predictions, so ID/OOD separate better. Reported SOTA on ImageNet-1k: -17.90% average FPR95 and +5.44% average AUROC vs. the previous best (Abstract; Sec. 4.2).
+
+## Problem & Contributions
+Problem: post-hoc OOD detection, framed as ID-vs-OOD binary discrimination via a scoring function S(x) with threshold gamma (Eq. 1, Sec. 2). No retraining, no OOD data, no validation set.
+Contributions (Sec. 1/2, listed p.2-3):
+1. RankFeat: subtract the rank-1 matrix from the high-level feature (Block 3 or Block 4 of a ResNet-type net); achieves SOTA across benchmarks/models.
+2. Extensive ablations: keep-only-rank-1 vs remove-rank-1; remove rank-n (n>1); which network depth; number of Power Iteration steps; multi-scale fusion strategy.
+3. Theoretical analyses: (a) removing rank-1 with larger s1 lowers the score upper bound more; (b) removing rank-1 makes OOD feature statistics closer to a random matrix (Marchenko-Pastur); (c) links RankFeat to ReAct (both attack the s1 term in the bound).
+
+## Method / Core mechanism (equations in words + notation)
+- Take reshaped high-level feature map X in R^{C x HW} per sample (Sec. 2).
+- SVD: X = U S V^T, with S the rectangular diagonal singular-value matrix (Eq. 2).
+- Rank-1 removal: X' = X - s1 u1 v1^T, where s1 is the largest singular value and u1,v1 its singular vectors (Eq. 3).
+- Feed X' through the rest of the network to get logits y'; OOD score = log-sum-exp of y' (energy score) (Eq. 4).
+- Acceleration: instead of full SVD, approximate the dominant singular pair by Power Iteration (PI) with coupled updates v_k = X u_k / ||X u_k||, u_{k+1} = (v_k^T X / ||v_k^T X||)^T; s1 = v_k^T X u_k (Eq. 5). ~20 PI iterations match SVD within <0.1% at ~48% less time (Table 7, Sec. 4.3).
+- Multi-scale fusion: combine Block 3 and Block 4 logit scores by averaging in logit space, log sum exp((y'+y'')/2) (Sec. 2; best fusion per Fig. 4).
+- Theory (Sec. 3): Proposition 1 gives RankFeat(x) < (1/HW)(sum_i s_i - s1)||W||_inf + ||b||_inf + log(Q); a larger removed s1 lowers this bound more. Theorem 1 (Marchenko-Pastur law) is used to show removing rank-1 pushes OOD eigenvalue statistics closer to a random matrix (Table 1). Connection to ReAct: both bounds are governed by s1; ReAct clips it via a manual threshold, RankFeat directly subtracts it (Eqs. 15-18).
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Fig. 1(a): OOD feature has a markedly larger top-1 singular value than ID (ImageNet-1k vs SUN). Fig. 1(b): removing rank-1 flips most OOD class predictions but leaves most ID predictions stable.
+- Table 2 (ResNetv2-101, BiT-S, ImageNet-1k, 4 OOD sets iNaturalist/SUN/Places/Textures): RankFeat (Block 3+4) average FPR95 = 36.80, AUROC = 92.15; vs best baseline ReAct 57.66/86.67 and GradNorm 54.70/86.71. Block 4 avg FPR95 39.69; Block 3 avg AUROC 90.80. Paper states +15.01% FPR95 over 2nd best for Block 4, +4.09% AUROC for Block 3, and Block 3+4 gives -17.90% FPR95 / +5.44% AUROC overall (Sec. 4.2).
+- Table 3: also works on SqueezeNet (avg FPR95 51.94 Block4; -14.22% FPR95, +7.48% AUROC vs 2nd best) and T2T-ViT-24 (avg FPR95 51.58, AUROC 85.60; -6.11% FPR95, +2.05% AUROC).
+- Table 4: beats training-needed methods (MOS, KL Matching) without extra training/validation (FPR95 36.80 vs MOS 39.97, KL Matching 54.30).
+- Table 5 (ablation): removing rank-1 (avg FPR95 39.69) beats keeping-only-rank-1 (58.49) by ~18.8% FPR95, and beats removing rank-2 (57.92) / rank-3 (61.94). Removing MORE than rank-1 degrades performance.
+- Table 6: Block 3/4 are the informative depths; Block 1/2 much worse.
+- Table 7: PI vs SVD time/accuracy trade-off (PI #20 iter ~ SVD within <0.1%).
+
+## Relevance to our cold-start low-rank DDI paper (RW bucket; how we'd cite; concrete DELTA vs our method)
+RW bucket: Stream A (spectral / low-rank structure of features under distribution shift; OOD side).
+How we'd cite: as the canonical "spectral view of distribution shift" work and as the counterpoint that fixes the SIGN of our low-rank story. Cite alongside our A1 effective-rank measurement to note that spectra of features carry distribution-shift signal, but that the direction of the effect is task-dependent.
+CONCRETE DELTA vs us (critical, per task instruction):
+- Task: RankFeat does OOD DETECTION (a binary ID-vs-OOD decision at test time). We do transferable PREDICTION of DDI on unseen (cold) drug pairs.
+- Sign of the low-rank story is OPPOSITE. RankFeat treats the dominant rank-1 component as distribution-SPECIFIC nuisance to be REMOVED (it encodes OOD over-confidence). Our thesis is the reverse: the transferable-to-unseen signal is the LOW-RANK SHARED part we want to KEEP and realize explicitly (H = H_base + M_A M_B with a few typed-mediator bases). RankFeat subtracts low rank; we construct/retain low rank.
+- Object differs: RankFeat operates on per-sample high-level CNN/ViT feature maps in image classification; we operate on relation-typed mediators over a biomedical KG for drug-pair scoring.
+- We should NOT claim RankFeat supports "low rank = transferable". It supports "dominant rank-1 = distribution-specific". Use it to sharpen our framing by contrast, not as direct support.
+
+## Safe-to-cite claims (section pointers)
+- OOD features tend to have a larger dominant singular value than ID features; the rank-1 component drives OOD (over-confident) predictions (Abstract; Sec. 1; Fig. 1a-b).
+- Removing the rank-1 matrix from high-level features improves post-hoc OOD detection to SOTA on ImageNet-1k (Abstract; Table 2).
+- Removing rank-1 specifically (not rank-n, n>1) is best (Table 5).
+- Removing rank-1 pushes OOD feature statistics closer to a random (Marchenko-Pastur) matrix, i.e., makes OOD features less informative (Sec. 3, Theorem 1, Table 1).
+- The energy-score upper bound is governed by the largest singular value s1; RankFeat and ReAct both target that term (Sec. 3, Prop. 1, Eqs. 15-18).
+- Power Iteration approximates rank-1 removal with negligible accuracy loss and lower cost (Table 7).
+
+## Do-NOT-overclaim / caveats
+- This is DETECTION, not transferable prediction. Do not present it as evidence that "transferable signal is low-rank." Its message is "distribution-specific signal concentrates in the top singular direction."
+- Numbers are for image classification (ImageNet-1k ID; iNaturalist/SUN/Places/Textures OOD) with ResNetv2-101/SqueezeNet/T2T-ViT. No KG, no DDI, no biomedical evaluation. Do not transfer numbers.
+- The bound analysis (Prop. 1) is explicitly described as an intuition/explanation, "not a strict guarantee of the score" (Sec. 3 Remark). Do not cite it as a rigorous guarantee.
+- "rank-1 removal is best" is an empirical finding on these benchmarks (Table 5), tied to the observation that only the top singular value differs strongly between ID and OOD; not a universal law.
+- Error bars: method is post-hoc, so paper reports N/A for seed variance (Checklist 3c, p.14) — single deterministic pass, not multi-seed.
+- No standard "effective rank" scalar is defined here (that is RankMe). RankFeat manipulates the rank-1 subspace, not an entropy-based rank measure.

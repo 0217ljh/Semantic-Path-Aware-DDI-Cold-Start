@@ -1,0 +1,32 @@
+[smoke] task=multilabel train=(300, 5) val=(75, 5) test=(120, 5) n_out=200 regime=transductive/S0
+/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/outdated/__init__.py:36: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import parse_version
+222.0
+number of relations:1
+/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/_reduction.py:51: UserWarning: size_average and reduce args will be deprecated, please use reduction='none' instead.
+  warnings.warn(warning.format(ret))
+0it [00:00, ?it/s]/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/dgl/core.py:82: DGLWarning: The input graph for the user-defined edge function does not contain valid edges
+  dgl_warning(
+0it [00:02, ?it/s]
+Traceback (most recent call last):
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 72, in <module>
+    main()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 61, in main
+    model.fit_leaf(sub)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_label_cls/baseline_unified.py", line 121, in fit_leaf
+    self.fit(leaf.train, leaf.val, resources=leaf.resources, _test=leaf.test)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_label_cls/baseline_unified.py", line 191, in fit
+    trainer.train()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/managers/trainer.py", line 132, in train
+    loss, auc, auc_pr, weight_norm = self.train_epoch()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/managers/trainer.py", line 74, in train_epoch
+    loss_train = self.criterion(score_pos, r_labels_pos * targets_pos)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/modules/loss.py", line 699, in forward
+    return F.binary_cross_entropy(
+  File "/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/torch/nn/functional.py", line 3560, in binary_cross_entropy
+    raise ValueError(
+ValueError: Using a target size (torch.Size([256, 256])) that is different to the input size (torch.Size([256, 200])) is deprecated. Please ensure they have the same size.

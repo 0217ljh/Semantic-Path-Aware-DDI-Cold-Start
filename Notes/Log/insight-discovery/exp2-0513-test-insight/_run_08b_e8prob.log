@@ -1,0 +1,62 @@
+[E8.2] loaded API key (len 108)
+[E8.2] loading KG ...
+[E8.2] avg #mol per drug = 7.6; avg #eff per drug = 19.1
+[E8] cold-start G2 drugs (unseen at train): 634;  G1 (seen): 1266
+[E8] after S2 closedness filter: positives=54369  negatives=54369
+[E8] feature-filtered pool sizes:  PD-pos=8418  PK-pos=7972  neg=8823
+[E8.2] sampled: PD-pos=30  PK-pos=30  NEG=30  total=90
+
+[E8.2] === NEW PROMPT PREVIEW (first PD-pos pair) ===
+
+--- A_name ---
+Drug A: Pentoxifylline
+Drug B: Cilostazol
+
+Estimate the probability (0 to 1) that these two drugs would have a clinically relevant drug-drug interaction when co-administered.
+
+--- B_molecular ---
+Drug A: Pentoxifylline
+Drug A's molecular targets/enzymes/transporters: PDE4A, ADORA2A, PDE5A, ADORA2B, PDE4B, OSBPL10, SPRED2, RFNG, ADORA1, MEST, CYP1A2, NT5E, ZNF395, MAFB, DERA, PTK2
+Drug B: Cilostazol
+Drug B's molecular targets/enzymes/transporters: CYP3A7-CYP3A51P, CYP3A7, PDE3A, UFM1, EIF5, CYP3A5, CYP2C19, SCAND1, LAP3, CYP1A2, MCUR1, CYP2D6, CAST, CLTB, HP, CYP3A4, AGR2, PPP2R5E, TRIB3, RRP8
+
+Based ONLY on the listed molecular features, estimate the probability (0 to 1) that these drugs share a pharmacokinetic interaction pathway (e.g., shared CYP isoform substrate/inhibitor pair, transporter competition, metabolic enzyme overlap) when co-administered.
+
+--- C_effect ---
+Drug A: Pentoxifylline
+Drug A's documented side effects / phenotypes: Blood fibrinogen decreased, Fibrinogen decreased, Cholestasis intrahepatic, Meningitis aseptic, Bad taste, Leukaemia, Salivation, Emotional distress, Abdominal bloating, Sleep disturbance, Cholecystitis, Lacrimation, Heartburn, Influenza-like symptoms, Laryngitis, Throat sore, Oropharyngeal discomfort, Cholestasis, Scotoma, Cholecystitis
+Drug B: Cilostazol
+Drug B's documented side effects / phenotypes: Bradyarrhythmia, Haemorrhage subcutaneous, Oesophageal haemorrhage, Epidural haemorrhage, Bleeding tendency, Nodal arrhythmia, Retroperitoneal haemorrhage, Subdural haematoma, Polycythaemia, Iron deficiency anaemia, Pulmonary haemorrhage, Haemorrhagic disorder, Abscess periodontal, Electrocardiogram QT corrected interval prolonged, Abnormal faeces, Duodenitis, Cerebral infarction, Retinal haemorrhage, Atrioventricular block complete, Varicose vein
+
+Based ONLY on the listed side-effect/phenotype features, estimate the probability (0 to 1) that these drugs share a pharmacodynamic risk pathway (e.g., overlapping toxicity, additive adverse effects on a shared organ system, common phenotypic risk like bleeding or QT prolongation) when co-administered.
+
+[E8.2] === END PREVIEW ===
+
+[E8.2] cache hits: 0
+  [1/270]  pair=PD-pos-DB00806_DB01166  variant=A_name  score=0.45  elapsed=3s  ETA=816s
+  [30/270]  pair=PD-pos-DB00264_DB00883  variant=C_effect  score=0.72  elapsed=97s  ETA=775s
+  [60/270]  pair=PD-pos-DB00438_DB00605  variant=C_effect  score=0.45  elapsed=215s  ETA=754s
+  [90/270]  pair=PD-pos-DB00193_DB01080  variant=C_effect  score=0.15  elapsed=379s  ETA=759s
+  [120/270]  pair=PK-pos-DB00528_DB00745  variant=C_effect  score=0.15  elapsed=596s  ETA=745s
+  [150/270]  pair=PK-pos-DB00624_DB00656  variant=C_effect  score=0.35  elapsed=705s  ETA=564s
+  [180/270]  pair=PK-pos-DB00757_DB08820  variant=C_effect  score=0.35  elapsed=811s  ETA=405s
+  [210/270]  pair=NEG-DB01250_DB01627  variant=C_effect  score=0.45  elapsed=919s  ETA=262s
+  [240/270]  pair=NEG-DB00744_DB01586  variant=C_effect  score=0.45  elapsed=1088s  ETA=136s
+  [270/270]  pair=NEG-DB00207_DB00988  variant=C_effect  score=0.25  elapsed=1196s  ETA=0s
+
+[E8.2] === AUROC by (class, variant) ===
+  PD   A_name         AUROC=0.766  [CI 0.644, 0.873]  pos_score=0.28 neg_score=0.12  n_pos=30 n_neg=30
+  PD   B_molecular    AUROC=0.625  [CI 0.485, 0.754]  pos_score=0.25 neg_score=0.14  n_pos=30 n_neg=30
+  PD   C_effect       AUROC=0.652  [CI 0.514, 0.783]  pos_score=0.36 neg_score=0.23  n_pos=30 n_neg=30
+  PK   A_name         AUROC=0.759  [CI 0.636, 0.866]  pos_score=0.23 neg_score=0.12  n_pos=30 n_neg=30
+  PK   B_molecular    AUROC=0.693  [CI 0.558, 0.809]  pos_score=0.36 neg_score=0.14  n_pos=30 n_neg=30
+  PK   C_effect       AUROC=0.510  [CI 0.371, 0.651]  pos_score=0.24 neg_score=0.23  n_pos=30 n_neg=30
+
+[E8.2] === Paired ΔAUROC ===
+  PD:  effect-name = -0.111 [-0.252, +0.022]  effect-mol = +0.031 [-0.141, +0.205]  mol-name = -0.142 [-0.303, +0.036]
+  PK:  effect-name = -0.247 [-0.410, -0.077]  effect-mol = -0.181 [-0.351, +0.015]  mol-name = -0.065 [-0.200, +0.069]
+
+[E8.2] tokens: in=81403  out=15762  cost~=$0.481
+[E8.2] errors: 0, unparsed: 0
+
+[E8.2] saved → llm_oracle_results_prob.json

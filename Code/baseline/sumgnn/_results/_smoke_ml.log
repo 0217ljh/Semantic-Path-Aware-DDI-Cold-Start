@@ -1,0 +1,17 @@
+[smoke] task=multilabel train=(300, 5) val=(75, 5) test=(120, 5) n_out=200 regime=transductive/S0
+/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/outdated/__init__.py:36: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import parse_version
+Traceback (most recent call last):
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 72, in <module>
+    main()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 61, in main
+    model.fit_leaf(sub)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_label_cls/baseline_unified.py", line 121, in fit_leaf
+    self.fit(leaf.train, leaf.val, resources=leaf.resources, _test=leaf.test)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_label_cls/baseline_unified.py", line 137, in fit
+    data_dir = self._ensure_data(train_df, val_df, test_df, resources)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_label_cls/baseline_unified.py", line 113, in _ensure_data
+    stats = write_twoside_split(data_dir, resources.drugs, kg_triples, train_df, val_df,
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_data/necessary/build_sumgnn_data.py", line 256, in write_twoside_split
+    "n_kg_rels": len(rel_list), "dropped_pairs": dropped, "n_labels": n_labels}
+NameError: name 'rel_list' is not defined

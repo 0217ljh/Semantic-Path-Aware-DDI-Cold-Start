@@ -1,0 +1,52 @@
+Title: Provable Domain Generalization via Invariant-Feature Subspace Recovery
+Authors: Haoxiang Wang, Haozhe Si, Bo Li, Han Zhao (University of Illinois Urbana-Champaign)
+Venue+Year: ICML 2022 (PMLR 162)
+arXiv-or-DOI: arXiv:2201.12919v2 [cs.LG], 7 Jul 2022
+PDF filename: ISR-Invariant-Feature Subspace Recovery-2201.pdf
+
+## TL;DR
+Two provable, convex, optimization-free algorithms (ISR-Mean, ISR-Cov) that recover the subspace spanned by domain-INVARIANT features from the first- and second-order moments of class-conditional distributions across training ENVIRONMENTS, then fit an ERM classifier inside that low-dimensional invariant subspace. ISR-Cov achieves the minimal possible O(1) environment complexity (needs only 2 environments), vs IRM's O(d_s).
+
+## Problem & Contributions
+- Domain generalization (DG / OOD generalization): train over E environments, generalize to unseen test environments. Prior IRM-type methods are shown (Rosenfeld et al. 2021) to fail unless E > d_s (d_s = spurious-feature dimension) and are non-convex.
+- Contribution 1: ISR-Mean — recovers the invariant subspace from PCA on the matrix of per-environment class-conditional means; provably learns the optimal invariant predictor with E >= d_s + 1 (matches IRM complexity but with fewer assumptions and global convergence). Theorem 1.
+- Contribution 2: ISR-Cov — uses the difference of per-environment class-conditional COVARIANCES; provably needs only E >= 2, i.e. constant O(1) environment complexity (the minimum any algorithm can achieve). Theorem 2.
+- Both bypass IRM's non-convexity, enjoy global convergence, and are computationally cheap (ERM + one eigen-decomposition).
+- Practical use: ISR is a POST-PROCESSING method — apply on top of frozen features from a trained neural net (ERM/Reweighting/GroupDRO), replacing only the last linear layer, to boost worst-group accuracy.
+
+## Method / Core mechanism
+- Data model (adopted from Rosenfeld et al. 2021, Fig. 1, Eq. 1-4): latent z = [z_c ; z_e] where invariant z_c ~ N(y*mu_c, sigma_c^2 I) is fixed across environments, spurious z_e ~ N(y*mu_e, sigma_e^2 I) varies by environment e. Observed x = R z = A z_c + B z_e with R = [A,B] full-rank (injective). Binary label y in {+-1}. Goal: learn optimal invariant predictor h* (Prop. 1, Eq. 6-8) that depends only on z_c.
+- ISR-Mean (Algorithm 1, Sec 4.1): (I) estimate positive-class sample mean x_e per environment; stack into M (E x d), where each row = A mu_c + B mu_e (Eq. 11). (II) PCA / eigen-decompose the sample covariance of mean-centered M. (III) "Phase transition": in the infinite-sample limit the first d_c eigenvalues are exactly ZERO and the rest are positive; the d_c zero-eigenvalue eigenvectors recover the invariant subspace (Theorem 1, Eq. 14). Intuition: per-environment means all lie in the d_s-dim spurious subspace; the tangent/orthogonal complement is the invariant subspace (Fig. 2). (IV) project data x -> P' x and fit an ERM logistic classifier; result equals h*.
+- ISR-Cov (Algorithm 2, Sec 4.2): (I) estimate per-environment positive-class covariance Sigma_e = A A^T sigma_c^2 + B B^T sigma_e^2; take difference of two environments Delta_Sigma = Sigma_e1 - Sigma_e2 = (sigma_e1^2 - sigma_e2^2) B B^T (Eq. 15) — the invariant part A A^T sigma_c^2 CANCELS. (II) eigen-decompose Delta_Sigma; zero-eigenvalue eigenvectors again recover the invariant subspace (Theorem 2, Eq. 17). Exploits anisotropy of covariance (Fig. 3). A robust flag-mean variant (Marrinan et al. 2014) averages over many environment pairs for finite-sample stability.
+
+## Key results & numbers
+- Synthetic Linear Unit-Tests (Aubin et al. 2021), d_c=5, d_s=5, E=2..10, 50 seeds (Sec 5.1, Fig. 4): ISR-Mean matches oracle for E > d_s = 5; ISR-Cov matches oracle for E >= 2 on Examples satisfying Assumption 2 (Example-2/2s/3'/3s'), empirically validating Theorems 1 and 2. IRMv1/IGA/ERM need more environments.
+- Real datasets, ISR-Mean as post-processing (Table 1, Sec 5.2), worst-group accuracy improvements:
+  - Waterbirds/ResNet-50/ERM: worst-group 62.93 -> 76.10 (ISR-Mean) -> 82.46 (ISR-Cov); average 86.66 -> 87.87 -> 90.47.
+  - CelebA/ResNet-50/ERM: worst-group 46.39 -> 55.39 -> 79.73 (ISR-Cov).
+  - MultiNLI/BERT/ERM: worst-group 65.95 -> 72.60 -> 74.21.
+  - Improves worst-group across all dataset x algorithm combos; average accuracy roughly maintained.
+- Reduced environment labels (Sec 5.2.1, Fig. 6): with 10% env labels ISR-Mean worst-group = 73.4% (+10.5 over ERM); with 50%, ISR-Cov = 80.9% (+18.0).
+- CLIP ViT-B/32 on Waterbirds (Table 2): ISR-Mean beats linear probing (e.g. ERM worst-group 52.96 -> 71.75).
+
+## Relevance to our cold-start low-rank DDI paper
+- RW STREAM: This is a CANONICAL Stream A (OOD / domain-generalization low-rank) citation. Its low-rank claim is: invariant/transferable regularity lives in a LOW-DIMENSIONAL SUBSPACE, recoverable by moment statistics, and provably so. This is the closest theoretical neighbor to our thesis that the transferable interaction regularity admits a lower-rank realization.
+- HOW WE'D CITE: as prior evidence that "the part of a predictor that transfers to unseen distributions occupies a low-dimensional subspace, separable from a higher-dimensional spurious/support-specific part." Use to motivate why we probe effective rank and why cold (transferable) rank < warm (support-fitting) rank. Also cite as the provable-subspace-recovery anchor.
+- CONCRETE DELTA vs us:
+  1. Source of low-dimensionality: ISR needs MULTIPLE EXPLICIT ENVIRONMENTS (E training domains with distinct spurious means/variances) and recovers invariance by cross-environment moment alignment/cancellation. We have ONE domain (a single biomedical KG) and NO exogenous environment labels; our support shift is ENDOGENOUS (train vs test drug entities are disjoint). We cannot form Delta across environments — there is no e index.
+  2. Task: ISR does binary/vector classification on x (per-sample feature vectors). We do RELATIONAL DDI interaction scoring on drug PAIRS over a KG, with typed mediators — a fundamentally relational, pairwise object, not a per-instance classifier.
+  3. Mechanism: ISR recovers a low-dim invariant subspace and DISCARDS the spurious subspace (project into null space). We instead ADD a low-rank residual H = H_base + M_A M_B over frozen node reps; low-rank is the realization of the shared typed-mediator interaction bases, not a discarded-spurious-subspace argument.
+  4. Provability: ISR is provable under a linear Gaussian data model. Our low-rank claim is EMPIRICAL (effective-rank probe on an unconstrained GCN), not a proof.
+
+## Safe-to-cite claims (with section pointers)
+- IRM/REx need E > d_s training environments to learn the optimal invariant predictor; fail for non-linear predictors (Sec 1, citing Rosenfeld et al. 2021).
+- ISR-Mean: E >= d_s + 1, matches IRM's environment complexity, fewer assumptions, global convergence (Theorem 1, Sec 4.1).
+- ISR-Cov: E >= 2, i.e. O(1) / constant environment complexity = the minimum possible; invariant covariance term cancels in the difference (Eq. 15, Theorem 2, Sec 4.2).
+- ISR is optimization-free / convex = ERM + eigen-decomposition; usable as a post-processing layer on frozen features (Sec 4, Sec 5.2).
+- Empirical worst-group accuracy gains on Waterbirds/CelebA/MultiNLI (Table 1).
+
+## Do-NOT-overclaim / caveats
+- The provable guarantees hold ONLY under the linear Gaussian data model of Rosenfeld et al. (2021) with linear predictors and the infinite-sample setting. On real non-linear data ISR is applied heuristically to frozen features, with NO guarantee.
+- "Low-rank" here means a low-dimensional invariant SUBSPACE of features (d_c out of d), recovered via zero/near-zero eigenvalue directions — NOT a low-rank matrix factorization of an adaptation/residual (that is Stream B / our M_A M_B). Do not conflate the two notions of low-rank when citing.
+- The core requirement is MULTIPLE ENVIRONMENTS with distinct spurious statistics. Do not imply ISR applies to a single-domain endogenous entity-support shift like ours without heavy adaptation.
+- d_s (spurious dim) must be known/estimated to pick the number of eigenvectors; the "phase transition" is exact only in the infinite-sample limit and is noisy with finite data (motivating the robust flag-mean ISR-Cov variant).

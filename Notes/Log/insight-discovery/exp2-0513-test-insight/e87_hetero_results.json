@@ -1,0 +1,50 @@
+{
+  "design": "Stage 1 Opus 4.5 (selector) + Stage 2 GPT-5.4 (reasoner)",
+  "models": {
+    "stage1": "claude-opus-4-6",
+    "stage2": "gpt-4o-2024-08-06"
+  },
+  "sample_sizes": {
+    "PD_pos": 60,
+    "PK_pos": 60,
+    "neg": 60
+  },
+  "results": {
+    "PD_effect_hetero": {
+      "n_pos": 60,
+      "n_neg": 60,
+      "auc": 0.7374999999999999,
+      "auc_ci_95": [
+        0.6497440084942865,
+        0.8210144181941782
+      ],
+      "pos_mean": 0.36166666666666664,
+      "neg_mean": 0.17833333333333332
+    },
+    "PK_effect_hetero": {
+      "n_pos": 60,
+      "n_neg": 60,
+      "auc": 0.696388888888889,
+      "auc_ci_95": [
+        0.6106166953180301,
+        0.7830887510728197
+      ],
+      "pos_mean": 0.30333333333333345,
+      "neg_mean": 0.17833333333333332
+    }
+  },
+  "selector_fallback_count": 0,
+  "selector_errors": 0,
+  "reasoner_errors": 0,
+  "tokens": {
+    "sel_in": 96234,
+    "sel_out": 5651,
+    "reas_in": 27380,
+    "reas_out": 5323
+  },
+  "cost_usd_est": {
+    "selector": 1.8673350000000002,
+    "reasoner": 0.12168,
+    "total": 1.9890150000000002
+  }
+}

@@ -1,0 +1,61 @@
+Title: From Low Intrinsic Dimensionality to Non-Vacuous Generalization Bounds in Deep Multi-Task Learning
+Authors: Anonymous (double-blind submission)
+Venue+Year: Under review as a conference paper at ICLR 2026 (preprint / submission version)
+arXiv-or-DOI: Not stated in PDF (anonymous ICLR 2026 submission; no arXiv id or DOI present in the file)
+PDF filename: From Low Intrinsic Dim to Non-Vacuous Bounds in Multi-Task.pdf
+
+## TL;DR
+The paper parametrizes deep multi-task networks so that each task's weights live in a SHARED learned low-dimensional subspace (a basis of k elements learned from ALL tasks) plus PER-TASK coefficients (k numbers per task). It defines the "amortized intrinsic dimension" AID = lk/n + k per task, shows empirically AID << single-task intrinsic dim ID, and turns this compressibility into the FIRST non-vacuous PAC-Bayes / compression generalization bounds for deep MTL, where the ambient dimension D in the bound is replaced by AID. This is structurally the "shared basis (M_B) + per-item coefficients (M_A)" decomposition we use, plus a matching upper-bound narrative.
+
+## Problem & Contributions
+- Problem: explain (and numerically guarantee) why deep multi-task learning generalizes well from few samples per task, despite overparametrization. Prior non-vacuous bounds existed only for single-task / generative settings (Lotfi et al.); none for deep MTL.
+- Contributions (Sec 1): (a) a new parametrization/analysis quantifying MTL intrinsic dimensionality — models as linear combinations of a small number of basis elements, each learned in a low-dim random subspace; (b) empirical demonstration that a much smaller effective dimension PER TASK suffices in MTL than single-task; (c) first NON-VACUOUS generalization bounds for deep multi-task (and transfer) learning via compression + PAC-Bayes, computable from training-time quantities.
+
+## Method / Core mechanism (equations in words + notation)
+Single-task intrinsic dim (Li et al. 2018, Eq 1): theta = theta_0 + P w, where theta_0 random init, w in R^d learnable low-dim vector, P in R^{D x d} fixed random Gaussian expansion. ID_tau = smallest d reaching accuracy tau.
+Amortized (MTL) parametrization (Sec 3, Eq 2-3) — THE DECOMPOSITION:
+- Shared parameters: vectors v_1..v_k in R^l. Build a LEARNED expansion matrix Q = [P_1 v_1, ..., P_k v_k] in R^{D x k}, where P_1..P_k are fixed i.i.d. Gaussian matrices (Eq 2). Q is the SHARED BASIS learned from all tasks' data.
+- Per-task coefficients: alpha_1..alpha_n in R^k. Task j's weights: theta_j = theta_0 + Q alpha_j (Eq 3). Each task is a linear combination of the k shared basis columns.
+- Budget: lk parameters for the shared basis + nk for per-task coefficients = total lk + nk, i.e. AID = lk/n + k per task (Def 1).
+Definition 1: ID_tau (single-task intrinsic dim) vs AID_tau (amortized intrinsic dim = smallest lk/n + k reaching accuracy tau under MTL). Target set to tau* = 0.9 A (A = well-trained single-task accuracy), following Li et al.
+Central Hypothesis (Sec 3): AID* << ID*. Extremes discussed: unrelated tasks -> k=n, l=ID*, AID*=ID*+n (no gain); identical tasks -> k=1, l=ID*, AID*=ID*/n + 1 (large gain). Real tasks: k,l grow sublinearly in n.
+Bounds (Sec 5):
+- Meta-encoder encodes shared global params E (here the basis / codebooks); multi-task encoder encodes the tuple of models jointly, exploiting redundancy (Def 4).
+- Theorem 2 (slow-rate, compression): R(f_1..f_n) <= empirical R_hat + sqrt( [ (l(E) + l_E(f_1..f_n)) log2 + log(1/delta) ] / (2 m n) ). Generalizes single-task Thm 1 (Shalev-Shwartz & Ben-David 7.7) to MTL.
+- Theorem 3 (fast-rate PAC-Bayes): kl(R_hat || R) <= [ (l(E) + l_E) log2 + log(2 sqrt(mn)/delta) ] / (mn); scales O(1/(mn)) at zero empirical risk vs O(1/sqrt(mn)) for Thm 2.
+- KEY narrative (Sec 5.2 discussion): with the Sec-3 parametrization, l(E)=O(lk) (basis) and l_E(f_1..f_n)=O(nk) (per-task coeffs), so the complexity term becomes O( sqrt( (lk/n + k)/m ) ) = O( sqrt(AID/m) ) — i.e. the ambient dimension D is REPLACED BY THE AMORTIZED INTRINSIC DIMENSION. Numerical bounds use quantized weights with two codebooks (global r_g for v's, local r_l for per-task alpha's), 16-bit codebook entries (Sec 5.3).
+Transfer-to-NEW-task extension (Sec 5.4, Eq 7): for a new related task, learn theta_j = theta_0 + Q alpha + P w, where Q (k columns) is the FIXED learned MTL basis and P (k' columns) is a fresh random basis, alpha,w learnable. Q is fixed and CONSTRUCTED WITHOUT the new task's data, so Q (like P) does NOT enter the complexity term — only alpha and w do. Combines reuse of the shared basis with single-task flexibility to avoid under-fitting.
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- AID vs ID (Table 1), 6 benchmarks (MNIST SP/PL, Folktables, Products, split-CIFAR10/100; ConvNet/MLP/ViT): in ALL cases AID* << ID*. E.g. MNIST SP: ID*=400 -> AID*=31.6 (basis (l,k)=(65,10): 10*65 + 30*10 = 950 params / 30 tasks approx 32). Folktables & Products: 50 -> 10. split-CIFAR10: 200 -> 12. split-CIFAR100 (ConvNet): 1500 -> 36. Smallest gain MNIST PL (~166.6, roughly half).
+- Fig 1: AID* decreases as number of tasks n grows (10..100); single-task ID would not.
+- Generalization guarantees (Table 2): upper bounds on test error, all NON-VACUOUS (< 1). MTL bounds (Thm 2/Thm 3) beat single-task Thm 1 on every dataset, sometimes largely; fast-rate Thm 3 tighter than Thm 2. E.g. MNIST SP: single-task bound 0.612 vs MTL 0.230 (Thm2) / 0.196 (Thm3).
+- Transfer learning (Table 3, Sec 5.4): using the pre-trained Q representation gives stronger guarantees than single-task-from-scratch on all datasets; bounds non-vacuous with a single small training set per task.
+- Fig 2: MTL bound and test error both decrease with more params up to a point where added expressiveness costs more than it saves in the bound (bounds not yet tight).
+
+## Relevance to our cold-start low-rank DDI paper (RW bucket; how we'd cite; concrete DELTA vs our method)
+RW bucket: "Low intrinsic dimensionality / shared-subspace multi-task learning and generalization bounds" — the THEORY/UPPER-BOUND anchor for our low-rank thesis.
+How we'd cite (two uses):
+1) Structural analogy for our decomposition. Their Q = [P_1 v_1,...,P_k v_k] (shared basis learned from all tasks) + per-task alpha_j (theta_j = theta_0 + Q alpha_j) is directly analogous to our M_B (few shared typed-mediator bases learned from all data) + M_A (per-pair coefficients), and H_base plays the role of theta_0. Their k = number of shared bases <-> our number of mediator bases; their alpha_j <-> our per-pair block-sparse selection.
+2) Upper-bound narrative. Their result that the ambient dimension D in the generalization bound is REPLACED BY AID = lk/n + k (Sec 5.2) is exactly the shape of argument we want: "signal that is shared across items admits a much smaller effective dimension, and that smaller dimension is what controls generalization." We can cite Thm 2 / Thm 3 (compression + PAC-Bayes) as precedent that per-item coefficients over a shared basis yield non-vacuous bounds scaling with the amortized (not ambient) dimension.
+3) Transfer/cold-start bridge. Their Sec 5.4 / Eq 7 (reuse fixed Q learned WITHOUT the new task's data; Q does not enter the bound) is the closest analog to our cold-start argument: shared mediator bases are learned from all data and reused for unseen drug pairs, so the "cost" for a new pair is only its low-dim coefficients.
+CONCRETE DELTA vs us:
+- Domain/task: they do supervised classification across many TASKS (image/tabular/text), not link prediction, not DDI, not a biomedical KG, not BOTH-entities-unseen. Their "new task" still has its OWN small labeled training set (they learn alpha, w on it); our cold-start test pairs have NO training data at all, so we cannot fit per-pair coefficients on test data — our M_A must be PREDICTED from drug/mediator structure, not learned per test pair. This is the sharp difference: they amortize across labeled tasks; we must produce per-pair coefficients for unseen pairs at inference.
+- Where the low rank lives: they low-rank the full network weight vector theta (random-expansion subspace); we low-rank the mediator RESIDUAL INTERACTION FUNCTION over typed mediators.
+- Their k basis columns are unstructured/random-expansion; our M_B bases are typed mediators (semantically grounded), and our M_A is block-sparse by construction (drugs only select shared mediators) — a cold-start-safety constraint absent in their setting.
+- Nature of claim: they give NUMERIC generalization bounds; we (if we borrow) would use their bound STRUCTURE as motivation/precedent, but our empirical claim (transferable signal is lower-rank than warm fitting) is about the DDI signal, which their theorems do not establish for DDI.
+
+## Safe-to-cite claims (section pointers)
+- Shared low-dim basis learned from all tasks (Q, Eq 2) + per-task coefficients (alpha_j, Eq 3); budget lk + nk, AID = lk/n + k (Sec 3, Def 1).
+- Hypothesis and empirical confirmation AID* << ID* across 6 benchmarks and 3 architectures (Sec 3-4, Table 1, Fig 1); AID drops as n grows (Fig 1).
+- First non-vacuous generalization bounds for deep MTL via compression (Thm 2) and PAC-Bayes fast-rate (Thm 3); complexity term scales with AID, replacing ambient D (Sec 5.1-5.2, Table 2).
+- Transfer to a new related task by reusing the fixed learned basis Q (learned without the new task's data), so Q does not enter the bound; only per-task alpha,w cost (Sec 5.4, Eq 7, Table 3).
+- Bounds depend only on training-time quantities and are numerically evaluable (Sec 1, Sec 5.3).
+
+## Do-NOT-overclaim / caveats
+- This is an ANONYMOUS ICLR 2026 SUBMISSION under review — not archival. Cite accordingly; author names unavailable from the PDF.
+- Not about DDI, not about graphs/KGs, not about link prediction, not about both-entities-unseen cold start. Their "transfer" still fits per-task parameters (alpha, w) on the new task's OWN labeled data (Eq 7); it is NOT zero-shot for the new task. Do not present it as evidence that unseen-pair signal is low-rank in DDI.
+- AID values in Table 1 are UPPER BOUNDS on the minimum amortized intrinsic dim for their specific design (Sec 4); not a fundamental lower bound.
+- The generalization bounds, while non-vacuous, are acknowledged as not tight (Fig 2 discussion): the bound eventually rises with expressiveness while true test error does not. Do not cite the bound values as tight or as matching test error.
+- Their basis uses fixed RANDOM expansion matrices P_i; the "learning" is of v_i and alpha_j. Our M_B bases are semantically typed mediators, not random expansions — the analogy is structural (shared basis + per-item coeffs), not literal.
+- "k" and "l" grow with number of tasks in general (only sublinearly); the dramatic AID<<ID gains rely on task RELATEDNESS. Do not imply unconditional dimensionality collapse.

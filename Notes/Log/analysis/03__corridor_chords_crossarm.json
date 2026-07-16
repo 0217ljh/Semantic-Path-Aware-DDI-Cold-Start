@@ -1,0 +1,137 @@
+{
+  "coverage": 0.37145522388059704,
+  "median_count_when_present": 4.0,
+  "discriminativity": {
+    "crossarm_any": {
+      "auroc": 0.5059,
+      "ci": [
+        0.4939,
+        0.5194
+      ],
+      "perm_p": 0.1827
+    },
+    "crossarm_wdensity": {
+      "auroc": 0.5105,
+      "ci": [
+        0.4972,
+        0.5243
+      ],
+      "perm_p": 0.0598
+    }
+  },
+  "go": false,
+  "blacklist": [
+    "het:AdG",
+    "het:AeG",
+    "het:AuG",
+    "het:GpBP",
+    "het:GpCC",
+    "het:GpMF",
+    "het:GpPW",
+    "prime:anatomy_anatomy",
+    "prime:anatomy_protein_absent",
+    "prime:anatomy_protein_present",
+    "prime:bioprocess_bioprocess",
+    "prime:bioprocess_protein",
+    "prime:cellcomp_cellcomp",
+    "prime:cellcomp_protein",
+    "prime:disease_disease",
+    "prime:disease_phenotype_positive",
+    "prime:molfunc_molfunc",
+    "prime:molfunc_protein",
+    "prime:pathway_protein",
+    "prime:phenotype_phenotype",
+    "prime:phenotype_protein"
+  ],
+  "top_relations": [
+    [
+      "prime:disease_protein",
+      13178
+    ],
+    [
+      "het:CcSE",
+      1144
+    ],
+    [
+      "prime:drug_protein",
+      471
+    ],
+    [
+      "prime:drug_effect",
+      358
+    ],
+    [
+      "prime:protein_protein",
+      344
+    ],
+    [
+      "het:CbG",
+      243
+    ],
+    [
+      "het:Gr>G",
+      207
+    ],
+    [
+      "prime:contraindication",
+      119
+    ],
+    [
+      "het:DaG",
+      112
+    ],
+    [
+      "het:GiG",
+      76
+    ],
+    [
+      "het:DuG",
+      49
+    ],
+    [
+      "het:DdG",
+      31
+    ],
+    [
+      "het:CrC",
+      29
+    ],
+    [
+      "prime:indication",
+      23
+    ],
+    [
+      "prime:disease_phenotype_negative",
+      18
+    ],
+    [
+      "het:GcG",
+      12
+    ],
+    [
+      "het:CdG",
+      4
+    ],
+    [
+      "het:CuG",
+      3
+    ],
+    [
+      "prime:off-label use",
+      2
+    ],
+    [
+      "het:CtD",
+      1
+    ]
+  ],
+  "config": {
+    "max_pairs": 6000,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "n_ge2": 5360
+  }
+}

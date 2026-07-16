@@ -1,0 +1,107 @@
+Title: Multi-Relational Contrastive Learning Graph Neural Network for Drug-Drug Interaction Event Prediction
+Authors: Zhankun Xiong, Shichao Liu, Feng Huang, Ziyan Wang, Xuan Liu, Zhongfei Zhang, Wen Zhang
+Venue+Year: AAAI-23 (The Thirty-Seventh AAAI Conference on Artificial Intelligence), 2023, pp. 5339-5347
+arXiv-or-DOI: (AAAI-23 proceedings; code https://github.com/Zhankun-Xiong/MRCGNN)
+PDF filename: MRCGNN.pdf
+
+## TL;DR
+MRCGNN predicts DDI EVENT TYPES (multi-class) by hierarchically fusing two information sources:
+per-drug molecular-graph features (via TrimNet) used as node attributes on a multi-relational
+DDI EVENT graph, over which an R-GCN with layer-attention learns drug representations. A
+multi-relational contrastive learning objective with a dual-view negative augmentation (shuffle
+node features / shuffle edge relations) targets rare (low-frequency) DDI events. Uses BOTH
+molecular structure and a relational drug-drug graph (the event graph itself, not an external
+biomedical KG). (Abstract; Method; Fig 1)
+
+## Problem & Contributions
+- Problem: predict the specific DDI event (interaction type) of each drug pair -- a multi-class
+  classification, richer than binary DDI existence (Introduction; Problem Formulation, page 2).
+- Gaps addressed (Introduction, page 1-2): most GNN methods use EITHER drug structural info
+  (molecular graphs) OR drug interactive info (association graphs), not both; rare DDI events have
+  too few labeled instances for reliable prediction.
+- Contributions (page 2): (1) hierarchically integrate drug structural info (molecular graphs) +
+  drug interactive info (DDI event graph); (2) multi-relational contrastive learning with a
+  dual-view negative counterpart augmentation to capture implicit info about rare events;
+  (3) SOTA on two datasets, especially on rare events.
+
+## Method / Core mechanism (equations in words + notation)
+- Formulation: multi-relational DDI event graph G=(V,E,R), V=drugs, R=event types, E=typed edges;
+  each drug v also has its molecular graph Mv (Problem Formulation, page 2).
+- Drug molecular learning (page 3, Eqs 1-2): TrimNet (a message-passing NN variant) on each Mv.
+  T iterations of message passing with GRU+LayerNorm update; message function uses multi-head
+  attention over (atom_i, atom_j, edge_ij) features. Set2Set readout -> drug feature xv; stacked
+  into X in R^{|V| x F}.
+- DDI event graph learning (page 3-4, Eqs 3-4): R-GCN encoder on G with node attributes X.
+  Per-layer update aggregates relation-specific neighbor messages sum_{r in R} sum_{u in N_v^r}
+  (1/c_{vr}) W_r^(l) h_u^(l) + W_o^(l) h_v^(l), then a layer-attention combines embeddings across
+  layers: h_v = sum_l alpha_l h_v^(l), alpha_l trainable -> H in R^{|V| x Q}.
+- Multi-relational contrastive learning (page 4, Eq 5): follows Deep Graph Infomax (DGI). Build
+  two corrupted views: G~_n shuffles node features X; G~_r shuffles edge relations R. Shared
+  R-GCN encodes both -> fake reps H~_n, H~_r. Global summary g = Gamma(H). Two MI-max losses
+  l_n and l_r push real nodes' agreement with g up and fake nodes' agreement down, using
+  discriminator D(h_v,g)=sigmoid(h_v^T W g).
+- DDI event prediction (page 4, Eqs 6-7): drug-pair representation h_{(u,v)} = h_u || x_u || h_v
+  || x_v (concatenating both R-GCN reps AND raw molecular features); MLP+Softmax over |R| event
+  types; cross-entropy loss l_c.
+- Total loss l = l_c + alpha*l_r + beta*l_n (Eq 8); alpha, beta balance contrastive terms.
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Datasets (Experimental Settings, page 4): Deng's dataset = 37,264 DDIs, 570 drugs, 65 event
+  types; Ryu's dataset = 191,570 DDIs, 1,700 drugs, 86 event types. Events grouped by frequency
+  into 5 bins; group [1,10] = rare events (Table 1). Split 7:1:2 (train/val/test), all types in
+  every split; 5 independent runs with different splits, averaged.
+- Main results (Table 2, page 5), multi-class, best-in-bold; MRCGNN best on both datasets:
+  Deng's: ACC 0.8979, Macro-F1 0.7791, Macro-Rec 0.7688, Macro-Pre 0.8101.
+  Ryu's: ACC 0.9567, Macro-F1 0.8894, Macro-Rec 0.8727, Macro-Pre 0.9221.
+  Baselines: DeepDDI, SSI-DDI, TrimNet-DDI, MUFFIN, R-GCN, GoGNN. (SSI-DDI on Deng's ACC 0.7866,
+  Macro-F1 0.4216; on Ryu's ACC 0.9008, Macro-F1 0.6663.)
+- Rare-event analysis (Fig 2, page 5-6): all models degrade as event frequency drops; MRCGNN best
+  on every frequency group, largest margin on rare events. Variant MRCGNN-MRC (no contrastive)
+  still beats R-GCN/DeepDDI, showing structural+interactive fusion helps; full MRCGNN adds more.
+- t-SNE visualization (Fig 3, page 6): MRCGNN drug-pair reps cluster more tightly, esp. for the
+  20 lowest-frequency events.
+- Ablation (Fig 4, page 6-7): removing DDI event graph learning (w/o DEG), molecular learning
+  (w/o DM), contrastive learning (w/o MRC), or either corruption view (w/o SNF / w/o SER) all hurt.
+  w/o DEG drops more than w/o DM -> interactive info more pivotal than structural info here.
+- Hyperparameters (Fig 5, page 7): best lr=0.001, alpha=0.10, beta=0.05 on Deng's dataset.
+
+## Relevance to our cold-start low-rank DDI paper (§2.1 taxonomy slot; molecular vs KG; warm vs cold; how we'd cite)
+- §2.1 taxonomy slot: multi-relational / contrastive GNN on the DDI EVENT graph (a node/relational
+  graph-based method), with molecular-graph features as node attributes. Best described as a
+  hybrid: molecular features (TrimNet on Mv) FUSED into a relational drug-drug graph via R-GCN.
+- Molecular vs KG: uses BOTH drug molecular structure AND a relational drug-drug graph. IMPORTANT:
+  the relational graph is the DDI EVENT graph itself (drugs as nodes, event types as relations),
+  NOT an external biomedical KG with proteins/pathways. Do not describe it as a KG method.
+- Warm vs cold: WARM-START ONLY. The R-GCN and layer-attention learn per-drug node embeddings on
+  the DDI event graph; unseen (cold-start) drugs have no edges/embeddings in that graph, and the
+  paper reports no cold-start / inductive split (all splits are edge-level 7:1:2 with every event
+  type present in all sets, page 5). This is a key contrast: relational-node methods like MRCGNN
+  cannot embed drugs absent from the training event graph.
+- How we'd cite: (a) representative multi-relational/contrastive GNN for DDI-event prediction in
+  §2.1; (b) motivating example that node/relational-embedding methods are warm-start only and fail
+  to generalize to unseen drugs, unlike molecular-structure or path/subgraph methods -- supporting
+  our cold-start framing; (c) note its rare-event contrastive trick is orthogonal to cold-start.
+
+## Safe-to-cite claims (section pointers)
+- "MRCGNN fuses molecular-graph features (TrimNet) as node attributes on a multi-relational DDI
+  event graph encoded by R-GCN with layer-attention" (Method, Eqs 1-4; Fig 1).
+- "Multi-relational contrastive learning via dual-view negatives (shuffle node features / shuffle
+  edge relations) under DGI-style MI maximization, targeting rare events" (Eq 5; Contrastive
+  Learning section).
+- "Predicts DDI EVENT TYPES (multi-class), not just binary interaction" (Introduction; Eqs 6-7).
+- Main numbers: Deng's ACC 0.8979 / Macro-F1 0.7791; Ryu's ACC 0.9567 / Macro-F1 0.8894 (Table 2).
+- SSI-DDI as a baseline: Deng's ACC 0.7866 / Macro-F1 0.4216 (Table 2).
+
+## Do-NOT-overclaim / caveats
+- NOT a knowledge-graph method: the "multi-relational graph" is the DDI event graph (drug nodes,
+  event-type relations), not an external biomedical KG. Do not lump with SumGNN/KnowDDI/EmerGNN.
+- NOT cold-start: no inductive / unseen-drug evaluation is reported; all evaluation is warm-start
+  edge-level split (7:1:2), so its numbers are NOT comparable to cold-start S1/S2 results.
+- Task is multi-class DDI EVENT prediction with Macro-F1/ACC; do NOT compare its numbers to the
+  binary-triple AUROC/AUPR of SSI-DDI or HDN-DDI (different task and metrics).
+- Datasets: Deng's 570 drugs / 65 events / 37,264 DDIs; Ryu's 1,700 drugs / 86 events / 191,570
+  DDIs (page 4). Ryu's here (191,570) differs from SSI-DDI's DrugBank count (191,400) and
+  HDN-DDI's (191,808) -- these are related but not identical dataset versions; keep them distinct.
+- Results are 5-run averages over different splits (page 5); report as "five runs," not seeds.
+- Case study is in Appendix C (not in the read text pages); do not cite specific case-study
+  details as verified from the main PDF body.

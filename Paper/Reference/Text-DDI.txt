@@ -1,0 +1,51 @@
+Title: Learning to Describe for Predicting Zero-shot Drug-Drug Interactions (TextDDI)
+Authors: Fangqi Zhu, Yongqi Zhang, Lei Chen, Bing Qin, Ruifeng Xu
+Venue+Year: EMNLP 2023 (Proceedings of the 2023 Conference on Empirical Methods in NLP, pp. 14855-14870)
+arXiv-or-DOI: Not printed on PDF. Code/data: https://github.com/zhufq00/DDIs-Prediction
+PDF filename: Text-DDI.pdf
+
+## TL;DR
+TextDDI reframes DDI prediction on NEW (unseen) drugs as a "zero-shot" problem and solves it with textual drug descriptions (from DrugBank/PubChem) instead of a KG or fingerprints. It couples (1) a RoBERTa-based DDI predictor that classifies interaction type from a prompt containing both drugs' names+descriptions, and (2) an RL-based "information selector" (PPO) that greedily assembles a short, drug-pair-specific prompt (<=256 tokens) of the most predictive sentences. It beats KG/pure-DDI baselines on zero-shot and few-shot splits (DrugBank, TWOSIDES).
+
+## Problem & Contributions
+- Problem setup (Def. 1, Sec. 2.1): "Zero-shot DDI prediction" = learn M mapping a drug pair (u,v) with u or v (or both) a NEW drug (Dnew) to interaction type i in I. Explicitly covers new-drug x known-drug AND new-drug x new-drug pairs (Sec. 2.1, Fig. 1). Drugs are split chronologically by development date so new drugs are unseen at training (Sec. 4.1.1).
+- Motivation: pure-DDI (fingerprint/KG-embedding) methods assume new interactions resemble known ones and fail for drugs with no interactions; KG-based methods fail for drugs with "rare biomedical connections" not in the external KG (Sec. 1). Text is available for essentially every drug.
+- Contributions (Sec. 1): (i) a new zero-shot-via-text problem setup; (ii) an LM DDI predictor + RL information selector that predicts DDIs from short relevant text; (iii) empirical gains in zero-shot and few-shot settings plus evidence that selected text is semantically relevant.
+
+## Method / Core mechanism (equations in words + notation)
+Two alternately-trained modules (Sec. 3, Fig. 2; Algorithm 1):
+1. DDI Predictor (Sec. 3.1): a pretrained LM (RoBERTa-Base, L=256) encodes a prompt p[u,v] = "[CLS] u_name : u_sel v_name : v_sel [Task Instruction] [SEP]"; the [CLS] embedding feeds a multi-class linear classifier giving P(i | p[u,v]). Trained by cross-entropy over training triples (Eq. 1). Because inputs are drug NAMES + free-text DESCRIPTIONS (not IDs or KG entities), it generalizes to unseen drugs.
+2. Information Selector (Sec. 3.2): sentence selection cast as an MDP (S,A,P,R). State = current prompt p_t[u,v]; action space A_t = remaining un-selected sentences from u_raw or v_raw (Eq. 3); at each step it scores each candidate sentence a via an MLP over [LMe(a) || LMe(p_{t-1})], softmax to a policy P(a|p_{t-1}) (Eq. 4), samples one sentence, appends it, and stops when length exceeds L. Reward R_t (Eq. 5) = difference between a "quality score" of the correct-vs-most-probable-incorrect logit margin before and after adding the sentence (RLPrompt-style). Trained by policy gradient maximizing discounted return (Eq. 6) with PPO.
+Training alternates: fine-tune predictor on random prompts, init selector encoder LMe from predictor LMp, then loop updating selector and re-updating predictor on selector-generated prompts (Algorithm 1, Sec. 3.3). To avoid leakage, the Drug Interaction section of the source text is NOT used (Sec. 4.1.1).
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Zero-shot main results (Table 2). DrugBank (multi-class, primary metric macro-F1): TextDDI F1 = 52.5+/-0.7, Acc 67.3, Kappa 60.5; best KG baseline Decagon F1 = 32.9, SumGNN F1 = 29.1. Relative F1 improvement +19.6% over best baseline. TWOSIDES (multi-label, primary PR-AUC): TextDDI PR-AUC 88.2, ROC-AUC 88.2..., Acc 80.3 (best row); improvements +8.7% PR-AUC / +4.5% ROC-AUC / +4.4% Acc over baselines.
+- Ablations (Table 2, text-based rows): "w/ drug name" alone (F1 42.1) already beats most GNN baselines; "w/ drug id" collapses (F1 21.1), showing drug names carry signal. Removing selector ("w/ truncated descriptions" 48.0 F1, "w/o information selector" 48.8 F1) is worse than full TextDDI (52.5), so the RL selector helps.
+- Few-shot (Sec. 4.3, Fig. 3): moving 1/3/5 known interactions per new drug into training; all methods improve with shots, TextDDI stays best.
+- LLM baselines (Appendix A, Table 4): GPT-3.5-Turbo F1 0.9 (near random), GPT-4 F1 35.2 / Acc 55.0 on 100 zero-shot DrugBank samples; both far below TextDDI, motivating a specialized fine-tuned approach.
+- Prompt length ablation (Sec. 4.5, Fig. 4): performance rises 64->128->256 tokens, saturates at 512; GPU cost grows ~quadratically, motivating short prompts.
+- Datasets (Table 1): DrugBank 1,710 drugs / 86 interaction types / 129,522 train; TWOSIDES 604 drugs / 200 types / 30,832 train. Backbone: RoBERTa-Base, Adam, PPO (Sec. 4.1.4).
+
+## Relevance to our cold-start low-rank DDI paper (bucket; how we'd cite; concrete DELTA vs our method)
+Bucket: §2.1 related work -- LLM/text-based DDI method AND a genuine cold-start (both-unseen) DDI baseline/setup reference.
+- Cold-start alignment: YES. This paper is one of the few DDI works that explicitly targets fully-unseen drugs, including the both-new (Dnew x Dnew) case, via a chronological drug split (Sec. 2.1, 4.1.1). This is the SAME hard setting our S2 (both drugs unseen) targets. We can cite it as prior art establishing the zero-shot / new-drug DDI problem and as motivation that KG-based methods degrade when drugs lack biomedical connections (Sec. 1).
+- How we'd cite: (a) as the canonical text-based zero-shot DDI method to contrast against our KG-based approach; (b) to justify the cold-start problem's importance; (c) as a baseline family if we report a text/LLM comparison.
+- DELTA vs our method:
+  * Substrate: TextDDI's transfer signal comes from free-text descriptions + an LM; OURS comes from a biomedical KG with frozen node reps and a structured low-rank residual interaction function H = H_base + M_A.M_B. Orthogonal information source (text vs graph).
+  * Mechanism: TextDDI has NO low-rank / rank-structure hypothesis; it is prompt-engineering-by-RL over an LM. Our thesis (transferable-to-unseen signal admits a lower-rank realization than warm fitting needs) is absent here.
+  * Generalization route: TextDDI generalizes to unseen drugs because text is available for any drug and the LM reads descriptions at test time; ours generalizes via a low-rank residual over frozen node embeddings on the KG. Complementary, not competing on the same axis.
+  * If both-unseen numbers are quoted, note their metric/splits differ (DrugBank 86-class F1 / TWOSIDES PR-AUC), so direct number transfer requires matching splits.
+
+## Safe-to-cite claims (section pointers)
+- Zero-shot DDI covers new-drug x known and new-drug x new-drug pairs via chronological drug split (Sec. 2.1 Def. 1; Sec. 4.1.1).
+- Pure-DDI and KG methods fail/degrade for new drugs with no interactions or rare KG connections (Sec. 1; empirical: MSTE cannot update new-drug embeddings, Sec. 4.2(i)).
+- TextDDI beats KG/pure-DDI baselines in zero-shot: DrugBank F1 52.5 vs Decagon 32.9 (Table 2); +19.6% relative F1.
+- General LLMs (GPT-3.5, GPT-4) alone are inadequate for zero-shot DDI (Appendix A, Table 4).
+- RL information selector + short prompts improve accuracy and cut quadratic compute (Sec. 4.5, Fig. 4; ablations Table 2).
+
+## Do-NOT-overclaim / caveats
+- Do NOT call TextDDI a KG method or a low-rank method. It uses NO knowledge graph structure in the model and no rank hypothesis; KG methods are only baselines. It relies on curated free-text (Background/Indications/Mechanism-of-Action) and fails when such descriptions are missing (Limitations section).
+- The strong "w/ drug name" result partly exploits drug-naming conventions (e.g., -statin suffixes) (Sec. 4.2(iii)); this is a text artifact, not a mechanistic claim.
+- TWOSIDES row in Table 2 has some OCR-garbled cells in the extracted text; verify exact TWOSIDES numbers against the original PDF/Table 2 before quoting decimals.
+- Largest LM used is GPT-2 XL (1.5B); results are RoBERTa-Base by default (Limitations; Sec. 4.1.4).
+- Number extraction (F1 88.2 for TWOSIDES ROC vs PR-AUC) came from a layout-mangled table; treat TWOSIDES decimals as "verify in PDF."

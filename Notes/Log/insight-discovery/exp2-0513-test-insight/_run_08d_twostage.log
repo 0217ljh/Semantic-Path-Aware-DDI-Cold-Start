@@ -1,0 +1,61 @@
+[E8.4] loaded key (len 108)
+[E8.4] loading KG ...
+[E8] cold-start G2 drugs (unseen at train): 634;  G1 (seen): 1266
+[E8] after S2 closedness filter: positives=54369  negatives=54369
+[E8] feature-filtered pool sizes:  PD-pos=8418  PK-pos=7972  neg=8823
+[E8.4] PD-pos=30  PK-pos=30  NEG=30
+[E8.4] unique drugs in sample: 136
+[E8.4] selector cache hits: 0
+[E8.4] === Stage 1: running selector (name-blind) ===
+  [1/272]  drug=DB00035 mod=effect sel=['Antidiuresis', 'Hyponatraemic', 'Water intoxication']  elapsed=2s ETA=610s
+  [50/272]  drug=DB00360 mod=molecular sel=['TPH1', 'TH', 'PAH']  elapsed=137s ETA=606s
+  [100/272]  drug=DB00605 mod=molecular sel=['PTGS2', 'PTGS1', 'CYP1A2']  elapsed=276s ETA=475s
+  [150/272]  drug=DB00834 mod=molecular sel=['CYP3A5', 'ABCB1', 'PGR']  elapsed=406s ETA=330s
+  [200/272]  drug=DB01076 mod=molecular sel=['CYP3A7-CYP3A51P', 'UGT2B7', 'SLCO1B1']  elapsed=544s ETA=196s
+  [250/272]  drug=DB01586 mod=molecular sel=['SLC10A1', 'ABCB11', 'NR1H4']  elapsed=660s ETA=58s
+
+[E8.4] === SELECTOR PREVIEW (first 3 PD-pos drugs) ===
+  Pentoxifylline:
+    eff core: ['Blood fibrinogen decreased', 'Cholestasis', 'Meningitis aseptic']
+    mol core: ['CYP1A2', 'PDE4A', 'PDE4B']
+  Cilostazol:
+    eff core: ['Bleeding tendency', 'Bradyarrhythmia', 'Electrocardiogram QT corrected interval prolonged']
+    mol core: ['CYP3A4', 'CYP2D6', 'CYP2C19']
+  Ropinirole:
+    eff core: ['Aseptic necrosis of bone', 'Cerebral atrophy', 'Phosphate increased']
+    mol core: ['CYP2D6', 'CYP1A2', 'HTR1A']
+  Iloprost:
+    eff core: ['Intracranial hemorrhage', 'Gingival bleeding', 'Epistaxis']
+    mol core: ['PTGER1', 'PTGIR', 'SLCO2A1']
+
+[E8.4] reasoner cache hits: 0
+[E8.4] === Stage 2: running reasoner ===
+  [1/180]  pair=PD-pos-DB00806_DB01166 mod=effect  score=0.35  elapsed=4s ETA=688s
+  [30/180]  pair=PD-pos-DB00313_DB01165 mod=molecular  score=0.35  elapsed=115s ETA=577s
+  [60/180]  pair=PD-pos-DB00193_DB01080 mod=molecular  score=0.15  elapsed=233s ETA=467s
+  [90/180]  pair=PK-pos-DB00657_DB01166 mod=molecular  score=0.1  elapsed=350s ETA=350s
+  [120/180]  pair=PK-pos-DB00757_DB08820 mod=molecular  score=0.45  elapsed=471s ETA=235s
+  [150/180]  pair=NEG-DB00694_DB01124 mod=molecular  score=0.05  elapsed=586s ETA=117s
+  [180/180]  pair=NEG-DB00207_DB00988 mod=molecular  score=0.15  elapsed=707s ETA=0s
+
+[E8.4] === Two-stage AUROC ===
+  PD  effect     two-stage  AUROC=0.613 [CI 0.492,0.735]  pos_mean=0.28 neg_mean=0.18  n_pos=30/n_neg=30
+  PD  molecular  two-stage  AUROC=0.509 [CI 0.363,0.650]  pos_mean=0.16 neg_mean=0.12  n_pos=30/n_neg=30
+  PK  effect     two-stage  AUROC=0.518 [CI 0.395,0.640]  pos_mean=0.21 neg_mean=0.18  n_pos=30/n_neg=30
+  PK  molecular  two-stage  AUROC=0.542 [CI 0.400,0.676]  pos_mean=0.19 neg_mean=0.12  n_pos=30/n_neg=30
+
+[E8.4] === Paired Δ within class (effect_two - molecular_two) ===
+  PD  eff_two - mol_two = +0.113  [CI -0.071, +0.303]  n=60
+  PK  eff_two - mol_two = -0.021  [CI -0.218, +0.185]  n=60
+
+[E8.4] === Two-stage vs Single-stage AUROC (E8.2 baseline) ===
+  PD  effect      single=0.652  two-stage=0.613  Δ=-0.038
+  PD  molecular   single=0.625  two-stage=0.509  Δ=-0.116
+  PK  effect      single=0.510  two-stage=0.518  Δ=+0.008
+  PK  molecular   single=0.693  two-stage=0.542  Δ=-0.151
+
+[E8.4] tokens: selector in=73188 out=5700; reasoner in=43151 out=12979
+[E8.4] cost~=$0.629
+[E8.4] avg selections per (drug, modality): 2.84  (min=1, max=3)
+
+[E8.4] saved → llm_oracle_results_twostage.json

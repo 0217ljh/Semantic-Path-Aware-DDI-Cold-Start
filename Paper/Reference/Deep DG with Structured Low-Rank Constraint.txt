@@ -1,0 +1,54 @@
+Title: Deep Domain Generalization With Structured Low-Rank Constraint
+Authors: Zhengming Ding, Yun Fu
+Venue+Year: IEEE Transactions on Image Processing (TIP), Vol. 27, No. 1, January 2018 (pp. 304-313)
+arXiv-or-DOI: DOI 10.1109/TIP.2017.2758199
+PDF filename: Deep DG with Structured Low-Rank Constraint.pdf
+
+## TL;DR
+A deep domain generalization (DG) framework (DDG) that trains multiple domain-specific CNNs plus one shared domain-invariant CNN, and couples them with a STRUCTURED LOW-RANK reconstruction: the domain-specific feature matrix H_s is reconstructed by the domain-invariant feature matrix H_c through a coefficient matrix Z whose nuclear norm is minimized and which is softly pushed toward a block-diagonal within-class structure Q. The claim (author-stated) is that the resulting domain-invariant network generalizes to an UNSEEN target domain with no target data at training (Abstract; Sec. I; Sec. III).
+
+## Problem & Contributions
+- Problem: domain generalization -- target domain is TOTALLY unavailable during training (distinct from domain adaptation which accesses target data). Multiple labeled source domains share the same label set; goal is to learn a classifier that works on an unseen target (Sec. I; Sec. III-A "Preliminaries").
+- Contribution 1: jointly build m domain-specific deep nets E_i and one domain-invariant deep net E_c, coupled by a "cross-network difference loss" L_d that ties per-layer weights/biases W_i^l -> W_c^l (Sec. III-C, Eq. 3).
+- Contribution 2: a structured low-rank reconstruction loss L_r couples the OUTPUTS (features) of specific vs invariant nets so that only same-class samples reconstruct each other, enforcing block-diagonal low-rank coefficients (Sec. III-D, Eqs. 5-6).
+- Author-stated as the first work to apply deep structures to domain generalization (Sec. I; Sec. II-B).
+
+## Method / Core mechanism (equations in words + notation)
+Notation: m source domains; E_i = per-source CNN params, E_c = shared invariant CNN params, theta_c = softmax classifier. H_{s,i}=E_i(X_{s,i}), H_{c,i}=E_c(X_{s,i}); H_s and H_c are the horizontal concatenations across sources. Inference uses only the invariant path: y_hat = theta_c(E_c(x)) (Sec. III-C).
+Total loss (Eq. 1): L = L_g + gamma*L_d + beta*L_r.
+- L_g (Eq. 2): standard cross-entropy / negative log-likelihood over all labeled source samples, using the invariant net's prediction.
+- L_d (Eq. 3): sum over layers l and sources i of ||W_i^l - W_c^l||_F^2 + ||b_i^l - b_c^l||_2^2 -- pulls each domain-specific net's parameters toward the shared invariant net ("shared factors across tasks").
+- Low-rank reconstruction (Eq. 4): minimize rank(Z) s.t. H_s = H_c Z; rank surrogate = nuclear/trace norm ||Z||_*. Z in R^{NxN} is the reconstruction-coefficient matrix. Ideal Z is block-diagonal because only within-class samples correlate across the two net types (Sec. III-D).
+- Structured version (Eq. 5-6): L_r = ||Z||_* + alpha*||Z - Q||_F^2 s.t. H_s = H_c Z, where Q[j,k]=1 if H_s^j and H_c^k share a class, else 0 (block-diagonal supervised structure matrix, Fig. 3). This injects label/discriminative info so Z recovers block-diagonal low-rank structure instead of an unsupervised whole-set reconstruction.
+- Optimization: alternating -- (1) fix deep nets, solve Z via augmented Lagrangian + Singular Value Thresholding (SVT), updating Lagrange multiplier R and penalty mu (Eqs. 7-8); (2) fix Z, update net weights by gradient descent with Adagrad (Eq. 9). Mini-batch extension samples n_r per class per domain to preserve the low-rank property (Sec. III-E).
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Datasets: Office-31, Office-10+Caltech-10, VLCS-5, MUS-10 (MNIST/USPS/SVHN) (Sec. IV-A, Table I). Backbone = AlexNet fine-tuned from ImageNet for the object datasets; DeCAF6 (4096-d) features for shallow baselines.
+- Baselines (8-9 methods): DCNN, LRCS, Undo-Bias, UML, DICA, LRE-SVM, MTAE, DSN, SCA (Sec. IV-A).
+- Results reported in Tables II (Office-31), III (Office-10+Caltech-10), IV (VLCS), and Fig. 6 (MUS-10). Author-stated: DDG outperforms all comparisons in all cases (Sec. IV-B). NOTE: the extracted PDF text renders the numeric table cells as images/inaccessible -- individual accuracy numbers in Tables II-V are NOT machine-readable in this copy and are therefore NOT quoted here (do not cite specific per-cell accuracies without re-checking the PDF figures).
+- Qualitative findings (Sec. IV-B): {D,W}->A is hardest (A is most distributionally different); scene-centric sources generalize well to object-centric Caltech target; SVHN as target is hardest for MUS-10.
+- Ablations (Sec. IV-C, Table V): variants DDG_l (alpha=0, remove structure term), DDG_p (beta=0, Z=I, pairwise), DDG_s (gamma=0, remove shared-factor L_d). Author-stated: full model > all variants, each component contributes. Convergence shown empirically in Fig. 7.
+
+## Relevance to our cold-start low-rank DDI paper (RW bucket; how we'd cite; concrete DELTA vs our method)
+- RW bucket: Stream A (OOD / transfer / domain generalization + low-rank). This is a canonical "low-rank coupling enables generalization to an UNSEEN target" DG paper -- a natural anchor for our Stream-A framing that transfer-relevant signal admits a low-rank realization.
+- How we'd cite: as prior evidence that (a) the knowledge that transfers to an unseen distribution can be captured by a low-rank operator, and (b) block-diagonal / structured low-rank reconstruction is a recurring device for isolating the transferable (within-class / shared) component from domain-specific variance. Good to cite alongside Stream-A when motivating "low-rank realization of the transferable signal."
+- Concrete DELTAs vs ours:
+  1. Exogenous vs endogenous shift: DDG assumes MULTIPLE labeled source DOMAINS and an exogenous domain gap (cameras, digit styles). Ours has NO exogenous domains -- the shift is endogenous support shift (unseen drugs on one biomedical KG). This is exactly the Stream-A vs Stream-B distinction; DDG is squarely Stream A.
+  2. What is low-rank: DDG's low-rank object is Z, the sample-by-sample RECONSTRUCTION coefficient matrix aligning two feature matrices (nuclear-norm minimized, SVT). Ours is a low-rank RESIDUAL H = H_base + M_A*M_B over frozen base node reps, with M_B = few typed mediator interaction bases per KG relation type and M_A = per-pair block-sparse coefficients. Different mathematical locus (feature reconstruction vs additive residual on representations).
+  3. Cold-safety mechanism: DDG's generalization relies on the shared invariant CNN approximating an unseen target; there is no notion of "no per-instance embedding." Ours is cold-safe by construction: drugs only SELECT shared typed mediators (common KG neighbors), no per-drug DDI embedding. DDG does not address the unseen-node identity problem.
+  4. Structured Q vs our block-sparse M_A: both use a block structure, but DDG's Q is a fixed within-CLASS indicator over samples; our M_A is learned per-pair block-sparse coefficients over relation-typed mediators. Superficially analogous, mechanistically distinct.
+  5. No rank-divergence diagnostic: DDG never measures effective rank of warm vs cold fitting; our thesis (unconstrained GCN probe: warm ~4x higher effective rank than cold) is not something DDG establishes or claims.
+
+## Safe-to-cite claims (section pointers)
+- DG setting = target domain totally unavailable at training; distinct from DA (Sec. I; Sec. III-A).
+- Structured low-rank reconstruction L_r = ||Z||_* + alpha||Z - Q||_F^2 with block-diagonal within-class Q couples domain-specific and domain-invariant features (Sec. III-D, Eqs. 5-6; Fig. 3).
+- Cross-network weight-tying difference loss L_d (Eq. 3) enforces shared factors across sources.
+- Alternating optimization via SVT for Z and gradient descent for weights (Sec. III-E, Eqs. 7-9).
+- Author-stated: first deep DG method; outperforms shallow DG baselines on the four benchmarks (Abstract; Sec. I; Sec. IV-B). Ablation shows each component helps (Sec. IV-C).
+
+## Do-NOT-overclaim / caveats
+- Do NOT quote specific accuracy numbers from Tables II-V: the numeric cells are not extractable as text from this PDF copy (rendered as images). "Outperforms all comparisons in all cases" is the authors' summary claim, not independently verified here.
+- This is a 2018 vision/DG paper on image classification benchmarks -- no KG, no graph, no DDI, no node-level cold start. Its "unseen target" is a whole domain, not unseen nodes/entities in one graph.
+- Low-rankness here is IMPOSED as a regularizer (nuclear norm on Z), NOT empirically diagnosed as an intrinsic property of the transferable signal. Do not cite it as evidence that transfer signal IS intrinsically low rank; cite it as a method that USES low rank.
+- The "first deep DG" novelty claim is as of 2016-2017 submission; do not present it as a current SOTA.
+- Convergence is empirical only; authors explicitly state no theoretical convergence guarantee for the joint deep+low-rank objective (Sec. IV-C).

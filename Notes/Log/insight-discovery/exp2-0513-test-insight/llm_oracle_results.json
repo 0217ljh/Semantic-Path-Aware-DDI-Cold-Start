@@ -1,0 +1,98 @@
+{
+  "model": "claude-sonnet-4-5-20250929",
+  "sample_sizes": {
+    "PD_pos": 30,
+    "PK_pos": 30,
+    "neg": 30
+  },
+  "per_class_per_variant": {
+    "PD_A_name": {
+      "n_parsed": 60,
+      "n_total": 60,
+      "accuracy": 0.5333333333333333,
+      "acc_mean_boot": 0.5340333333333335,
+      "acc_ci_95": [
+        0.4,
+        0.6666666666666666
+      ],
+      "yes_rate": 0.06666666666666667
+    },
+    "PD_B_molecular": {
+      "n_parsed": 60,
+      "n_total": 60,
+      "accuracy": 0.5333333333333333,
+      "acc_mean_boot": 0.53305,
+      "acc_ci_95": [
+        0.4,
+        0.6504166666666663
+      ],
+      "yes_rate": 0.06666666666666667
+    },
+    "PD_C_effect": {
+      "n_parsed": 60,
+      "n_total": 60,
+      "accuracy": 0.5333333333333333,
+      "acc_mean_boot": 0.5338999999999999,
+      "acc_ci_95": [
+        0.4166666666666667,
+        0.65
+      ],
+      "yes_rate": 0.1
+    },
+    "PK_A_name": {
+      "n_parsed": 60,
+      "n_total": 60,
+      "accuracy": 0.5,
+      "acc_mean_boot": 0.49939999999999996,
+      "acc_ci_95": [
+        0.36666666666666664,
+        0.6166666666666667
+      ],
+      "yes_rate": 0.03333333333333333
+    },
+    "PK_B_molecular": {
+      "n_parsed": 60,
+      "n_total": 60,
+      "accuracy": 0.6,
+      "acc_mean_boot": 0.5977166666666667,
+      "acc_ci_95": [
+        0.48333333333333334,
+        0.717083333333333
+      ],
+      "yes_rate": 0.13333333333333333
+    },
+    "PK_C_effect": {
+      "n_parsed": 60,
+      "n_total": 60,
+      "accuracy": 0.5,
+      "acc_mean_boot": 0.49798333333333333,
+      "acc_ci_95": [
+        0.36666666666666664,
+        0.6166666666666667
+      ],
+      "yes_rate": 0.06666666666666667
+    }
+  },
+  "differentials": {
+    "PD": {
+      "name_only_acc": 0.5343166666666666,
+      "molecular_acc": 0.5321166666666667,
+      "effect_acc": 0.53335,
+      "effect_minus_name": -0.0009666666666665602,
+      "effect_minus_molecular": 0.0012333333333333085
+    },
+    "PK": {
+      "name_only_acc": 0.4989,
+      "molecular_acc": 0.5969000000000001,
+      "effect_acc": 0.49661666666666665,
+      "effect_minus_name": -0.0022833333333333594,
+      "effect_minus_molecular": -0.10028333333333345
+    }
+  },
+  "tokens": {
+    "input": 69883,
+    "output": 17230
+  },
+  "errors": 0,
+  "unparsed": 0
+}

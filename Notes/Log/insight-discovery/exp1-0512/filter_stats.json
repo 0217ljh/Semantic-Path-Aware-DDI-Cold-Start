@@ -1,0 +1,15 @@
+{
+  "n_rows": 94447,
+  "char_reduction": {
+    "mean_original": 389.34243543998224,
+    "mean_filtered": 154.47174605863606,
+    "mean_pct_kept": 32.62838815106069
+  },
+  "sentence_reduction": {
+    "mean_orig_sent": 2.2308913994091926,
+    "mean_kept_sent": 1.0034940231029044,
+    "mean_pct_sent_kept": 36.259192016362704
+  },
+  "rows_with_empty_filtered_text": 32515,
+  "rows_with_filtered_text_very_short_<30char": 32552
+}

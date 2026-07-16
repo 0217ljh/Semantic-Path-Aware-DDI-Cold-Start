@@ -1,0 +1,1059 @@
+MKG-FENN: A Multimodal Knowledge Graph Fused End-to-End Neural
+Network for Accurate Drug–Drug Interaction Prediction
+Di Wu1,2, Wu Sun1, Yi He3*, Zhong Chen4, Xin Luo2
+1College of Computer Science and Technology, Chongqing University of Posts
+and Telecommunications, Chongqing 400065, China
+2College of Computer and Information Science, Southwest University, Chongqing 400715, China
+3Department of Computer Science, Old Dominion University, Norfolk, VA 23529, USA
+4School of Computing, Southern Illinois University, Carbondale, IL 62901, USA
+wudi.cigit@gmail.com, s220201081@stu.cqupt.edu.cn, yihe@cs.odu.edu, zhong.chen@siu.edu, luoxin21@gmail.com
+Abstract
+Taking incompatible multiple drugs together may cause ad-
+verse interactions and side effects on the body. Accurate pre-
+diction of drug-drug interaction (DDI) events is essential for
+avoiding this issue. Recently, various artificial intelligence-
+based approaches have been proposed for predicting DDI
+events. However, DDI events are associated with complex re-
+lationships and mechanisms among drugs, targets, enzymes,
+transporters, molecular structures, etc. Existing approaches
+either partially or loosely consider these relationships and
+mechanisms by a non-end-to-end learning framework, result-
+ing in sub-optimal feature extractions and fusions for predic-
+tion. Different from them, this paper proposes a Multimodal
+Knowledge Graph Fused End-to-end Neural Network (MKG-
+FENN) that consists of two main parts: multimodal knowl-
+edge graph (MKG) and fused end-to-end neural network
+(FENN). First, MKG is constructed by comprehensively ex-
+ploiting DDI events-associated relationships and mechanisms
+from four knowledge graphs of drugs-chemical entities, drug-
+substructures, drugs-drugs, and molecular structures. Corre-
+spondingly, a four channels graph neural network is designed
+to extract high-order and semantic features from MKG. Sec-
+ond, FENN designs a multi-layer perceptron to fuse the ex-
+tracted features by end-to-end learning. With such designs,
+the feature extractions and fusions of DDI events are guaran-
+teed to be comprehensive and optimal for prediction. Through
+extensive experiments on real drug datasets, we demonstrate
+that MKG-FENN exhibits high accuracy and significantly
+outperforms state-of-the-art models in predicting DDI events.
+The source code and supplementary file of this article are
+available on: https://github.com/wudi1989/MKG-FENN.
+Introduction
+The joint use of multiple drugs is very common in clinical
+care (Zitnik, Agrawal, and Leskovec 2018). While incom-
+patible multiple drugs may cause adverse drug-drug interac-
+tion (DDI) events that have harmful side effects on the body
+(Vilar et al. 2014). For example, taking Abemaciclib along-
+side Bosutinib can lead to an increase in serum concentra-
+tions of Abemaciclib; Conversely, if Abemaciclib is taken
+at the same time as Clemastine, Abemaciclib’s metabolism
+*Corresponding author: Dr. Yi He (yihe@cs.odu.edu)
+Copyright © 2024, Association for the Advancement of Artificial
+Intelligence (www.aaai.org). All rights reserved.
+Figure 1: The examples of taking incompatible multiple
+drugs together may cause adverse interactions and side ef-
+fects on the body.
+may be impaired, as illustrated in Figure 1. To avoid the neg-
+ative consequences associated with DDI events and maxi-
+mize their benefits, it is crucial to proactively identify such
+interactions in advance.
+DDI events prediction is essential for addressing this
+issue. Recently, various artificial intelligence-based ap-
+proaches have been proposed for achieving DDI events pre-
+diction, such as utilizing graph neural networks (GNNs) to
+analyze the structural similarity of chemicals (Huang et al.
+2020), employing semi-supervised learning to extract valu-
+able information from labeled and unlabeled drug data (Chu
+et al. 2019), and leveraging knowledge graph for predict-
+ing the pharmacological effects of multi-typed DDIs (Yu
+et al. 2021). Notably, DDI events are associated with com-
+plex relationships and mechanisms among drugs, targets,
+enzymes, transporters, molecular structures, etc. (Cui et al.
+2020; Lin et al. 2020). To exploit such complex relationships
+and mechanisms, some efforts have been made (Deng et al.
+2020), including drug features analyzed (Chu et al. 2019),
+graph learning-based (Yu et al. 2021), and hybrid modeling
+(Lyu et al. 2021) approaches. However, these approaches
+either partially or loosely consider such relationships and
+mechanisms by a non-end-to-end learning framework, mak-
+ing the cross-modality complementarity and potential rela-
+tionships between different aspects of DDI events be not
+well exploited. As a result, the feature extractions and fu-
+sions of DDI events are sub-optimal for predictions.
+To address this issue, this study proposes a novel Multi-
+The Thirty-Eighth AAAI Conference on Artiﬁcial Intelligence (AAAI-24)
+10216
+
+modal Knowledge Graph Fused End-to-end Neural Network
+(MKG-FENN) for accurate DDI events prediction. MKG-
+FENN has two main parts: multimodal knowledge graph
+(MKG) and fused end-to-end neural network (FENN). First,
+MKG is to comprehensively exploit DDI events associated
+relationships and mechanisms by constructing four knowl-
+edge graphs of drugs-chemical entities, drugs-substructures,
+drugs-drugs, and molecular structures, where a four chan-
+nels GNN is designed to extract high-order and semantic
+features from MKG. Second, FENN designs a multi-layer
+perceptron to fuse the extracted features by an end-to-end
+learning framework. With such designs, MKG-FENN can
+guarantee that the feature extractions and fusions of DDI
+events are comprehensive and optimal for achieving accu-
+rate predictions.
+Specific contributions of this paper are as follows:
+i) This is the first study to comprehensively exploit various
+relationships and mechanisms of drugs-chemical entities,
+drugs-substructures, drugs-drugs, and molecular struc-
+tures to predict DDI events in end-to-end learning way.
+ii) A novel and highly-accurate MKG-FENN model is pro-
+posed and elaborated for DDI events prediction.
+iii) Extensive experiments on real drug datasets are con-
+ducted to evidence the viability, effectiveness, and supe-
+riority of the proposed MKG-FENN model.
+Due to page limit, some contents including notations, algo-
+rithm designs, details of rival models and implementation,
+and certain experimental results are deferred to the Supple-
+mentary File, available as an electronic companion.
+Related Work
+Drug Features Analyzed Methods
+Drug features analysis is a difficult but important process
+for DDI events prediction. Some studies assume that similar
+drugs may exhibit similar DDIs and propose to learn accu-
+rate and interpretable similarity measurements from differ-
+ent types of drug features for DDI prediction (Deng et al.
+2020). DeepDDI (Ryu, Kim, and Lee 2018) is a deep learn-
+ing method to learn drug pairs and drug–food constituent
+pairs for DDIs prediction. MDF-SA-DDI (Lin et al. 2022b)
+introduces a DDI event prediction model based on multi-
+source drug fusion, multi-source feature fusion, and trans-
+former self-attention for offline drug feature learning. ML-
+RDA (Chu et al. 2019) is developed to effectively utilize
+multiple features of drugs by incorporating a novel unsuper-
+vised disentangling loss called CuXCov. DeSIDE-DDI (Kim
+and Nam 2022) is a deep learning-based framework that fo-
+cuses on interpreting the underlying genes in DDIs analysis.
+Recently, a multi-type DDI prediction model named MDDI-
+SCL(Lin et al. 2022a) is presented by supervised contrastive
+learning and three-level loss functions. Nonetheless, most
+of the drug features analyzed methods focus on acquir-
+ing the extensive attributes and features of drugs while ne-
+glecting the topological information and semantic relation-
+ships among drugs, targets, enzymes, transporters, molecu-
+lar structures, etc. In comparison, the proposed MKG-FENN
+model can extract such high-order topological information
+and semantic relationships, which is of great help to DDI
+events prediction.
+Graph Learning-Based Methods
+Graph embedding-based.
+Currently, there are many
+graph embedding methods used for effective network-based
+features in DDI prediction. These methods fall into three cat-
+egories. The first category involves models that use the ad-
+jacency matrix as input to learn latent embeddings through
+matrix decomposition (Shi et al. 2019).
+The second category focuses on generating sequences of
+nodes through random walks and learning node represen-
+tations based on these sequences (Ribeiro, Saverese, and
+Figueiredo 2017). The final category utilizes diverse neural
+architectures and graph data as input to capture higher-order
+connectivity patterns and leverage rich drug network infor-
+mation (Tang et al. 2015; Wang, Cui, and Zhu 2016).
+Knowledge graph-based.
+The utilization of knowledge
+graphs has significantly advanced research in various do-
+mains, including relation inference and recommendation
+(Wang et al. 2019). KGNN (Lin et al. 2020) success-
+fully integrated graph convolutional networks with neigh-
+borhood sampling to effectively extract neighborhood rela-
+tions. SumGNN (Yu et al. 2021) introduced a graph summa-
+rization module for subgraphs to extract manageable path-
+ways. LaGAT (Hong et al. 2022) proposed a link-aware
+graph attention method that generates multiple attention
+pathways for drug entities based on different links between
+drug pairs. DDKG (Su et al. 2022) extended this idea by
+learning drug embeddings from their attributes in the KG
+and considering neighboring node embeddings and triple
+facts simultaneously using an attention mechanism.
+Molecular graph-based.
+This type method encompasses
+predicting molecular properties (Wang et al. 2022) and
+molecular interactions (Li et al. 2022). MFFGNN (He et al.
+2022) combines the topological structure within molecu-
+lar graphs with the interaction relationship between drugs
+and the local chemical context in SMILES sequences. Fur-
+thermore, Molormer (Zhang et al. 2022) leverages the two-
+dimensional structures of drugs as input and encodes the
+molecular graph with spatial information using a lightweight
+attention mechanism.
+Note that although these graph learning-based methods
+have delved into the higher-order structure and semantic re-
+lationships of drugs, they still partially consider these rela-
+tionships. In comparison, the proposed MKG-FENN model
+has comprehensively exploited various relationships and
+mechanisms from drugs, chemical entities, and molecular
+structures.
+Hybrid Modeling Methods
+Hybrid modeling is more effective than individual mod-
+els (Chen et al. 2021). MDNN (Lyu et al. 2021) design a
+two-pathway framework including a drug knowledge graph
+pathway and a heterogeneous features pathway to for pre-
+dicting DDI events. Deepika and Geetha (Deepika and
+Geetha 2018) employed a semi-supervised learning frame-
+work that incorporated network representation learning and
+The Thirty-Eighth AAAI Conference on Artiﬁcial Intelligence (AAAI-24)
+10217
+
+meta-learning techniques on different drug datasets. Chen et
+al. (Chen et al. 2021) introduced a multi-scale feature fu-
+sion deep learning model called MUFFIN to learn drug rep-
+resentations from both the drug structure and a biomedical
+knowledge graph. However, these hybrid modeling meth-
+ods are non-end-to-end learning frameworks, resulting in
+sub-optimal feature extractions and fusions for DDI events
+prediction. In comparison, the proposed MKG-FENN has
+an end-to-end learning way to fuse the extracted features,
+which guarantees the feature extractions and fusions of DDI
+events always to be comprehensive and optimal.
+Preliminaries
+DDI Matrix.
+The DDI matrix represents drug-drug in-
+teraction events and is denoted as Y
+∈(0, yij)Nd×Nd,
+where Nd represents the number of drugs in the matrix.
+The label matrix consists of labels yij ∈L, where L =
+{y1, y2, · · · , yNl} denotes the set of possible labels, and Nl
+represents the number of event types. Each element yij ∈L
+in the DDI matrix indicates whether there is a presence or
+absence of an interaction event between drug di and drug
+dj. If yij = 0, it signifies that there is no interaction event
+between drug di and drug dj. Please note that in our exper-
+iment, there are a total of 65 classes of DDI events, such as
+”serum concentration increase” and ”fluid increase”, and we
+have assigned a unique identifier to each event class.
+Drug Knowledge Graph.
+The drug knowledge graph is a
+specialized knowledge graph for predicting DDI events. It is
+represented by the tuple G = (D, R, T ). In this represen-
+tation, D denotes a subset of drug entities, T represents a
+subset of tail entities, which are related to drugs (such as tar-
+gets), and R denotes the set of relations between drugs and
+tail entities. The drug knowledge graph is defined as a set of
+tuples (d, rdt, t), where each tuple represents a connection
+between a drug entity d, a relation rdt, and a tail entity t.
+These connections exist if and only if the drug entity is in the
+set D, the relation is in the set R, and the tail entity is in the
+set T . By constructing and analyzing the drug knowledge
+graph, insights can be drawn regarding the relationships be-
+tween drugs and their corresponding tail entities.
+DDI Events Prediction.
+Our objective is to predict spe-
+cific interaction events between drug di and drug dj using
+the DDI events matrix Y and drug knowledge graph Gi,
+where i represents the number of drug knowledge graphs.
+To achieve this, we learn a prediction function denoted as
+ˆyij = Γ
+ di, dj | Θ, Y, Gi
+, where ˆyij represents the prob-
+ability of an event occurring between drug di and drug dj.
+The function Γ incorporates the model parameters Θ and the
+information from Y and Gi to make accurate predictions.
+Proposed Method
+Overview.
+The architecture of MKG-FENN is depicted in
+Figure 2, which consists of two main functional parts: multi-
+modal knowledge graph (MKG) and fused end-to-end neu-
+ral network (FENN). MKG employs a GNN to extract the
+features of both topological structure and semantic relation-
+ships from the various knowledge graphs associated with
+DDI events. FENN aims to effectively exploit the potential
+complementarity and relationships among the extracted fea-
+tures in an end-to-end learning way.
+Multimodal Knowledge Graph
+Constructing Drug Knowledge Graphs.
+We construct
+four knowledge graphs of drugs-chemical entities, drug-
+substructures, drugs-drugs, and molecular structures. Each
+drug knowledge graph is represented in the form of triples,
+denoted as <drugs, relationships, entities>. These triples
+capture the relationships between drugs and various entities
+in the knowledge graph. We used Unified Medical Language
+System and DrugBank ID for unified identifier system and
+knowledge graph construction.
+First, the data of drug knowledge graphs are sourced
+from DrugBank. We collect drug-related information such
+as transporters and targets to serve as the entities in this part.
+To establish the relationships between drugs and entities, we
+assign the general function of the entity as the corresponding
+relationship. For instance, let’s consider the drug Lovastatin.
+If there is a transporter called Serum albumin, and its gen-
+eral function is Toxic substance binding, we would create
+the following triplet: <Lovastatin, Toxic substance binding,
+Serum albumin>.
+Second, the data of drug knowledge graphs are sourced
+from the SMILES attribute in DDIMDL (Deng et al. 2020).
+In this process, the SMILES attribute of drugs is considered
+as entities, while the relationship between drugs and entities
+is represented by “including”.
+Third, the data of drug knowledge graphs are derived from
+DDI events matrix. This dataset is known for its substantial
+size and rich information. In this data, we can gather infor-
+mation about the other drug that each drug can interact with.
+We treat these drugs as entities, and the specific interaction
+event as the corresponding relationship.
+Finally, the drug knowledge graphs are constructed based
+on the Molecular ACCess System (MACCS) bonds along
+with 13 MACCS bonds and 7 other molecular features
+(Baranwal et al. 2020). These MACCS bonds and molec-
+ular features are treated as entities of the drug, where the
+values indicating their belonging frequencies are denoted
+as relationships. For instance, Glucosamine possesses three
+molecular substructures of NumSaturatedRings, yielding
+<Glucosamine, 3, NumSaturatedRings>.
+Extracting Features by the GNN Layer.
+The purpose of
+using the GNN layer is to obtain the topological structure
+and semantic relationships of drugs. In this article, the drug
+knowledge graph is transformed into a matrix representa-
+tion. The initial representation matrix of the drug knowledge
+graph, denoted as Gi, is as follows:
+Ei
+Gi = [ e(0)
+d1 , · · · , e(0)
+Nd
+|
+{z
+}
+drug−embedding
+,
+e(0)
+r1 , · · · , e(0)
+Nr
+|
+{z
+}
+relation−embedding
+, e(0)
+t1 , · · · , e(0)
+Nk
+|
+{z
+}
+tail−embedding
+] (1)
+In the formula, EiGi represents the i-th knowledge graph’s
+initial representation matrix, where i ranges from 1 to
+4. Nd, Nr and Nk indicate the number of drugs, rela-
+tionships, and tail entities, respectively.
+ed(0)
+∈
+Rd ,
+The Thirty-Eighth AAAI Conference on Artiﬁcial Intelligence (AAAI-24)
+10218
+
+Figure 2: The overall structure of the proposed MKG-FENN model.
+er(0)
+∈
+Rd
+and
+et(0)
+∈
+Rd
+represent the initial
+embeddings for drugs, relationships, and tail entities, where
+d is the embedding dimension of the drug knowledge graph.
+For each drug di, a fixed-size neighborhood of samples is
+uniformly sampled as the drug’s neighbors instead of con-
+sidering all tail entities. The fixed-size neighborhoods are
+represented by Ns (di).
+Assuming the drug knowledge graph G of drug di, we
+represent it in triples (di, rin, tn), where tn represents the
+neighborhood of drug di and rin represents the semantic re-
+lationship within the neighborhood. To incorporate the se-
+mantics of relationships into drug representation learning,
+we calculate the semantic feature score between drug di and
+its corresponding neighborhood tail entity tn using the fol-
+lowing formula:
+π(l)
+(di,rin) = sum
+h
+e(l−1)
+di
+⊙e(l−1)
+rin
+
+W (p)
+1
++ b(p)
+1
+i
+(2)
+In the formula, e(l−1)
+rin
+represents the embedding of the re-
+lationship between drug di and tail entity tn in the (l −1)th
+layer of the GNN. e(l−1)
+di
+represents the embedding of drug
+di in the (l −1)th layer of the GNN. W (p)
+1
+is the trainable
+weight matrix, b(p)
+1
+is the bias vector, and p represents the
+number of fully connected layers. The symbol ⊙represents
+element-wise multiplication.
+Next, we aggregate the embeddings of the neighborhood
+Ns (di) by combining the embeddings of the neighborhood
+and the semantic feature scores. The aggregation function is
+defined as follows:
+e(l)
+Ns(di) =
+X
+tn∈Ns(di)
+π(l)
+(di,rin)e(l−1)
+tn
+(3)
+In the formula, e(l−1)
+tn
+represents the neighborhood em-
+bedding of drug di in the (l −1)th layer of the GNN.
+π(l)
+(di,rin) represents the semantic feature score of drug di and
+the relationship in the (l)th layer.
+The final step involves the aggregation process.To fuse
+the embedding of drug di with its corresponding neighbor-
+hood representation into a vector, we use the following fu-
+sion equation:
+Edi = e(l)
+di = σ
+
+e(l−1)
+di
+⊕e(l)
+Ns(di)
+
+W2 + b2
+
+(4)
+The Thirty-Eighth AAAI Conference on Artiﬁcial Intelligence (AAAI-24)
+10219
+
+where σ represents the ReLU activation function, and ⊕
+denotes the concatenation operation. W2
+∈
+R(2d)∗d
+is
+the trainable weight matrix, and b2 is a bias vector.
+Note that the constructed four drug knowledge graphs
+share a consistent format. Similarly, we can apply the same
+methodology to calculate the representation of drug dj using
+its corresponding knowledge graphs. By applying the for-
+mula and generating the drug representation, we can capture
+the relevant information and features of drug dj within the
+drug knowledge graph.
+Fused End-to-End Neural Network
+To maximize the information from the four paths, we take
+into account their complementarity and correlation in the
+fused end-to-end neural network layer. For drug di, we can
+obtain drug representations corresponding to the four parts
+of the dataset in the graph neural network, represented by
+E1di, E2di, E3di and E4di, respectively. The fusion of the
+four-part drug representations can be described by the fol-
+lowing formula:
+ˆEdi = E1
+di ⊕E2
+di ⊕E3
+di ⊕E4
+di
+(5)
+By following this approach, the final representations of
+the drug, denoted as ˆEdi, incorporate semantic relation-
+ships and topological information from the four parts of
+the dataset. Similarly, for drug dj, we can utilize the same
+method to obtain its fused representations, denoted as ˆEdi.
+Next, a multi-layer perceptron (MLP) is utilized to pre-
+dict DDI events between different drugs. The formula for
+the MLP prediction is described as follows:
+ˆyij = σ
+
+ˆEdi ⊕ˆEdj
+
+W (q)
+3
++ b(q)
+3
+
+(6)
+In the formula, W (q)
+3
+represents the trainable weight ma-
+trix, b(q)
+3
+denotes the bias vector, and q represents the to-
+tal number of fully connected layers in the model. The acti-
+vation function σ used in these layers is ReLU, which ap-
+plies element-wise rectification and introduces non-linearity
+to the network.
+To optimize the model, we incorporate a batch normaliza-
+tion layer to expedite convergence. Additionally, we intro-
+duce a dropout layer to mitigate overfitting and enhance the
+model’s generalization capabilities. Furthermore, we apply
+ℓ2 regularization to counteract overfitting tendencies. For the
+optimization process, we employ the Adam optimizer and
+utilize cross-entropy as the loss function.
+Experiments
+In the subsequent experiments, we conduct three kinds of ex-
+periments as follows: predicting DDI events between known
+drugs (Task 1), between known drugs and new drugs (Task
+2), and among new drugs (Task 3). Then, we aim to answer
+the following research questions (RQs):
+• RQ.1. Can the proposed MKG-FENN model outperform
+state-of-the-art models in Task 1?
+• RQ.2. How does the proposed MKG-FENN model com-
+pare to state-of-the-art models in Tasks 2 and 3?
+• RQ.3. How do different channels impact the performance
+of the MKG-FENN model (ablation study)?
+• RQ.4. How do different hyper-parameter settings affect
+the performance of the MKG-FENN model?
+General Settings
+Datasets.
+To validate the effectiveness of MKG-FENN,
+we collect real drug datasets that have four parts. Part 1:
+We obtained this portion from DrugBank1 (version 5.1.7)
+based on DDI events. Part 2: This section was obtained
+from DDIMDL2, and we converted the drug’s smile char-
+acteristics into a knowledge graph. Part 3: This section is
+derived from DDIMDL, where we converted the DDI ma-
+trix into a knowledge graph. Part 4: Part 4 represents the
+MACCS (Molecular ACCess System) keys. We selected 13
+MACCS keys and 7 other molecular features based on the
+work of (Baranwal et al. 2020). The four parts of datasets
+are employed to construct four drug knowledge graphs de-
+scribed in Figure 2. The detailed information of the datasets
+is provided in Table 1.
+Dataset
+Drug
+number
+Entity
+number
+Relationship
+number
+Triple
+number
+Part 1
+572
+825
+235
+6541
+Part 2
+572
+583
+1
+70350
+Part 3
+572
+572
+65
+74528
+Part 4
+572
+20
+13
+11440
+Table 1: The details of the dataset.
+Evaluation Metrics.
+For model evaluation metrics, we
+employ multi-class classification evaluation metrics, includ-
+ing accuracy (ACC), area under the precision-recall curve
+(AUPR), area under the ROC curve (AUC), F1 score, preci-
+sion (Pre), and recall (Rec) (Lyu et al. 2021).
+Baselines.
+The proposed MKG-FENN model is com-
+pared with six state-of-the-art related models: MDDI-
+SCL (Lin et al. 2022a), MDF-SA-DDI (Lin et al. 2022b),
+DDIMDL (Deng et al. 2020), MDNN (Lyu et al. 2021),
+Lee et al.’s methods (Lee, Park, and Ahn 2019), and Deep-
+DDI (Ryu, Kim, and Lee 2018). Additionally, several tra-
+ditional classification methods are also considered, namely
+DNN, RF, KNN, LR (Deng et al. 2020), and GNN (Kipf
+and Welling 2016).
+Hyper-Parameter.
+In the experiment, the training was
+configured with the following settings: 120 epochs of iter-
+ations, a learning rate of 0.01, a batch size of 1024, an em-
+bedding size of 128, a Ns(neighborhood size) of 6 , and a
+1https://go.drugbank.com/
+2https://github.com/YifanDengWHU/DDIMDL
+The Thirty-Eighth AAAI Conference on Artiﬁcial Intelligence (AAAI-24)
+10220
+
+Metric
+MDDI-
+SCL
+MDF-SA
+-DDI
+DDIMDL MDNN Lee et al.’
+methods
+DeepDDI
+DNN
+RF
+KNN
+LR
+GNN
+MKG-
+FENN
+Task 1
+ACC
+0.9378
+0.9301
+0.8852
+0.9175
+0.9094
+0.8371
+0.8797 0.7775 0.7214 0.7920 0.9142 0.9409
+AUPR
+0.9782
+0.9737
+0.9208
+0.9668
+0.9562
+0.8899
+0.9134 0.8349 0.7716 0.8400 0.9691 0.9786
+AUC
+0.9983
+0.9989
+0.9976
+0.9984
+0.9961
+0.9961
+0.9963 0.9956 0.9813 0.9960 0.9989 0.9989
+F1
+0.8755
+0.8878
+0.7585
+0.8301
+0.8391
+0.6848
+0.7223 0.5936 0.4831 0.5948 0.8332 0.8958
+Pre
+0.8804
+0.9085
+0.8471
+0.8622
+0.8509
+0.7275
+0.8047 0.7893 0.7174 0.7437 0.8941 0.9132
+Rec
+0.8767
+0.8760
+0.7182
+0.8202
+0.8339
+0.6611
+0.7027 0.5161 0.4081 0.5236 0.8012 0.8876
+Statistic
+Win/Tie/Loss 6/0/0
+5/1/0
+6/0/0
+6/0/0
+6/0/0
+6/0/0
+6/0/0
+6/0/0
+6/0/0
+6/0/0
+5/1/0
+64/2/0*
+p-value
+0.0156
+0.0313
+0.0156
+0.0156
+0.0156
+0.0156
+0.0156 0.0156 0.0156 0.0156 0.0313
+-
+F-rank
+10
+10.5
+6.17
+8.17
+7.25
+3.75
+5.17
+2.33
+1
+3
+8.83
+11.83
+Table 2: The comparison between MKG-FENN and its competitors in task 1, including the Win/Tie/Loss counts, Wilcoxon
+signed-ranks test, and Friedman test.
+classification loss weight of 1e-08. Additionally, the param-
+eters were set to l = 1, p = 2, and q = 3. It is worth
+noting that l denotes the number of hidden layers in GNN.
+Our empirical study suggested using 1 layer, aligning with
+the recent issue of over-smoothing in GNN (Lyu et al. 2021).
+Comparison Based on Known Drugs (RQ.1)
+Task 1 holds significant importance for DDI prediction. Ta-
+ble 2 illustrates the comparison of our model with all the
+baselines in terms of the evaluation metric for Task 1. To
+gain deeper insights into these results, we conducted statis-
+tical analyses involving win/tie/loss analysis, the Wilcoxon
+signed-ranks test, and the Friedman test.
+In Table 2, we can clearly see that our model outperforms
+all the other models across all evaluation metrics. This is
+evident from the total win/tie/loss cases, where our model
+has achieved a remarkable 64 wins and 2 tie, with no losses.
+Furthermore, all the p-values calculated for the comparisons
+are smaller than 0.05, indicating that the performance im-
+provement of our MKG-FENN model is statistically signifi-
+cant compared to the other models, with a significance level
+of 0.05. Additionally, our model boasts the highest F-rank
+value, further solidifying its superiority.
+In addition, we conducted a detailed analysis of MKG-
+FENN’s performance for each event in task 1 and calculated
+a metric score for each event using predicted scores and real
+labels. The AUPR scores and AUC scores for all predictive
+models are presented in Figure 3. The results depicted in
+Figure 3 clearly demonstrate that MKG-FENN consistently
+achieved higher AUPR and AUC scores compared to other
+models across the majority of events. To further scrutinize
+the comparison, we utilized boxplots to showcase the supe-
+rior performance of our model in these events. Figure 4 illus-
+trates the distribution of model performances. It is worth not-
+ing that our proposed model can achieve better performance
+than other models for small-sample data. For instance, we
+can accurately predict event number 62, which is not achiev-
+able by other comparative models.
+Comparison Based on New Drugs (RQ.2)
+Table 3 and Table 4 present the performance comparison be-
+tween our model and baselines in tasks 2 and 3. For task
+1, we employed five-fold cross-validation to divide the DDI
+Figure 3: The AUPR scores and AUC scores of all prediction
+models for each event.
+Figure 4: Boxplots displaying the AUPR and AUC of com-
+pared methods of each event.
+event dataset into five subsets, with four subsets used for
+training and one subset for testing. In tasks 2 and 3, we ini-
+tially divided the drug types into five parts, with one part
+consisting of new drugs. Subsequently, we further divided
+the data of new drugs in the DDI dataset to create a test set.
+The Thirty-Eighth AAAI Conference on Artiﬁcial Intelligence (AAAI-24)
+10221
+
+Based on the experimental results, it is evident that MKG-
+FENN outperforms the comparison models in most cases
+and achieves a higher F-rank value. Specifically, in tasks 2
+and 3, the overall outcomes can be summarized as 31 wins, 0
+ties,and 5 losses in favor of MKG-FENN. Moreover, the F-
+rank value of our model is 6.17, which achieves the highest
+F-rank value among all the models. These results demon-
+strate the superior performance of MKG-FENN.
+Metric MDDI
+-SCL
+MDF-
+SA-
+DDI
+DDIM
+DL
+Lee
+et al.’
+methods
+Deep
+DDI
+DNN MKG
+-FENN
+ACC 0.6767 0.6633 0.6415 0.6405 0.5774 0.6239 0.6805
+AUPR 0.6947 0.6776 0.6558 0.6244 0.5594 0.6361 0.7049
+AUC 0.9634 0.9497 0.9799 0.9247 0.9575 0.9796 0.9673
+F1
+0.5304 0.5584 0.4460 0.5039 0.3416 0.2997 0.5394
+Pre
+0.6254 0.6547 0.5607 0.5388 0.3630 0.4237 0.6063
+Rec
+0.4814 0.5078 0.4319 0.4891 0.3890 0.2840 0.5106
+Win/Tie
+/Loss
+5/0/1
+4/0/2
+5/0/1
+6/0/0
+6/0/0
+5/0/1 31/0/5*
+p-value0.0781 0.1563 0.0469 0.0156 0.0156 0.0313
+-
+F-rank
+5.17
+5.33
+4.17
+3
+1.67
+2.50
+6.17
+Table 3: The comparison results between MKG-FENN and
+its competitors in task 2.
+Ablation Study (RQ.3)
+To examine the influence of different channels, we con-
+ducted an ablation study by combining the different knowl-
+edge graphs of MKG-FENN. The results are presented in
+Table 5. Analyzing these results, it is evident that construct-
+ing a drug representation based on drug topology is a vi-
+able approach. We achieved satisfactory performance us-
+ing a single-channel model. However, when employing a
+multi-channel fusion model, we observed a continuous per-
+formance improvement, ultimately leading to the best re-
+sults with the MKG-FENN model. Including different chan-
+nels aims to explore the representation of different aspects
+of drugs, thereby enriching the learning process regarding
+Metric MDDI
+-SCL
+MDF-
+SA-
+DDI
+DDIM
+DL
+Lee
+et al.’
+methods
+Deep
+DDI
+DNN MKG
+-FENN
+ACC 0.4589 0.4338 0.4075 0.4097 0.3602 0.4087 0.4552
+AUPR 0.3938 0.3873 0.3635 0.3184 0.2781 0.3776 0.4162
+AUC 0.9053 0.8630 0.9512 0.8302 0.9059 0.9550 0.9149
+F1
+0.1919 0.2329 0.1590 0.2022 0.1373 0.1152 0.2186
+Pre
+0.2585 0.2715 0.2408 0.2216 0.1586 0.1836 0.2754
+Rec
+0.1678 0.2226 0.1452 0.2027 0.1450 0.1093 0.2131
+Win/Tie
+/Loss
+5/0/1
+4/0/2
+5/0/1
+6/0/0
+6/0/0
+5/0/1 31/0/5*
+p-value0.0313 0.1563 0.0313 0.0156 0.0156 0.0469
+-
+F-rank
+4.83
+5.33
+3.50
+3.33
+1.83
+3
+6.17
+Table 4: The comparison results between MKG-FENN and
+its competitors in task 3.
+ACC AUPR AUC
+F1
+Pre
+Rec F-rank
+P1
+0.9172 0.9696 0.9988 0.8256 0.9011 0.7858 5.17
+P2
+0.9169 0.9693 0.9989 0.8165 0.8842 0.7846 4.08
+P3
+0.9169 0.9688 0.9989 0.8200 0.8933 0.7802 3.92
+P4
+0.9157 0.9680 0.9987 0.8230 0.9127 0.7825 4.17
+P1+P2
+0.9341 0.9758 0.9987 0.8707 0.9117 0.8492 10.08
+P1+P3
+0.9307 0.9742 0.9987 0.8666 0.9113 0.8436 6.83
+P1+P4
+0.9322 0.9748 0.9987 0.8669 0.9075 0.8465 7.67
+P2+P3
+0.9318 0.9749 0.9987 0.8689 0.9037 0.8468 7.67
+P2+P4
+0.9303 0.9743 0.9987 0.8661 0.9088 0.8416 6.33
+P3+P4
+0.9297 0.9741 0.9987 0.8700 0.9073 0.8457 6.50
+P1+P2
++P3
+0.9344 0.9751 0.9986 0.8858 0.9199 0.8626 10.50
+P1+P2
++P4
+0.9355 0.9755 0.9985 0.8847 0.9218 0.8648 11.17
+P1+P3
++P4
+0.9349 0.9758 0.9985 0.8868 0.9161 0.8692 11.25
+P2+P3
++P4
+0.9351 0.9757 0.9985 0.8765 0.9210 0.8542 10.50
+P1+P2+
+P3+P4
+0.9409 0.9786 0.9989 0.8958 0.9132 0.8876 14.17*
+* P1, P2, P3, and P4 represent 4 parts of the dataset, respec-
+tively.
+Table 5: The ablation study of MKG-FENN.
+different drug topologies. Therefore, the fusion of multi-
+channel drug embeddings can enhance the prediction accu-
+racy of DDI events.
+Parameter Sensitivity Analysis (RQ.4)
+In this study, we identified three crucial parameters: the size
+of the sampling neighborhood Ns, the dimension of the drug
+embedding d in the drug knowledge graph, and the clas-
+sification loss weight (CLW). To investigate the impact of
+these parameters, we conducted experiments while keeping
+the other parameters fixed. Finally, the model achieved op-
+timal performance when Ns = 6; the model performs best
+when d = 128; and the optimal CLW value for achieving the
+best model performance is 1e −8. Please refer to the Sup-
+plementary File to see details.
+Conclusion
+This paper proposes a novel MKG-FENN model for pre-
+dicting DDI events. MKG-FENN utilizes a multi-channel
+GNN to effectively leverage both topological information
+and semantic relationships from four knowledge graphs of
+drugs-chemical entities, drugs-substructures, drugs-drugs,
+and molecular structures. Additionally, the MKG-FENN is
+designed as an end-to-end and tightly integrated architecture
+that learns to effectively integrate and converge information
+from the four constructed drug knowledge graphs. To eval-
+uate the proposed MKG-FENN, extensive experiments are
+conducted on real drug datasets. The results demonstrate
+that the MKG-FENN significantly outperforms both tradi-
+tional approaches and state-of-the-art models in predicting
+DDI events. In the future, we plan to improve MKG-FENN
+by incorporating some self-attention mechanisms.
+The Thirty-Eighth AAAI Conference on Artiﬁcial Intelligence (AAAI-24)
+10222
+
+Acknowledgments
+This work was supported in part by the National Natu-
+ral Science Foundation of China under Grants 62176070,
+62371438, and 62272078, in part by the Science and Tech-
+nology Foundation of State Grid Corporation of China under
+grant 1400-202357341A-1-1-ZN, in part by the Chongqing
+Technical Innovation and Application Development Special
+Project under grant CSTB2023TIAD-KPX0037, in part by
+the Commonwealth Cyber Initiative (CCI), and in part by
+the National Science Foundation (NSF) under Grants IIS-
+2245946 and IIS-2236578.
+References
+Baranwal, M.; Magner, A.; Elvati, P.; Saldinger, J.; Violi,
+A.; and Hero, A. O. 2020. A deep learning architecture for
+metabolic pathway prediction. Bioinformatics, 36(8): 2547–
+2553.
+Chen, Y.; Ma, T.; Yang, X.; Wang, J.; Song, B.; and Zeng,
+X. 2021. MUFFIN: multi-scale feature fusion for drug–drug
+interaction prediction. Bioinformatics, 37(17): 2651–2658.
+Chu, X.; Lin, Y.; Wang, Y.; Wang, L.; Wang, J.; and Gao,
+J. 2019. MLRDA: A multi-task semi-supervised learning
+framework for drug-drug interaction prediction. In Proceed-
+ings of the 28th International Joint Conference on Artificial
+Intelligence, 4518–4524.
+Cui, L.; Seo, H.; Tabar, M.; Ma, F.; Wang, S.; and Lee, D.
+2020. Deterrent: Knowledge guided graph attention network
+for detecting healthcare misinformation. In Proceedings of
+the 26th ACM SIGKDD international conference on knowl-
+edge discovery & data mining, 492–502.
+Deepika, S.; and Geetha, T. 2018. A meta-learning frame-
+work using representation learning to predict drug-drug in-
+teraction. Journal of biomedical informatics, 84: 136–147.
+Deng, Y.; Xu, X.; Qiu, Y.; Xia, J.; Zhang, W.; and Liu, S.
+2020. A multimodal deep learning framework for predicting
+drug–drug interaction events. Bioinformatics, 36(15): 4316–
+4322.
+He, C.; Liu, Y.; Li, H.; Zhang, H.; Mao, Y.; Qin, X.; Liu,
+L.; and Zhang, X. 2022. Multi-type feature fusion based on
+graph neural network for drug-drug interaction prediction.
+BMC bioinformatics, 23(1): 224.
+Hong, Y.; Luo, P.; Jin, S.; and Liu, X. 2022.
+LaGAT:
+link-aware graph attention network for drug–drug interac-
+tion prediction. Bioinformatics, 38(24): 5406–5412.
+Huang, K.; Xiao, C.; Hoang, T.; Glass, L.; and Sun, J. 2020.
+Caster: Predicting drug interactions with chemical substruc-
+ture representation. In Proceedings of the AAAI conference
+on artificial intelligence, volume 34, 702–709.
+Kim, E.; and Nam, H. 2022. DeSIDE-DDI: interpretable
+prediction of drug-drug interactions using drug-induced
+gene expressions. Journal of cheminformatics, 14(1): 1–12.
+Kipf, T. N.; and Welling, M. 2016. Semi-supervised classi-
+fication with graph convolutional networks. arXiv preprint
+arXiv:1609.02907.
+Lee, G.; Park, C.; and Ahn, J. 2019. Novel deep learning
+model for more accurate prediction of drug-drug interaction
+effects. BMC bioinformatics, 20: 1–8.
+Li, Y.; Hsieh, C.-Y.; Lu, R.; Gong, X.; Wang, X.; Li, P.; Liu,
+S.; Tian, Y.; Jiang, D.; Yan, J.; et al. 2022. An adaptive graph
+learning method for automated molecular interactions and
+properties predictions. Nature Machine Intelligence, 4(7):
+645–651.
+Lin, S.; Chen, W.; Chen, G.; Zhou, S.; Wei, D.-Q.; and
+Xiong, Y. 2022a. MDDI-SCL: predicting multi-type drug-
+drug interactions via supervised contrastive learning. Jour-
+nal of Cheminformatics, 14(1): 1–12.
+Lin, S.; Wang, Y.; Zhang, L.; Chu, Y.; Liu, Y.; Fang,
+Y.; Jiang, M.; Wang, Q.; Zhao, B.; Xiong, Y.; et al.
+2022b.
+MDF-SA-DDI: predicting drug–drug interaction
+events based on multi-source drug fusion, multi-source fea-
+ture fusion and transformer self-attention mechanism. Brief-
+ings in Bioinformatics, 23(1): bbab421.
+Lin, X.; Quan, Z.; Wang, Z.-J.; Ma, T.; and Zeng, X. 2020.
+KGNN: Knowledge Graph Neural Network for Drug-Drug
+Interaction Prediction. In IJCAI, volume 380, 2739–2745.
+Lyu, T.; Gao, J.; Tian, L.; Li, Z.; Zhang, P.; and Zhang, J.
+2021. MDNN: A Multimodal Deep Neural Network for Pre-
+dicting Drug-Drug Interaction Events. In IJCAI, 3536–3542.
+Ribeiro, L. F.; Saverese, P. H.; and Figueiredo, D. R. 2017.
+struc2vec: Learning node representations from structural
+identity. In Proceedings of the 23rd ACM SIGKDD interna-
+tional conference on knowledge discovery and data mining,
+385–394.
+Ryu, J. Y.; Kim, H. U.; and Lee, S. Y. 2018. Deep learn-
+ing improves prediction of drug–drug and drug–food inter-
+actions. Proceedings of the national academy of sciences,
+115(18): E4304–E4311.
+Shi, J.-Y.; Mao, K.-T.; Yu, H.; and Yiu, S.-M. 2019. Detect-
+ing drug communities and predicting comprehensive drug–
+drug interactions via balance regularized semi-nonnegative
+matrix factorization. Journal of cheminformatics, 11(1): 1–
+16.
+Su, X.; Hu, L.; You, Z.; Hu, P.; and Zhao, B. 2022.
+Attention-based knowledge graph representation learning
+for predicting drug-drug interactions. Briefings in bioinfor-
+matics, 23(3): bbac140.
+Tang, J.; Qu, M.; Wang, M.; Zhang, M.; Yan, J.; and Mei, Q.
+2015. Line: Large-scale information network embedding. In
+Proceedings of the 24th international conference on world
+wide web, 1067–1077.
+Vilar, S.; Uriarte, E.; Santana, L.; Lorberbaum, T.; Hripcsak,
+G.; Friedman, C.; and Tatonetti, N. P. 2014. Similarity-based
+modeling in large-scale prediction of drug-drug interactions.
+Nature protocols, 9(9): 2147–2163.
+Wang, D.; Cui, P.; and Zhu, W. 2016. Structural deep net-
+work embedding. In Proceedings of the 22nd ACM SIGKDD
+international conference on Knowledge discovery and data
+mining, 1225–1234.
+Wang, H.; Zhao, M.; Xie, X.; Li, W.; and Guo, M. 2019.
+Knowledge graph convolutional networks for recommender
+systems. In The world wide web conference, 3307–3313.
+Wang, Y.; Wang, J.; Cao, Z.; and Barati Farimani, A. 2022.
+Molecular contrastive learning of representations via graph
+The Thirty-Eighth AAAI Conference on Artiﬁcial Intelligence (AAAI-24)
+10223
+
+neural networks. Nature Machine Intelligence, 4(3): 279–
+287.
+Yu, Y.; Huang, K.; Zhang, C.; Glass, L. M.; Sun, J.; and
+Xiao, C. 2021. SumGNN: multi-typed drug interaction pre-
+diction via efficient knowledge graph summarization. Bioin-
+formatics, 37(18): 2988–2995.
+Zhang, X.; Wang, G.; Meng, X.; Wang, S.; Zhang, Y.;
+Rodriguez-Paton, A.; Wang, J.; and Wang, X. 2022.
+Molormer: a lightweight self-attention-based method fo-
+cused on spatial structure of molecular graph for drug–drug
+interactions prediction. Briefings in Bioinformatics, 23(5):
+bbac296.
+Zitnik, M.; Agrawal, M.; and Leskovec, J. 2018. Model-
+ing polypharmacy side effects with graph convolutional net-
+works. Bioinformatics, 34(13): i457–i466.
+The Thirty-Eighth AAAI Conference on Artiﬁcial Intelligence (AAAI-24)
+10224

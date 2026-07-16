@@ -1,0 +1,411 @@
+10552
+
+IEEE TRANSACTIONS ON NEURAL NETWORKS AND LEARNING SYSTEMS, VOL. 35, NO. 8, AUGUST 2024
+
+DSIL-DDI: A Domain-Invariant Substructure Interaction Learning for Generalizable Drug­Drug Interaction Prediction
+Zhenchao Tang , Guanxing Chen , Hualin Yang, Weihe Zhong , and Calvin Yu-Chian Chen
+
+Abstract-- Drug­drug interactions (DDIs) trigger unexpected pharmacological effects in vivo, often with unknown causal mechanisms. Deep learning methods have been developed to better understand DDI. However, learning domain-invariant representations for DDI remains a challenge. Generalizable DDI predictions are closer to reality than source domain predictions. For existing methods, it is difficult to achieve out-of-distribution (OOD) predictions. In this article, focusing on substructure interaction, we propose DSIL-DDI, a pluggable substructure interaction module that can learn domain-invariant representations of DDIs from source domain. We evaluate DSIL-DDI on three scenarios: the transductive setting (all drugs in test set appear in training set), the inductive setting (test set contains new drugs that were not present in training set), and OOD generalization setting (training set and test set belong to two different datasets). The results demonstrate that DSIL-DDI improve the generalization and interpretability of DDI prediction modeling and provides valuable insights for OOD DDI predictions. DSIL-DDI can help doctors ensuring the safety of drug administration and reducing the harm caused by drug abuse.
+Index Terms-- Domain-invariant representation, drug­drug interaction (DDI) prediction, out-of-distribution (OOD) generalization.
+I. INTRODUCTION
+ONE drug cannot always meet the treatment of multiple complex diseases, and in many cases, two or more drugs are required to treat multiple diseases together [1], [2]. However, when people take more than one drug, the interaction between drugs may cause adverse effects on the body, which is called drug­drug interaction (DDI) phenomenon. It is crucial
+Manuscript received 8 September 2022; revised 27 December 2022; accepted 1 February 2023. Date of publication 14 February 2023; date of current version 6 August 2024. This work was supported in part by the National Natural Science Foundation of China under Grant 62176272 and in part by the China Medical University Hospital under Grant DMR-112-085. (Corresponding author: Calvin Yu-Chian Chen.)
+Zhenchao Tang, Guanxing Chen, Hualin Yang, and Weihe Zhong are with the School of Intelligent Systems Engineering, Sun Yat-sen University, Shenzhen 510275, China (e-mail: tangzhch7@mail2.sysu.edu.cn).
+Calvin Yu-Chian Chen is with the School of Intelligent Systems Engineering, Sun Yat-sen University, Shenzhen 510275, China, also with the Department of Medical Research, China Medical University Hospital, Taichung 40447, Taiwan, and also with the Department of Bioinformatics and Medical Engineering, Asia University, Taichung 41354, Taiwan (e-mail: chenyuchian@mail.sysu.edu.cn).
+This article has supplementary material provided by the authors and color versions of one or more figures available at https://doi.org/10.1109/TNNLS.2023.3242656.
+Digital Object Identifier 10.1109/TNNLS.2023.3242656
+
+to confirm the DDIs before taking multiple drugs [3]. Traditionally, the detection of DDIs is performed through extensive biological or pharmacological assays. However, this process is time-consuming and labor-intensive. Deep learning methods can serve as a low-cost but effective alternative to predict potential DDIs by identifying patterns of known DDIs.
+Existing methods [4], [5], [6], [7] have been successfully applied to DDI predictions. Although much effort has been devoted to further improve the performance, the above methods still have challenges: existing methods follow the independent and identical distribution assumption, which leads them to tend to fit the statistical distribution of DDIs (one DDI event: drug 1, drug 2, interaction category). DDIs have different distributions in different domains. Testing in the unfamiliar domains is more approximate to real-world scenario, because when a new drug is discovered, its medicinal properties may lead to a completely different statistical distribution of DDIs. With the rapid development of new drugs design, how to find a generalizable method is an urgent need for new drug discovery [8], molecular generation [9], [10], virtual screening [11], molecular property prediction [12], and drug design [13]. Based on the medicinal chemistry knowledge, a drug is just an entity composed of different functional groups/chemical substructures which determine all of its pharmacokinetic (how it is handled by an organism) and pharmacodynamic (how it affects an organism) properties, and ultimately determines all its interactions [14]. Therefore, in this study, we learn domaininvariant substructure interactions to improve the generalization ability of the model.
+In DSIL-DDI, we consider the substructure interactions as domain-invariant representations of DDIs. After extracting the substructures using the graph neural network (GNN), our pluggable substructure interaction module is used to learn domain-invariant substructure interaction patterns. For our proposed substructure interaction module, we simulate the interaction of attributes in substructures. To learn domaininvariant representations, we design a practical loss function that removes noise from irrelevant substructure interactions. For a pair of drugs, the proposed module outputs a DDI representation. The representation contains the most important substructure interaction pattern corresponding to this DDI event. We feed the representation into classifier to obtain category of this DDI. For out-of-distribution (OOD) DDI predictions, we compute DDI representations on unfamiliar
+
+2162-237X © 2023 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission. See https://www.ieee.org/publications/rights/index.html for more information.
+
+Authorized licensed use limited to: William & Mary. Downloaded on July 07,2026 at 20:12:12 UTC from IEEE Xplore. Restrictions apply.
+
+TANG et al.: DSIL-DDI: A DOMAIN-INVARIANT SUBSTRUCTURE INTERACTION LEARNING
+
+10553
+
+Fig. 1. Flowchart of DSIL-DDI. We propose a pluggable substructure interaction module for learning domain-invariant representations of DDIs. DSIL-DDI is trained in the source domain, and enable achieve OOD DDI prediction.
+domains (without retraining), and then cluster these representations by a specified number of categories. Our work can be summarized in Fig. 1.
+We evaluate DSIL-DDI on two benchmarks: Drugbank [15] and Twosides [3]. The experiments are divided into three scenarios: the transductive setting (warm start, all drugs in test set appear in training set), the inductive setting (cold start, test set contains new drugs that were not present in training set), and OOD generalization. However, the first two settings share the same dataset/domain. For OOD generalization, we perform prediction on the unfamiliar domain. Experimental results show that: 1) DSIL-DDI achieves the state-of-the-art (SOTA) performance on both two settings; 2) For substructure interaction, DSIL-DDI can present an analysis consistent with medicinal chemistry, demonstrating its interpretability; and 3) DSIL-DDI can learn domain-invariant representations, which proves that it has generalization on OOD prediction.
+II. RELATED WORK
+A. DDI Prediction
+DDI prediction requires the prediction of possible adverse interactions when two drugs used together. Deep learning-based DDI prediction methods are generally divided into two categories [16]. The first case is to build a knowledge graph with DDI events and related information. The second case is that DDI events are independent of each other. For the knowledge graph-based (KG-based) method, we regard drugs as nodes, connect different drugs to form a system, and the edges of the system represent the types of interactions or other relationships between drugs. Graph-based analysis methods [17], [18], [19], [20] have been applied to this case. However, these methods cannot handle drugs that do not appear in the training set (like the inductive setting), because the only information available for new drugs is the chemical structure. For the second methods [4], [5], [6], [21], [22], [23], [24], where drug entities are independent of each other, these methods can handle the inductive setting. The key to the second methods is to learn a representation for each drug pair, including multi-input attribute-based methods and molecular graph-based methods. Existing methods perform well on source domain, but the OOD generalization problem remains unsolved.
+
+B. OOD Generalization
+Learning domain-invariant representations improves OOD generalization of models, including generative methods [25], [26], [27], [28], contrastive learning [29], [30], and causal representation learning [31], [32]. Generative methods approximate the representations to a fixed prior space. Data augmentation can be used in contrastive learning to capture domain-invariant representations, but this data augmentation framework can also be viewed from the perspective of causal representation learning [33]. Causal representation learning aims to find the common basis between causal inference and machine learning. Besides, considering that the statistical correlation between correlated and irrelevant features is the main reason for distribution shifts leading to model collapse, existing methods [34], [35], [36] have been proposed to achieve OOD generalization by decorrelating correlated and irrelevant features. Some existing methods in computer vision [33], [37], [38] achieve OOD generalization by learning domain-invariant representations. Drug pairs are not continuous image-like signals, thus, learning a domain-invariant representation for DDI is an open problem.
+III. METHOD
+A. Overview of the Method
+In DSIL-DDI, we propose a pluggable substructure interaction module, and a practical loss function that encourages module to learn domain-invariant substructure interaction representations. For an input drug pair, we first use GNN to extract all substructure representations of each drug. The substructure interaction module extracts domain-invariant substructure interaction representations, and supports combining different GNN (such as GAT [7], GMPNN [22]) models to improve prediction performance. The substructure interaction representations of DSIL-DDI are domain-invariant and discriminative. For DDI prediction on the source domain, we use a classifier to directly classify domain-invariant substructure interaction representations. For the OOD generalization problem of DDI prediction, we cluster representations from the unseen domain and match them to categories on the unseen domain. The overall architecture of DSIL-DDI is shown in Fig. 2.
+B. Substructure Interaction Module
+Given a drug pair (drug x, drug y), drug x is represented by a graph: Gx = (Vx , Ex ), where Vx and Ex correspond to the atomic set and bond set of drug x, respectively. GNN extracts the substructure representation pi(x) centered on node i of drug x (the ith substructure of drug x, i  {1, . . . , |Vx |}). The same GNN extracts the substructure representation of drug y, the j th substructure of drug y is noted as p(jy), j  {1, . . . , |Vy|}, where |Vy| represents the number of substructures of drug y.
+The substructure interaction module considers the fine-grained properties of substructures. We regard the substructure representation extracted by GNN as the property spectrum of the substructure. The property spectrum represents the extent to which chemical substructure responds
+
+Authorized licensed use limited to: William & Mary. Downloaded on July 07,2026 at 20:12:12 UTC from IEEE Xplore. Restrictions apply.
+
+10554
+
+IEEE TRANSACTIONS ON NEURAL NETWORKS AND LEARNING SYSTEMS, VOL. 35, NO. 8, AUGUST 2024
+
+Fig. 2. Overall architecture of DSIL-DDI: 1) given an input drug pair, the GNN extracts its substructure representations; 2) substructure interaction module calculates interactions of all substructures, corresponding to substructure interaction matrix ssim; 3) aggregate ssim to DDI representation ddi, which is domain-invariant representation of DDI event (also known as a domain-invariant substructure interaction representation); and 4) classify or cluster representations ddi, matching to DDI categories.
+
+to different properties. Therefore, we model the fine-grained
+attribute interactions via Hadamard product. Specifically, we simulate interaction of pi(x) and p(jy), where
+the substructure interaction can be defined as
+
+ssii j = Wssi pi(x)  p(jy)
+
+(1)
+
+where ssii j is substructure i and j interaction representation,
+Wssi is learnable weights, and  is Hadamard product. Hypothesis pi(x) and p(jy) are represented by three properties,
+namely pi(x) = [i1, i2, i3]T , and p(jy) = [ j1, j2, j3]T , we can expand ssii j
+
+ssii j = Wssi pi(x)  p(jy)
+
+w11 w12 w13i1  j1
+
+= w21 w22 w33i2   j2
+
+w31 w32 w33 i3
+
+j3
+
+w11i1 j1 + w12i2 j1 + w13i3 j1
+
+= w21i1 j2 + w22i2 j2 + w23i3 j2
+
+(2)
+
+w31i1 j3 + w32i2 j3 + w33i3 j3
+
+where ssii j is a priori representation of the interaction between two substructures. We modify the priori representation by attention weights to obtain the posteriori representation postssii j
+
+postssii j = MLP concat pi(x), p(jy) × ssii j .
+
+(3)
+
+We concatenate the posteriori representations of all substructure interactions to obtain substructure interaction matrix ssim as follows:
+
+ssim = concat(postssi11, . . . , postssii j , . . . , postssi|Vx ||Vy|). (4)
+
+Substructure interaction representations with high attention weights contribute more to the DDI representation, but all
+
+important and minor substructure interaction representations jointly affect the DDI category. Therefore, we aggregate ssim to DDI representation ddi, which is domain-invariant representation of DDI events (also term domain-invariant substructure interaction representation)
+
+|Vx ||Vy |
+
+ddi =
+
+ssimi
+
+(5)
+
+i
+
+where ssimi is the posteriori representation of the ith substructure interaction pattern.
+
+C. Learning on Source Domain
+We propose a simple and practical loss function to encourage model to learn domain-invariant substructure interaction representations. A DDI event contains multiple substructure interactions, and these substructure interaction representations contain domain-invariant information (category-related factors, such as image shape information) and noise (non-categoryrelated factors, such as image style information). Noise is pervasive and leads to correlations between substructure interaction representations, limiting the learning of domaininvariant representations. We remove correlations between substructure interaction representations to reduce noise
+
+lossnoise
+
+=
+
+1 |Vx ||Vy|
+
+|Vx ||Vy | i =1
+
+|Vx ||Vy |
+(cov(ssimi , ssim j ))2
+j=1, j=i
+
+(6)
+
+where cov(·, ·) is used to calculate the covariance of two substructure interaction representations (or term substructure interaction patterns).
+To learn a discriminative substructure interaction representation on the source domain, we define the distance between
+
+Authorized licensed use limited to: William & Mary. Downloaded on July 07,2026 at 20:12:12 UTC from IEEE Xplore. Restrictions apply.
+
+TANG et al.: DSIL-DDI: A DOMAIN-INVARIANT SUBSTRUCTURE INTERACTION LEARNING
+
+10555
+
+two representations m and n as follows:
+
+s(m, n) = (m)T · n/||m||||n||.
+
+(7)
+
+For a batch of drug pairs D = {pairk}, k = 1, . . . , N , N is batch size. In a drug pair pairk, we term DDI representation ddi as pairdkdi, substructure interaction matrix ssim as pairkssim, i th substructure interaction pattern ssimi as pairsksimi , and the total number of substructure interaction representations |Vx ||Vy| as pairknumber. We conduct contrastive learning at the drug pair level. A DDI event contains many substructure interactions
+whose representations should be closer than that of another
+DDI event
+
+1N
+
+losscontras = - N
+
+log
+
+k=1
+
+pairknumber i =1
+
+exp s pairdkdi, pairkssimi
+
+N r =1,r =k
+
+exp s pairkddi, pairrddi
+
+.
+
+(8)
+
+On source domain, pairkddi is input to classifier to output the category prediction probability yk, and ground truth of
+drug pair pairk is yk. Adding cross entropy loss, lossnoise, and losscontras, the overall loss function is described as
+
+1 lossoverall = - N
+
+N
+
+yk log( yk )
+
+k=1
+
++
+
+1 N
+
+N
+loss(nko)ise + losscontras
+
+(9)
+
+k=1
+
+where loss(nko)ise is the lossnoise value of drug pair pairk and  represents hyperparameter.
+
+D. Prediction on Source Domain and Unseen Domain
+
+For DDI prediction on source domain, we use a classifier to directly classify DDI representations (domain-invariant substructure interaction representations). The classifier is a single-layer linear network. For the OOD generalization problem of DDI prediction, we cluster representations from the unseen domain and match them to categories on the unseen domain. We can use different clustering methods, such as K -means [39] and deep embedding clustering (DEC) [40]. Afterward we use Kuhn­Munkres algorithm to match the categories on unseen domain to the clustering results.
+For DEC, we use the student's t-distribution as the kernel function to measure the distance between ddi and cluster centroid µ j of DDI category j, and zi is the ith drug pair's ddi in the unseen domain. The target distribution Q is expressed as
+
+qi j =
+
+(1 + zi - µ j 2)-1 j (1 + zi - µ j 2)-1
+
+(10)
+
+where, qi j is the probability of zi belongs to µ j . Then we iteratively fine-tune the cluster. Assuming that the number of samples in the unseen domain is n and the number of DDI categories is k, we can introduce the auxiliary distribution P
+
+pi j =
+
+qi2j
+
+n i =1
+
+qi
+
+j
+
+.
+
+k j =1
+
+qi2j
+
+n i =1
+
+qi
+
+j
+
+(11)
+
+The auxiliary distribution increases the weight of DDI prediction with high confidence, and normalizes the contribution of cluster centroid to the overall distribution, which can prevent large clusters from distorting the embedding space. We use two distributions to construct Kullback­Leibler (KL) divergence as follows:
+
+nk
+
+L = KL(PQ) =
+
+pi j log
+
+i=1 j=1
+
+pi j qi j
+
+.
+
+(12)
+
+By minimizing the KL divergence, the distribution P and the distribution Q will be close, and the model parameters can be optimized by gradient descent method in an unsupervised way. The initial cluster centroid is generated randomly, and the cluster centroid will also be updated as a parameter. During training, the gradient of cluster centroid µ j is
+
+L µj
+
+n
+= -2 (1 + zi
+i =1
+
+- µ j 2)-1( pi j
+
+- qi j )(z j - µ j ).
+
+(13)
+
+IV. EXPERIMENT
+A. Datasets
+We evaluate DSIL-DDI on Drugbank [15] and Twosides [3]. DrugBank is a unique bioinformatics and cheminformatics resource that combines detailed drug data with comprehensive drug-target information. It contains 191 808 DDI tuples with 1706 drugs, where each drug is represented by simplified molecular-input line-entry system (SMILES). There are 86 interaction categories describing how one drug affects the metabolism of another one. We converted the SMILES format of drugs into molecular graph using RDKit.
+Twosides contains 4 576 287 DDI tuples with 645 drugs, and 963 interaction categories. In contrast to the DrugBank dataset, these interactions are at the phenotypic level (i.e., headache, pain in the throat, and others) rather than metabolic.
+A description of atomic feature and bond feature is provided in Supplementary Tables S1 and S2. Data split (include transductive and inductive settings) is consistent with the settings [24].
+
+B. Experimental Setup
+We compared DSIL-DDI with SOTA methods, namely, MRGNN [5], SSI-DDI [21], GMPNN-CS [22], and SA-DDI [24]. These baselines only take chemical structure information as input and work in both transductive and inductive scenarios. KG-based methods are only applicable in transductive scenario, and we only use them as comparison methods for transductive setting. The parameter settings are consistent with their published source codes. Furthermore, we consider the performance of our module combined with different GNNs.
+DSIL-DDI is trained on mini-batches of 1024 DDIs using the Adam optimizer [41] with weight decay set to 10-4. We set the learning rate with an exponentially decaying schedule lr = 10-2×0.96t , where t is the current epoch. DSIL-DDI is implemented in PyTorch Geometric. Experiments were run on Windows 10 OS with a NVIDIA GeForce
+
+Authorized licensed use limited to: William & Mary. Downloaded on July 07,2026 at 20:12:12 UTC from IEEE Xplore. Restrictions apply.
+
+10556
+
+IEEE TRANSACTIONS ON NEURAL NETWORKS AND LEARNING SYSTEMS, VOL. 35, NO. 8, AUGUST 2024
+TABLE I PERFORMANCE COMPARISON OF DIFFERENT METHODS (TRANSDUCTIVE SETTING)
+
+RTX 3060 GPU, a processor Intel1 Core2 i7-9750H CPU at 2.60 GHz and 32 GB of RAM. Experiment results are presented in following metrics: the accuracy (ACC), the area under the receiver operating characteristic curve (AUC), and the F1-score (F1).
+
+TABLE II
+PERFORMANCE COMPARISON OF DIFFERENT METHODS (INDUCTIVE SETTING)
+
+V. RESULTS AND DISCUSSION
+A. Transductive Setting
+The transductive setting is the most common method evaluation scheme, where the entire dataset is randomly split and each drug in the test set can be found in the training set. In this scenario, we randomly split the dataset into training (60%), validation (20%), and test (20%) sets. All experiments were repeated eight times and the average value was taken. All methods share the same training, validation, and test sets each time. Table I summarized the performance of DSIL-DDI and previous methods on DrugBank and TWOSIDES, where it outperforms existing methods.
+The proposed substructure interaction module can be easily combined with different GNNs, such as GCN [42], GAT [7], and GMPNN [22]. Among them, GMPNN can extract sizeadaptive substructures. Our module combined with different GNNs have outperformed existing methods. The variation range of the metrics value in repeated eight experiments does not exceed 0.2%, proving the robustness of the proposed method.
+Furthermore, we evaluated: 1) how the size of the training set affects the model performance; 2) the number of model parameters; 3) loss of methods; and 4) inference time cost comparison. See Supplementary Figs. S3­S6.
+B. Inductive Setting
+The transductive setting may lead to overly optimistic results as it causes information leakage (i.e., drug structure information) into the test set. To further demonstrate the effectiveness of DSIL-DDI, we evaluated all the baselines in the inductive setting. "new  old" is an inductive setting in which one drug in a drug pair in the test set is inaccessible in the training set. "new  new" is also an inductive setting where neither drugs in a drug pair in the test set are inaccessible in the training set.
+1Registered trademark. 2Trademarked.
+
+We consider the inductive setting on Drugbank because the variety of drugs in Twosides is not as rich as Drugbank. We randomly hold 20% DDI events as the test set according to the above criterion. Table II summarized experimental results in "new  new." "new  new" is more challenging than "new  old." Experimental results in "new  old" are described in Supplementary Table S3. The inductive setting exhibits the performance degradation, but DSIL-DDI significantly outperforms existing methods. DSIL-DDI still maintains visible generalization in the challenging "new  new" task. One possible reason is that DSIL-DDI learns substructure interaction patterns common to both training set and test set. Furthermore, the proposed substructure interaction module is pluggable and can be easily combined with different GNNs.
+C. OOD Generalization
+We remove the classifier, then cluster the representations from the unseen domain and match them to categories on the unseen domain. Next, we compute the accuracy of OOD predictions. We tested it in two scenarios: 1) Drugbank (source domain) to Twosides (unseen domain), training on Drugbank, test on Twosides and 2) Twosides (source domain) to Drugbank (unseen domain). The t-distributed stochastic neighbor embedding (t-SNE) [43] visualization of DDI representations on unseen domains is shown in Fig. 3. Among them, we do not compare methods because existing methods do not support OOD generalization.
+It has been observed that the true statistical distribution of Drugbank is more unbalanced than that of Twosides. The t-SNE results on the unseen Drugbank fit the true statistical distribution of Drugbank. The t-SNE results on the unseen two-sided also fit its statistical distribution. Clustering is iterative, and DDI representations on unseen domains show
+
+Authorized licensed use limited to: William & Mary. Downloaded on July 07,2026 at 20:12:12 UTC from IEEE Xplore. Restrictions apply.
+
+TANG et al.: DSIL-DDI: A DOMAIN-INVARIANT SUBSTRUCTURE INTERACTION LEARNING
+
+10557
+
+Fig. 3. t-SNE visualization of DDI representations on unseen domains. The left shows the true statistical distribution of two datasets (domain). The right reveals the prediction results on unseen domain. Visualizations are drawn using the DEC clustering method.
+
+increased discriminative power through clustering. Therefore, the accuracy after matching categories will increase. Notably, for the unseen Drugbank, OOD generalization accuracy exceeds the performance of existing methods in the inductive setting. DSIL-DDI can be combined with other clustering methods and still remain robustness (see Section V-D for details).
+
+TABLE III
+ABLATION EXPERIMENTS. THREE TASKS: THE INDUCTIVE SETTING "NEW  NEW," OOD GENERALIZATION "D  T" (DRUGBANK TO TWOSIDES), AND OOD GENERALIZATION "T  D" (TWOSIDES TO DRUGBANK)
+
+D. Ablation Experiment
+We analyze ablation experiments in the inductive setting ("new  new") and OOD generalization. Table III summarizes the ablation experiments.
+DSIL-DDI is robust to GNNs for task "new  new" (the first two parts of Table III). When the loss function has only cross entropy ( = 0), the model does not perform well. ACC is significantly improved when our proposed loss function is introduced, and our loss function is robust to the hyperparameter . This proves that the advantages brought by learning domain-invariant representations are not accidental.
+DSIL-DDI is still robust to GNNs for OOD generalization (the third part of Table III). Regardless of task D  T or task T  D, the choice of clustering algorithms does not affect the OOD generalization performance. For the fourth part of Table III, OOD generalization fails without using proposed loss function ( = 0). Once our loss function is introduced, OOD generalization performance is significantly improved. Our loss function is robust, and the hyperparameter  does not significantly affect it.
+E. Domain-Invariant Representation
+We further investigate the substructure interaction representations. According to the attention weights, we index the most
+
+contributing substructure pairs (substructure interactions) from the drug pairs. It is well known that GMPNN can extract sizeadaptive substructures. For two substructure graphs A and B in a substructure pair, in graph A, the hop count from the highest order neighbor to the central node is gA; in graph B, the hop count from the highest order neighbor to the central node is gB. We denote the substructure pair as g-hop substructure [the node of the drug graph represents the center of the substructure, and g = max(gA, gB)]. A graphical example of this definition can be found in Supplementary Fig. S7.
+
+Authorized licensed use limited to: William & Mary. Downloaded on July 07,2026 at 20:12:12 UTC from IEEE Xplore. Restrictions apply.
+
+10558
+
+IEEE TRANSACTIONS ON NEURAL NETWORKS AND LEARNING SYSTEMS, VOL. 35, NO. 8, AUGUST 2024
+
+Fig. 4. Analysis of domain-invariant representations between Drugbank and Twosides.
+
+In general, five-hop indicates that the substructure pair contains a large-sized chemical functional group, and three-hop indicates that the substructure pair does not contain a large-sized chemical functional group. First, we count the frequency of three-hops and five-hops in each category. It can be seen that the statistical distributions of three-hop and fivehop are significantly different in the Drugbank and Twosides datasets, respectively (two bar plots on the upper left of Fig. 4). This shows that whether it is Drugbank or Twosides, and the substructure interaction is related to the category.
+For the Sankey plot at the bottom left of Fig. 4, we select drug pairs on the subset of categories 0­6 in Drugbank, use the label of Drugbank as reference (restricting the predicted categories to Drugbank categories) to make predictions, and then use the label of Twosides as reference (restricting the predicted categories to Twosides categories). It is found that samples whose prediction results are Drugbank categories 0 and 6 are assigned to Twosides categories 0 and 1, and the samples whose prediction results are drugbank categories 1­5 are assigned to Twosides category 961. At the same time, we notice the phenomenon: 1) for categories 0­6 on Drugbank, categories 0 and 6 in the frequency bar plot correspond to five-hop, and the rest correspond to three-hop and 2) for categories 0, 1 and 961 on Twosides, categories 0 and 1 in the
+
+frequency bar plot correspond to five-hop, 961 corresponds to three-hop.
+The relationship between Drugbank categories and Twosides categories is provided in the gray box to the right of Fig. 4, which proves that DSIL-DDI does learn domain invariant representations.
+F. Explainability Analysis
+We demonstrate the explainability of DSIL-DDI by investigating how these combinations of drug substructures lead to potential DDIs from a medicinal chemistry perspective. According to the attention weights, we index the most contributing substructure pairs (substructure interactions) from drug pairs. Then we compare these substructure interactions with existing literature, and we can discover some interesting knowledge.
+As shown in Fig. 5, we present three DDI events and visualize their substructure pairs. The first case is the sulfonylurea hypoglycemic agent, Tolazamide, and the monoamine oxidase inhibitor, Phenelzine. When combined orally, ethylhydrazine functional groups and sulfonylureas can synergistically promote insulin secretion and cause hypoglycemia [44]. The next example concerns barbiturates (phenobarbital). Since the malonylurea of barbiturates can induce the activity of
+
+Authorized licensed use limited to: William & Mary. Downloaded on July 07,2026 at 20:12:12 UTC from IEEE Xplore. Restrictions apply.
+
+TANG et al.: DSIL-DDI: A DOMAIN-INVARIANT SUBSTRUCTURE INTERACTION LEARNING
+
+10559
+
+REFERENCES
+
+Fig. 5. Explainable visualization of substructure interactions. Line 1: phenelzine can enhance the hypoglycemic effect of sulfonylurea. Line 2: phenobarbital makes meloxicam less effective. Line 3: arbutamine can reduce the hypotensive effect of chlorothiazide. The centers of the most important substructures and their receptive fields are shown in blue and orange, respectively.
+liver microsomal enzymes [45], coadmistration of barbiturates with nonsteroidal anti-inflammatory drug (meloxicam) can accelerate the metabolism of the enolamide group in meloxicam. The last is the thiazide diuretics (chlorothiazide) and -adrenoceptor agonist (arbutamine) [46]. In contrast to chlorothiazide, arbutamine constricts blood vessels. Coadministration may reduce the antihypertensive effect of chlorpromethiazide and increase the risk of hypokalemia. As expected, the pharmacophore, chlorobenzenesulfonamide in chlorothiazide, and -hydroxyphenethylamine in arbutamine, are highlighted in the DDI predictions. Based on the above analysis, the substructure interactions learned by DSIL-DDI conform to the theoretical intuition of medicinal chemistry, further proving that it learns the scientific knowledge implicit in DDIs.
+VI. CONCLUSION
+In this article, we propose DSIL-DDI, a domain-invariant substructure interaction learning for generalizable DDI predictions. In DSIL-DDI, we implement a pluggable substructure interaction module that can extract the substructure interaction patterns of DDIs, and a practical loss function that encourages module to learn domain-invariant substructure interaction representations of DDIs. The experimental results show that DSIL-DDI outperforms existing methods on two realworld datasets, Drugbank and Twosides, and demonstrates superiority on the inductive setting tasks. Besides, ablation experiments demonstrate the stable robustness of DSIL-DDI. Furthermore, DSIL-DDI enables OOD generalization of DDI predictions. The domain-invariant representations learned by DSIL-DDI are consistent with studies in the medicinal chemistry literature, suggesting that it can mine the scientific knowledge implicit in DDIs. DSIL-DDI can help doctors or drug discovery researchers avoid adverse consequences of drug interactions, further ensuring the safety of drug administration and reducing the harm caused by drug abuse.
+
+[1] K. A. Ryall and A. C. Tan, "Systems biology approaches for advancing the discovery of effective drug combinations," J. Cheminform., vol. 7, no. 1, pp. 1­15, Dec. 2015.
+[2] P. Jaaks et al., "Effective drug combinations in breast, colon and pancreatic cancer cells," Nature, vol. 603, no. 7899, pp. 166­173, 2022.
+[3] N. P. Tatonetti, P. P. Ye, R. Daneshjou, and R. B. Altman, "Data-driven prediction of drug effects and interactions," Sci. Transl. Med., vol. 4, no. 125, p. 125, Mar. 2012.
+[4] M. Zitnik, M. Agrawal, and J. Leskovec, "Modeling polypharmacy side effects with graph convolutional networks," Bioinformatics, vol. 34, no. 13, pp. i457­i466, Jul. 2018.
+[5] N. Xu, P. Wang, L. Chen, J. Tao, and J. Zhao, "MR-GNN: Multiresolution and dual graph neural network for predicting structured entity interactions," 2019, arXiv:1905.09558.
+[6] H. Wang, D. Lian, Y. Zhang, L. Qin, and X. Lin, "GoGNN: Graph of graphs neural network for predicting structured entity interactions," 2020, arXiv:2005.05537.
+[7] P. Velickovic´, G. Cucurull, A. Casanova, A. Romero, P. Liò, and Y. Bengio, "Graph attention networks," 2017, arXiv:1710.10903.
+[8] A. G. Atanasov, S. B. Zotchev, V. M. Dirsch, and C. T. Supuran, "Natural products in drug discovery: Advances and opportunities," Nature Rev. Drug Discovery, vol. 20, no. 3, pp. 200­216, Mar. 2021.
+[9] C. Li et al., "Geometry-based molecular generation with deep constrained variational autoencoder," IEEE Trans. Neural Netw. Learn. Syst., early access, Feb. 16, 2022, doi: 10.1109/TNNLS.2022.3147790.
+[10] C. Ji, Y. Zheng, R. Wang, Y. Cai, and H. Wu, "Graph polish: A novel graph generation paradigm for molecular optimization," IEEE Trans. Neural Netw. Learn. Syst., early access, Sep. 14, 2021, doi: 10.1109/TNNLS.2021.3106392.
+[11] A. Morro et al., "A stochastic spiking neural network for virtual screening," IEEE Trans. Neural Netw. Learn. Syst., vol. 29, no. 4, pp. 1371­1375, Apr. 2018.
+[12] R. Huang, X. Tan, and Q. Xu, "Learning to learn variational quantum algorithm," IEEE Trans. Neural Netw. Learn. Syst., early access, Feb. 28, 2022, doi: 10.1109/TNNLS.2022.3151127.
+[13] C. Y. Lee and Y.-P.-P. Chen, "New insights into drug repurposing for COVID-19 using deep learning," IEEE Trans. Neural Netw. Learn. Syst., vol. 32, no. 11, pp. 4770­4780, Nov. 2021.
+[14] B. M. W. Harrold and R. M. Zavod, "Basic concepts in medicinal chemistry," Drug Develop. Ind. Pharmacy, vol. 40, no. 7, p. 988, 2014.
+[15] D. S. Wishart et al., "DrugBank 5.0: A major update to the DrugBank database for 2018," Nucleic Acids Res., vol. 46, no. D1, pp. D1074­D1082, 2018.
+[16] T. Zhang, J. Leng, and Y. Liu, "Deep learning for drug­drug interaction extraction from the literature: A review," Briefings Bioinform., vol. 21, no. 5, pp. 1609­1627, 2020.
+[17] T. Lyu, J. Gao, L. Tian, Z. Li, P. Zhang, and J. Zhang, "MDNN: A multimodal deep neural network for predicting drug-drug interaction events," in Proc. IJCAI, vol. 487, 2021, pp. 3536­3542.
+[18] X. Lin, Z. Quan, Z.-J. Wang, T. Ma, and X. Zeng, "KGNN: Knowledge graph neural network for drug-drug interaction prediction," in IJCAI, vol. 380, 2020, pp. 2739­2745.
+[19] M. R. Karim, M. Cochez, J. B. Jares, M. Uddin, O. Beyan, and S. Decker, "Drug-drug interaction prediction based on knowledge graph embeddings and convolutional-LSTM network," in Proc. 10th ACM Int. Conf. Bioinf., Comput. Biol. Health Informat., Sep. 2019, pp. 113­123.
+[20] Y. Yu, K. Huang, C. Zhang, L. M. Glass, J. Sun, and C. Xiao, "SumGNN: Multi-typed drug interaction prediction via efficient knowledge graph summarization," Bioinformatics, vol. 37, no. 18, pp. 2988­2995, Sep. 2021.
+[21] A. K. Nyamabo, H. Yu, and J.-Y. Shi, "SSI­DDI: Substructure­ substructure interactions for drug­drug interaction prediction," Briefings Bioinf., vol. 22, no. 6, 2021, Art. no. bbab133.
+[22] A. K. Nyamabo, H. Yu, Z. Liu, and J.-Y. Shi, "Drug­drug interaction prediction with learnable size-adaptive molecular substructures," Briefings Bioinf., vol. 23, no. 1, 2022, Art. no. bbab441.
+[23] J. Zhu, Y. Liu, Y. Zhang, Z. Chen, and X. Wu, "Multi-attribute discriminative representation learning for prediction of adverse drugdrug interaction," IEEE Trans. Pattern Anal. Mach. Intell., vol. 44, no. 12, pp. 10129­10144, Dec. 2022.
+[24] Z. Yang, W. Zhong, Q. Lv, and C. Y.-C. Chen, "Learning size-adaptive molecular substructures for explainable drug­drug interaction prediction by substructure-aware graph neural network," Chem. Sci., vol. 13, no. 29, pp. 8693­8703, 2022.
+
+Authorized licensed use limited to: William & Mary. Downloaded on July 07,2026 at 20:12:12 UTC from IEEE Xplore. Restrictions apply.
+
+10560
+
+IEEE TRANSACTIONS ON NEURAL NETWORKS AND LEARNING SYSTEMS, VOL. 35, NO. 8, AUGUST 2024
+
+[25] D. P. Kingma and M. Welling, "Auto-encoding variational Bayes," 2013, arXiv:1312.6114.
+[26] K. Sohn, H. Lee, and X. Yan, "Learning structured output representation using deep conditional generative models," in Proc. Adv. Neural Inf. Process. Syst., vol. 28, 2015, pp. 1­9.
+[27] W. Zhang, X. Li, H. Ma, Z. Luo, and X. Li, "Universal domain adaptation in fault diagnostics with hybrid weighted deep adversarial learning," IEEE Trans. Ind. Informat., vol. 17, no. 12, pp. 7957­7967, Dec. 2021.
+[28] X. Li, W. Zhang, H. Ma, Z. Luo, and X. Li, "Degradation alignment in remaining useful life prediction using deep cycle-consistent learning," IEEE Trans. Neural Netw. Learn. Syst., vol. 33, no. 10, pp. 5480­5491, Oct. 2022.
+[29] T. Chen, S. Kornblith, M. Norouzi, and G. Hinton, "A simple framework for contrastive learning of visual representations," in Proc. Int. Conf. Mach. Learn., 2020, pp. 1597­1607.
+[30] S. Lin et al., "Prototypical graph contrastive learning," IEEE Trans. Neural Netw. Learn. Syst., early access, Jul. 27, 2022, doi: 10.1109/TNNLS.2022.3191086.
+[31] B. Schölkopf et al., "Towards causal representation learning," 2021, arXiv:2102.11107.
+[32] P. Cui and S. Athey, "Stable learning establishes some common ground between causal inference and machine learning," Nature Mach. Intell., vol. 4, no. 2, pp. 110­115, Feb. 2022.
+[33] F. Lv et al., "Causality inspired representation learning for domain generalization," in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit., Jun. 2022, pp. 8046­8056.
+[34] Z. Shen, P. Cui, K. Kuang, B. Li, and P. Chen, "Causally regularized learning with agnostic data selection bias," in Proc. 26th ACM Int. Conf. Multimedia, Oct. 2018, pp. 411­419.
+[35] Y. He, Z. Shen, and P. Cui, "Towards non-I.I.D image classification: A dataset and baselines," Pattern Recognit., vol. 110, Feb. 2021, Art. no. 107383.
+[36] Z. Shen, P. Cui, T. Zhang, and K. Kunag, "Stable learning via sample reweighting," in Proc. AAAI Conf. Artif. Intell., 2020, vol. 34, no. 4, pp. 5692­5699.
+[37] D. Zhang, H. Zhang, J. Tang, X.-S. Hua, and Q. Sun, "Causal intervention for weakly-supervised semantic segmentation," in Proc. Adv. Neural Inf. Process. Syst., vol. 33, 2020, pp. 655­666.
+[38] T. Wang, J. Huang, H. Zhang, and Q. Sun, "Visual commonsense R-CNN," in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR), Jun. 2020, pp. 10760­10770.
+[39] A. Likas, N. Vlassis, and J. J. Verbeek, "The global k-means clustering algorithm," Pattern Recognit., vol. 36, no. 2, pp. 451­461, Feb. 2003.
+[40] J. Xie, R. Girshick, and A. Farhadi, "Unsupervised deep embedding for clustering analysis," in Proc. Int. Conf. Mach. Learn., 2016, pp. 478­487.
+[41] D. P. Kingma and J. Ba, "Adam: A method for stochastic optimization," 2014, arXiv:1412.6980.
+[42] T. N. Kipf and M. Welling, "Semi-supervised classification with graph convolutional networks," 2016, arXiv:1609.02907.
+[43] L. Van der Maaten and G. Hinton, "Visualizing data using t-SNE," J. Mach. Learn. Res., vol. 9, no. 11, pp. 2579­2605, 2008.
+[44] M. G. Livingston and H. M. Livingston, "Monoamine oxidase inhibitors," Drug Saf., vol. 14, no. 4, pp. 219­227, 1996.
+[45] C. Ioannides and D. V. Parke, "Mechanism of induction of hepatic microsomal drug metabolizing enzymes by a series of barbiturates," J. Pharmacy Pharmacol., vol. 27, no. 10, pp. 739­746, Apr. 2011.
+[46] D. Cooney, S. Milfred-LaForest, and M. Rahman, "Diuretics for hypertension: Hydrochlorothiazide or chlorthalidone?" Cleveland Clinic J. Med., vol. 82, no. 8, pp. 527­533, Aug. 2015.
+Zhenchao Tang received the B.S. degree in water resources and hydropower engineering from the Huazhong University of Science and Technology, Wuhan, China, in 2021. He is currently pursuing the Ph.D. degree in pattern recognition and intelligent systems with Sun Yat-sen University, Shenzhen, China.
+His research interests include machine learning and pattern recognition.
+
+Guanxing Chen is currently pursuing the Ph.D. degree in computer science and technology with Sun Yat-sen University, Shenzhen, China.
+His research interests include machine learning and pattern recognition.
+Hualin Yang received the B.S. degree in electronic information science and technology and the M.S. degree in circuit and engineering from Jilin University, Changchun, Jilin, China, in 2018 and 2021, respectively. He is currently pursuing the Ph.D. degree in electronic information with Sun Yat-sen University, Shenzhen, China.
+His research interests include machine learning, pattern recognition, and natural language processing.
+Weihe Zhong is currently pursuing the Ph.D. degree in biology and medicine with Sun Yat-sen University, Shenzhen, China.
+His research interests include drug discovery and machine learning.
+Calvin Yu-Chian Chen is currently the Director of the Intelligent Medical Center and a Professor with the School of Intelligent Systems Engineering, Sun Yat-sen University, Shenzhen, China. He also serves as an Advisor of China Medical University, Taichung, Taiwan, and Asia University, Taichung; and a Guest Professor with the Massachusetts Institute of Technology (MIT), Cambridge, MA, USA, and the University of Pittsburgh, Pittsburgh, PA, USA. He has published more than 300 SCI articles and with H-index more than 47. His laboratory general research interests are to develop structured machine learning techniques for computer vision tasks to investigate how to exploit the human commonsense and incorporate them to develop the advanced artificial intelligence systems. Dr. Chen is one of the highly cited candidate (in the field of computer science and Technology) in 2020­2023. In 2021­2023, he was also selected as one of the world's top 100 000 scientists. In 2018­2023, he was also selected as the world's top 2% scientists. He had built several artificial intelligence medical systems for Hospital, including various pathological image processing, MRI image processing, and big data modeling. He also built the world's largest traditional Chinese medicine database (http://tcmbank.cn/).
+
+Authorized licensed use limited to: William & Mary. Downloaded on July 07,2026 at 20:12:12 UTC from IEEE Xplore. Restrictions apply.
+
+

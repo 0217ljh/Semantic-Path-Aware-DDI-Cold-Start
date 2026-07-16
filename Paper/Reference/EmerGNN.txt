@@ -1,0 +1,56 @@
+Title: Emerging Drug Interaction Prediction Enabled by Flow-based Graph Neural Network with Biomedical Network
+Authors: Yongqi Zhang, Quanming Yao (corresponding), Ling Yue, Xian Wu, Ziheng Zhang, Zhenxi Lin, Yefeng Zheng
+Venue+Year: arXiv preprint (q-bio.QM), 15 Nov 2023. This extracted PDF is the extended/journal-style manuscript (41 pages with Methods + Supplementary). (Published version appeared in Nature Computational Science 2024; the extracted file is the arXiv v1.)
+arXiv-or-DOI: arXiv:2311.09261v1
+PDF filename: EmerGNN.pdf
+
+## TL;DR
+EmerGNN predicts DDIs for emerging (unseen) drugs by extracting all length-<=L paths between a drug pair in an augmented DDI+biomedical network (HetioNet), merging them into a directed path-based subgraph pointed from source drug u to target drug v, and running a "flow-based" GNN that propagates drug-u fingerprint features step by step along the subgraph with relation-type attention weights, finally reading out a bi-directional pair representation for interaction-type classification. It is explicitly built for cold-start (emerging-drug) DDI and is a path/flow-reasoning method. It is OUR baseline.
+
+## Problem & Contributions
+- Problem: predicting DDIs for emerging drugs that have few or no known interactions. Existing embedding/GNN DDI methods rely on historical interactions and fail for emerging drugs; shallow feature methods work in cold-start but lack expressiveness (Intro, pp. 1-2).
+- Two task settings for emerging drugs (Results, p. 3): S1 = interaction between one emerging drug and one existing drug; S2 = interaction between two emerging drugs. S0 (both existing / warm) is reported only in Supplementary Table 3.
+- Contributions (Intro, p. 3): (i) a deep method over a biomedical network that predicts interactions for emerging drugs; (ii) EmerGNN, a GNN learning pair-wise representations by integrating biomedical concepts on paths connecting the drug pair; (iii) interpretability via learned edge attention weights on the biomedical network; (iv) potential clinical value.
+
+## Method / Core mechanism (equations in words + notation)
+Four components (Methods, p. 9):
+1. Augmented network. Integrate DDI network N_D = {(u,i,v)} and biomedical network N_B = {(h,r,t)} into N' = N_D union N_B, then add inverse relation types r_inv for every relation (active/passive voice analogy) to form the augmented network N with entity set V = V_D union V_B and relation set R = R' union R'_inv. Inverse edges let all paths be organized in a single forward direction (Eq. for N', N'_inv, N; p. 9-10).
+2. Path-based subgraph. For a target pair (u,v), extract the set P^L_{u,v} of all paths e0 -r1-> e1 -...-> eL with e0=u, eL=v, length <= L, then merge shared entities into one directed subgraph G^L_{u,v} whose edges point away from u toward v. Link prediction is recast as whole-graph learning: DDI(u,v) = g(G^L_{u,v}; theta) (Eq. 1). L is a tuned hyper-parameter; L=3 found optimal (Fig. 5c, p. 7-8).
+3. Flow-based GNN. Define V^l_{u,v} = entities reachable in l steps from u AND (L-l) steps from v; V^0={u}, V^L={v}. Initialize h^(0)_{u,u} = f_u (drug u fingerprint). At step l, for entity e in V^l_{u,v}:
+   h^(l)_{u,e} = delta( W^(l) * sum_{e' in V^{l-1}} [ h^(l-1)_{u,e} + phi(h^(l-1)_{u,e'}, h^(l)_r) ] )   (Eq. 2)
+   with W^(l) a learnable d x d matrix, h^(l)_r the step-l learnable relation embedding, delta = ReLU. The message function (Eq. 3) is phi = alpha^(l)_r * (h^(l-1)_{u,e'} element-wise-product h^(l)_r), i.e. information "flows" from u along the paths, gated by a relation-type attention weight alpha^(l)_r = sigmoid( (w^(l)_r)^T [f_u ; f_v] ) that depends on the fingerprints of BOTH target drugs. So edges are weighted by relevance to the specific pair being predicted; large-weight edges give interpretation.
+4. Bi-directional readout + classifier. Compute h^(L)_{u,v} and the reverse-subgraph representation h^(L)_{v,u} with shared parameters, concatenate, and predict logits l(u,v) = W_rel [h^(L)_{u,v} ; h^(L)_{v,u}] over |R_I| interaction types (Eq. 4).
+Training: DrugBank is multi-class (softmax + cross-entropy, Eq. 5); TWOSIDES is multi-label (sigmoid + binary cross-entropy with sampled negatives, Eq. 6). Adam optimizer.
+
+Cold-start protocol (Methods, "Drug-drug interaction network" + "Biomedical network", pp. 12-13): drug set V_D split 7:1:2 into train/valid/test drug pools; valid/test drugs are the "emerging" drugs. In S1, test edges connect a test (emerging) drug to a train-or-valid drug; in S2, both endpoints are test (emerging) drugs. Crucially, to prevent leakage the biomedical-network edges touching valid/test drugs are removed during training (N_B-train excludes edges incident to V_D-valid union V_D-test), and emerging drugs are required to be present in the biomedical network (V_D-valid, V_D-test subset of V_B). Negative sampling: one negative per positive for TWOSIDES evaluation.
+
+## Key results & numbers (with Table/Fig/Section pointers)
+Table 1 (p. 15-16), mean +- std over five runs, values in %; primary metric F1-Score (DrugBank, multi-class) and PR-AUC (TWOSIDES, multi-label).
+- S1 setting (emerging-existing), DrugBank | TWOSIDES:
+  EmerGNN: F1 62.0+-2.0, Acc 68.6+-3.7, Kappa 62.4+-4.3 | PR-AUC 90.6+-0.7, ROC-AUC 91.5+-1.0, Acc 84.6+-0.7.
+  Best baselines in S1: CSMDDI (DF) F1 45.5, HIN-DDI (GF) PR-AUC 81.9, DeepLGF (GNN) F1 39.7 / PR-AUC 81.4, SumGNN (GNN) F1 35.0 / PR-AUC 80.3. p-values of EmerGNN over 2nd-best: 8.9E-7 (F1), 1.6E-6 (PR-AUC).
+- S2 setting (both emerging), DrugBank | TWOSIDES:
+  EmerGNN: F1 25.0+-2.8, Acc 46.3+-3.6, Kappa 31.9+-3.8 | PR-AUC 81.4+-7.4, ROC-AUC 79.6+-7.9, Acc 73.0+-8.2.
+  Best baselines in S2: CSMDDI F1 19.8 (2nd on DrugBank), HIN-DDI PR-AUC 64.8 (2nd on TWOSIDES); KG-DDI and DeepLGF collapse in S2 (e.g. KG-DDI F1 1.1, DeepLGF F1 4.8 on DrugBank). p-values: 0.02 (F1 DrugBank), 1.4E-3 (PR-AUC TWOSIDES).
+- Ablations (Fig. 5d, pp. 7-8): removing inverse edges (undirected) hurts (directional info lost); a SumGNN-style subgraph-representation variant and a uni-directional variant both underperform the full bi-directional flow GNN. L sweep (Fig. 5c): L=1 worst, L=3 best, L>3 degrades. Adding a few known emerging-drug interactions improves EmerGNN monotonically (Fig. 5b).
+- Interpretability (Fig. 3, pp. 5-6): dominant diagonal in the interaction-correlation heatmap shows selected paths route through a similar drug u1 sharing interaction i1=i_pred with v; the drug-resembling relation CrC is the most frequently attended biomedical relation; keeping only top-1/3/5 attended relations matches full-network performance while random edge dropping degrades it (Fig. 3d).
+- Efficiency (Fig. 2, p. 5): EmerGNN is memory- and parameter-efficient because subgraphs are tiny vs the ~3.66M-edge augmented network, but per-pair subgraph learning makes it slower than Decagon/DeepLGF (comparable cost to SumGNN).
+
+## Relevance to our cold-start low-rank DDI paper (§2.1 taxonomy slot: node/path/subgraph; warm vs cold; how we'd cite / whether it's a baseline)
+- Taxonomy slot: PATH-based (flow/path reasoning). It merges paths into a directed subgraph, but the defining mechanism is directional path/flow propagation from u to v, not enclosing-subgraph pooling. In a node/path/subgraph split, cite it as the canonical path/flow-reasoning method for DDI. (It sits at the path-subgraph boundary; note it uses a path-derived subgraph but flow-style message passing.)
+- Warm vs cold: explicitly COLD-START / emerging-drug (S1 one-side unseen, S2 both unseen), with a leakage-controlled protocol that removes biomedical edges touching held-out drugs. This is exactly the cold-start regime our paper targets; S2 (both unseen) is our "cold" definition.
+- Use in our paper: EmerGNN is OUR baseline. In §2.1 present it as the strongest prior path/flow-based cold-start DDI method and the one we compare against. Cite its 7:1:2 drug-pool split and S0/S1/S2 protocol as the standard emerging-drug evaluation. Its per-pair relation-type attention weight alpha^(l)_r conditioned on [f_u; f_v] is a natural point of contrast for our low-rank typed-adapter framing (pair-conditioned edge weighting vs low-rank typed mediator adapters).
+
+## Safe-to-cite claims (section pointers)
+- EmerGNN extracts length-<=L paths between a drug pair and merges them into a directed path-based subgraph pointing from u to v (Methods, Eq. 1, p. 9-10).
+- The flow-based GNN propagates drug-u fingerprint features along the subgraph with relation-type attention weights that depend on both drugs' fingerprints (Eqs. 2-3, pp. 10-11).
+- It defines S1 (emerging-existing) and S2 (both-emerging) cold-start settings and controls leakage by removing biomedical edges incident to held-out drugs (Methods, pp. 12-13).
+- On DrugBank S1 F1 = 62.0 and TWOSIDES S1 PR-AUC = 90.6; on S2 F1 = 25.0 (DrugBank) and PR-AUC = 81.4 (TWOSIDES), outperforming all baselines with small p-values (Table 1, pp. 15-16).
+- L=3 hops is optimal; inverse edges and bi-directional readout are each ablated as beneficial (Fig. 5c-d).
+
+## Do-NOT-overclaim / caveats
+- The numeric grid was recovered from pypdf text extraction of Table 1; individual cell values were legible but reconfirm against the published PDF before quoting exact decimals in-paper.
+- The extracted file is arXiv v1 (2023); page numbers and some phrasing may differ from the peer-reviewed Nature Computational Science version. Verify venue/year string before citing.
+- EmerGNN REQUIRES the emerging drug to already be a node in the biomedical network (stated limitation, Discussion p. 8). It does not handle drugs absent from HetioNet. Do not claim it is fully feature-only cold-start.
+- S2 numbers have large std (e.g. PR-AUC 81.4+-7.4), reflecting difficulty/variance of the both-unseen regime; report with the std.
+- It is not a low-rank method; do not attribute low-rank structure to it. Its "attention" is a scalar per-relation-per-step gate, not a low-rank typed adapter.

@@ -1,0 +1,366 @@
+
+====================================================================================================
+[1] PKB-001  DB06636 (Isavuconazonium) ↔ DB09063 (Ceritinib)  class=PK-B
+ddi_type: The serum concentration of can be increased when it is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (249 chars / 1 sentences)]:
+Coadministration with potent inhibitors of CYP450 3A4 may significantly increase the plasma concentrations of isavuconazole, which is primarily metabolized by CYP450 3A4 and 3A5 and subsequently by uridine diphosphate glucuronosyltransferases (UGT).
+----------------------------------------------------------------------------------------------------
+[FILTERED (249 chars / 1 sent)]:
+Coadministration with potent inhibitors of CYP450 3A4 may significantly increase the plasma concentrations of isavuconazole, which is primarily metabolized by CYP450 3A4 and 3A5 and subsequently by uridine diphosphate glucuronosyltransferases (UGT).
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[2] PKB-002  DB01036 (Tolterodine) ↔ DB01110 (Miconazole)  class=PK-B
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (492 chars / 3 sentences)]:
+Coadministration with drugs that are inhibitors of CYP450 3A4 may increase the plasma concentrations of tolterodine, which is partially metabolized by the isoenzyme. The possibility of prolonged and/or increased pharmacologic effects of tolterodine should be considered. Although tolterodine is primarily metabolized by CYP450 2D6, there is some evidence that CYP450 3A4 may play a minor role, thus any alteration in its activity levels could conceivably affect the metabolism of tolterodine.
+----------------------------------------------------------------------------------------------------
+[FILTERED (387 chars / 2 sent)]:
+Coadministration with drugs that are inhibitors of CYP450 3A4 may increase the plasma concentrations of tolterodine, which is partially metabolized by the isoenzyme. Although tolterodine is primarily metabolized by CYP450 2D6, there is some evidence that CYP450 3A4 may play a minor role, thus any alteration in its activity levels could conceivably affect the metabolism of tolterodine.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences — prescriptive language):
+The possibility of prolonged and/or increased pharmacologic effects of tolterodine should be considered.
+
+====================================================================================================
+[3] PKB-003  DB00193 (Tramadol) ↔ DB14575 (Eslicarbazepine)  class=PK-B
+ddi_type: The metabolism of can be increased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (215 chars / 1 sentences)]:
+Central nervous system- and/or respiratory-depressant effects may be additively or synergistically increased in patients taking multiple drugs that cause these effects, especially in elderly or debilitated patients.
+----------------------------------------------------------------------------------------------------
+[FILTERED (215 chars / 1 sent)]:
+Central nervous system- and/or respiratory-depressant effects may be additively or synergistically increased in patients taking multiple drugs that cause these effects, especially in elderly or debilitated patients.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[4] PKB-004  DB00373 (Timolol) ↔ DB06654 (Safinamide)  class=PK-B
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (469 chars / 2 sentences)]:
+Sympathetic ganglion-blocking or catecholamine-depleting agents such as guanethidine, reserpine, and monoamine oxidase (MAO) inhibitors may potentiate the pharmacologic effects of beta-blockers, which are thought to competitively antagonize catecholamines at cardiac and other peripheral adrenergic neurons. Combining these medications may increase the risk of hypotension, orthostasis, bradycardia, and heart failure due to excessive reduction of sympathetic activity.
+----------------------------------------------------------------------------------------------------
+[FILTERED (469 chars / 2 sent)]:
+Sympathetic ganglion-blocking or catecholamine-depleting agents such as guanethidine, reserpine, and monoamine oxidase (MAO) inhibitors may potentiate the pharmacologic effects of beta-blockers, which are thought to competitively antagonize catecholamines at cardiac and other peripheral adrenergic neurons. Combining these medications may increase the risk of hypotension, orthostasis, bradycardia, and heart failure due to excessive reduction of sympathetic activity.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[5] PKB-005  DB00625 (Efavirenz) ↔ DB00661 (Verapamil)  class=PK-B
+ddi_type: The serum concentration of can be decreased when it is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (221 chars / 2 sentences)]:
+Coadministration with efavirenz may decrease the plasma concentrations of drugs that are substrates of the CYP450 3A4 isoenzyme. The mechanism is accelerated clearance due to induction of CYP450 3A4 activity by efavirenz.
+----------------------------------------------------------------------------------------------------
+[FILTERED (221 chars / 2 sent)]:
+Coadministration with efavirenz may decrease the plasma concentrations of drugs that are substrates of the CYP450 3A4 isoenzyme. The mechanism is accelerated clearance due to induction of CYP450 3A4 activity by efavirenz.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[6] PKB-006  DB01406 (Danazol) ↔ DB09330 (Osimertinib)  class=PK-B
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (177 chars / 1 sentences)]:
+Coadministration with inhibitors of CYP450 3A4 may increase the plasma concentrations of osimertinib, which has been shown in vitro to be primarily metabolized by the isoenzyme.
+----------------------------------------------------------------------------------------------------
+[FILTERED (177 chars / 1 sent)]:
+Coadministration with inhibitors of CYP450 3A4 may increase the plasma concentrations of osimertinib, which has been shown in vitro to be primarily metabolized by the isoenzyme.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[7] PKB-007  DB01041 (Thalidomide) ↔ DB12245 (Triclabendazole)  class=PK-B
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (978 chars / 6 sentences)]:
+Thalidomide can cause bradycardia and may have additive effects with other drugs that decrease heart rate. Cases of bradycardia have been associated with thalidomide use, some requiring medical interventions. The clinical significance and underlying etiology of the bradycardia observed with thalidomide treatment have not been established. However, the potential for additive bradycardic effects should be considered when used with other drugs that slow cardiac conduction such as beta-blockers, calcium channel blockers, digitalis, flecainide, moricizine, and propafenone. Non-cardiac drugs that may also cause bradycardia include atazanavir, lacosamide, lithium, mefloquine, succinylcholine, H2-receptor antagonists, tricyclic antidepressants, and anticholinesterase or cholinergic agents. Because bradycardia is a risk factor for torsade de pointes arrhythmia, concerns also exist when thalidomide is used with drugs that prolong the QT interval or cause torsade de pointes.
+----------------------------------------------------------------------------------------------------
+[FILTERED (744 chars / 5 sent)]:
+Thalidomide can cause bradycardia and may have additive effects with other drugs that decrease heart rate. Cases of bradycardia have been associated with thalidomide use, some requiring medical interventions. The clinical significance and underlying etiology of the bradycardia observed with thalidomide treatment have not been established. Non-cardiac drugs that may also cause bradycardia include atazanavir, lacosamide, lithium, mefloquine, succinylcholine, H2-receptor antagonists, tricyclic antidepressants, and anticholinesterase or cholinergic agents. Because bradycardia is a risk factor for torsade de pointes arrhythmia, concerns also exist when thalidomide is used with drugs that prolong the QT interval or cause torsade de pointes.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences — prescriptive language):
+However, the potential for additive bradycardic effects should be considered when used with other drugs that slow cardiac conduction such as beta-blockers, calcium channel blockers, digitalis, flecainide, moricizine, and propafenone.
+
+====================================================================================================
+[8] PKB-008  DB00252 (Phenytoin) ↔ DB01242 (Clomipramine)  class=PK-B
+ddi_type: The metabolism of can be increased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (351 chars / 3 sentences)]:
+Tricyclic antidepressants may increase serum phenytoin levels. In vitro studies suggest the mechanism may involve inhibition of CYP450 2C19-catalyzed phenytoin p-hydroxylation by tricyclic antidepressants, especially imipramine and amitriptyline. Phenytoin may induce the hepatic metabolism of desipramine resulting in decreased plasma concentrations.
+----------------------------------------------------------------------------------------------------
+[FILTERED (351 chars / 3 sent)]:
+Tricyclic antidepressants may increase serum phenytoin levels. In vitro studies suggest the mechanism may involve inhibition of CYP450 2C19-catalyzed phenytoin p-hydroxylation by tricyclic antidepressants, especially imipramine and amitriptyline. Phenytoin may induce the hepatic metabolism of desipramine resulting in decreased plasma concentrations.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[9] PKB-009  DB00696 (Ergotamine) ↔ DB01200 (Bromocriptine)  class=PK-B
+ddi_type: The serum concentration of can be increased when it is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (287 chars / 1 sentences)]:
+Coadministration of two or more 5-HT1 receptor agonists and/or ergotamine-containing or ergot-type medications may potentiate the risk of vasospastic reactions, including coronary artery vasospasm, peripheral vascular ischemia and colonic ischemia, due to additive pharmacologic effects.
+----------------------------------------------------------------------------------------------------
+[FILTERED (287 chars / 1 sent)]:
+Coadministration of two or more 5-HT1 receptor agonists and/or ergotamine-containing or ergot-type medications may potentiate the risk of vasospastic reactions, including coronary artery vasospasm, peripheral vascular ischemia and colonic ischemia, due to additive pharmacologic effects.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[10] PKB-010  DB00349 (Clobazam) ↔ DB00977 (Ethinylestradiol)  class=PK-B
+ddi_type: The serum concentration of can be decreased when it is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (140 chars / 1 sentences)]:
+RECOMMENDED: Coadministration with clobazam, a weak inducer of CYP450 3A4, may decrease the plasma concentrations of contraceptive hormones.
+----------------------------------------------------------------------------------------------------
+[FILTERED (0 chars / 0 sent)]:
+(empty)
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences — prescriptive language):
+RECOMMENDED: Coadministration with clobazam, a weak inducer of CYP450 3A4, may decrease the plasma concentrations of contraceptive hormones.
+
+====================================================================================================
+[11] PDB-001  DB00934 (Maprotiline) ↔ DB04843 (Mepenzolate)  class=PD-B
+ddi_type: The risk or severity of adverse effects can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (913 chars / 5 sentences)]:
+Agents with anticholinergic properties (e.g., sedating antihistamines; antispasmodics; neuroleptics; phenothiazines; skeletal muscle relaxants; tricyclic antidepressants; disopyramide) may have additive effects when used in combination. Excessive parasympatholytic effects may result in paralytic ileus, hyperthermia, heat stroke, and the anticholinergic intoxication syndrome. Peripheral symptoms of intoxication commonly include mydriasis, blurred vision, flushed face, fever, dry skin and mucous membranes, tachycardia, urinary retention, and constipation. Central symptoms may include memory loss, disorientation, incoherence, hallucinations, psychosis, delirium, hyperactivity, twitching or jerking movements, stereotypy, and seizures. Central nervous system-depressant effects may also be additively or synergistically increased when these agents are combined, especially in elderly or debilitated patients.
+----------------------------------------------------------------------------------------------------
+[FILTERED (913 chars / 5 sent)]:
+Agents with anticholinergic properties (e.g., sedating antihistamines; antispasmodics; neuroleptics; phenothiazines; skeletal muscle relaxants; tricyclic antidepressants; disopyramide) may have additive effects when used in combination. Excessive parasympatholytic effects may result in paralytic ileus, hyperthermia, heat stroke, and the anticholinergic intoxication syndrome. Peripheral symptoms of intoxication commonly include mydriasis, blurred vision, flushed face, fever, dry skin and mucous membranes, tachycardia, urinary retention, and constipation. Central symptoms may include memory loss, disorientation, incoherence, hallucinations, psychosis, delirium, hyperactivity, twitching or jerking movements, stereotypy, and seizures. Central nervous system-depressant effects may also be additively or synergistically increased when these agents are combined, especially in elderly or debilitated patients.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[12] PDB-002  DB00189 (Ethchlorvynol) ↔ DB01156 (Bupropion)  class=PD-B
+ddi_type: The risk or severity of CNS depression can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (416 chars / 3 sentences)]:
+Excessive use or abrupt discontinuation of benzodiazepines and other sedatives after chronic ingestion may precipitate seizures in patients receiving bupropion. Conversely, bupropion may antagonize the central pharmacologic effects of sedatives. Bupropion can cause agitation, anxiety, and insomnia and has been shown to decrease the sedative effect of diazepam in healthy volunteers given single doses of the drugs.
+----------------------------------------------------------------------------------------------------
+[FILTERED (416 chars / 3 sent)]:
+Excessive use or abrupt discontinuation of benzodiazepines and other sedatives after chronic ingestion may precipitate seizures in patients receiving bupropion. Conversely, bupropion may antagonize the central pharmacologic effects of sedatives. Bupropion can cause agitation, anxiety, and insomnia and has been shown to decrease the sedative effect of diazepam in healthy volunteers given single doses of the drugs.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[13] PDB-003  DB00308 (Ibutilide) ↔ DB00726 (Trimipramine)  class=PD-B
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (309 chars / 2 sentences)]:
+Like other class III antiarrhythmic agents, ibutilide can cause dose-related QT interval prolongation. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (309 chars / 2 sent)]:
+Like other class III antiarrhythmic agents, ibutilide can cause dose-related QT interval prolongation. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[14] PDB-004  DB00849 (Methylphenobarbital) ↔ DB01215 (Estazolam)  class=PD-B
+ddi_type: The risk or severity of CNS depression can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (215 chars / 1 sentences)]:
+Central nervous system- and/or respiratory-depressant effects may be additively or synergistically increased in patients taking multiple drugs that cause these effects, especially in elderly or debilitated patients.
+----------------------------------------------------------------------------------------------------
+[FILTERED (215 chars / 1 sent)]:
+Central nervous system- and/or respiratory-depressant effects may be additively or synergistically increased in patients taking multiple drugs that cause these effects, especially in elderly or debilitated patients.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[15] PDB-005  DB00199 (Erythromycin) ↔ DB11730 (Ribociclib)  class=PD-B
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (525 chars / 4 sentences)]:
+Ribociclib can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death. Coadministration with ribociclib may increase the plasma concentrations and pharmacologic effects of drugs that are substrates of CYP450 3A4. The proposed mechanism is decreased clearance due to ribociclib-mediated inhibition of CYP450 3A4 metabolism.
+----------------------------------------------------------------------------------------------------
+[FILTERED (525 chars / 4 sent)]:
+Ribociclib can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death. Coadministration with ribociclib may increase the plasma concentrations and pharmacologic effects of drugs that are substrates of CYP450 3A4. The proposed mechanism is decreased clearance due to ribociclib-mediated inhibition of CYP450 3A4 metabolism.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[16] PDB-006  DB01262 (Decitabine) ↔ DB08880 (Teriflunomide)  class=PD-B
+ddi_type: The risk or severity of adverse effects can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1465 chars / 7 sentences)]:
+The use of leflunomide with other immunosuppressive or myelosuppressive agents may increase the risk of infections. The risk is thought to extend to teriflunomide, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of teriflunomide. Serious infections including sepsis, as well as opportunistic infections like Pneumocystis jiroveci pneumonia, pulmonary and extrapulmonary tuberculosis, and aspergillosis have been reported with the use of leflunomide, particularly in patients on concomitant hematotoxic therapy. Agents that may be significantly immuno- or myelosuppressive include antineoplastic agents, radiation, zidovudine, linezolid, some antirheumatic agents, high dosages of corticosteroids or adrenocorticotropic agents , and long-term topical or inhaled corticosteroids. Rare cases of pancytopenia, agranulocytosis, and thrombocytopenia have also occurred with leflunomide alone, but were most frequent in the presence of concomitant or recent use of methotrexate or other myelotoxic agents. Due to the prolonged elimination half-life of leflunomide's active metabolite, an interaction may occur even when hematotoxic agents are initiated after the discontinuation of leflunomide. Administering a washout procedure with cholestyramine or activated charcoal helps to accelerate elimination of the active metabolite from plasma and reduce the overlap of systemic exposure to these agents.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1276 chars / 6 sent)]:
+The use of leflunomide with other immunosuppressive or myelosuppressive agents may increase the risk of infections. The risk is thought to extend to teriflunomide, its principal active metabolite, because recommended dosages of both result in a similar range of plasma concentrations of teriflunomide. Serious infections including sepsis, as well as opportunistic infections like Pneumocystis jiroveci pneumonia, pulmonary and extrapulmonary tuberculosis, and aspergillosis have been reported with the use of leflunomide, particularly in patients on concomitant hematotoxic therapy. Agents that may be significantly immuno- or myelosuppressive include antineoplastic agents, radiation, zidovudine, linezolid, some antirheumatic agents, high dosages of corticosteroids or adrenocorticotropic agents , and long-term topical or inhaled corticosteroids. Rare cases of pancytopenia, agranulocytosis, and thrombocytopenia have also occurred with leflunomide alone, but were most frequent in the presence of concomitant or recent use of methotrexate or other myelotoxic agents. Administering a washout procedure with cholestyramine or activated charcoal helps to accelerate elimination of the active metabolite from plasma and reduce the overlap of systemic exposure to these agents.
+----------------------------------------------------------------------------------------------------
+[REMOVED (1 sentences — prescriptive language):
+Due to the prolonged elimination half-life of leflunomide's active metabolite, an interaction may occur even when hematotoxic agents are initiated after the discontinuation of leflunomide.
+
+====================================================================================================
+[17] PDB-007  DB00246 (Ziprasidone) ↔ DB00334 (Olanzapine)  class=PD-B
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (913 chars / 5 sentences)]:
+Agents with anticholinergic properties (e.g., sedating antihistamines; antispasmodics; neuroleptics; phenothiazines; skeletal muscle relaxants; tricyclic antidepressants; disopyramide) may have additive effects when used in combination. Excessive parasympatholytic effects may result in paralytic ileus, hyperthermia, heat stroke, and the anticholinergic intoxication syndrome. Peripheral symptoms of intoxication commonly include mydriasis, blurred vision, flushed face, fever, dry skin and mucous membranes, tachycardia, urinary retention, and constipation. Central symptoms may include memory loss, disorientation, incoherence, hallucinations, psychosis, delirium, hyperactivity, twitching or jerking movements, stereotypy, and seizures. Central nervous system-depressant effects may also be additively or synergistically increased when these agents are combined, especially in elderly or debilitated patients.
+----------------------------------------------------------------------------------------------------
+[FILTERED (913 chars / 5 sent)]:
+Agents with anticholinergic properties (e.g., sedating antihistamines; antispasmodics; neuroleptics; phenothiazines; skeletal muscle relaxants; tricyclic antidepressants; disopyramide) may have additive effects when used in combination. Excessive parasympatholytic effects may result in paralytic ileus, hyperthermia, heat stroke, and the anticholinergic intoxication syndrome. Peripheral symptoms of intoxication commonly include mydriasis, blurred vision, flushed face, fever, dry skin and mucous membranes, tachycardia, urinary retention, and constipation. Central symptoms may include memory loss, disorientation, incoherence, hallucinations, psychosis, delirium, hyperactivity, twitching or jerking movements, stereotypy, and seizures. Central nervous system-depressant effects may also be additively or synergistically increased when these agents are combined, especially in elderly or debilitated patients.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[18] PDB-008  DB00715 (Paroxetine) ↔ DB00754 (Ethotoin)  class=PD-B
+ddi_type: The risk or severity of adverse effects can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (572 chars / 3 sentences)]:
+The efficacy of anticonvulsants may be diminished during coadministration with selective serotonin reuptake inhibitors (SSRIs) or serotonin-norepinephrine reuptake inhibitor (SNRIs). Antidepressants including SSRIs and SNRIs can reduce seizure threshold.Coadministration of SSRIs or SNRIs with some anticonvulsants, particularly carbamazepine, eslicarbazepine, oxcarbazepine and valproic acid, may increase the risk of hyponatremia. The risk appears to be dose-related, and elderly patients and patients who are volume depleted (e.g., diuretic use) may be at greater risk.
+----------------------------------------------------------------------------------------------------
+[FILTERED (572 chars / 3 sent)]:
+The efficacy of anticonvulsants may be diminished during coadministration with selective serotonin reuptake inhibitors (SSRIs) or serotonin-norepinephrine reuptake inhibitor (SNRIs). Antidepressants including SSRIs and SNRIs can reduce seizure threshold.Coadministration of SSRIs or SNRIs with some anticonvulsants, particularly carbamazepine, eslicarbazepine, oxcarbazepine and valproic acid, may increase the risk of hyponatremia. The risk appears to be dose-related, and elderly patients and patients who are volume depleted (e.g., diuretic use) may be at greater risk.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[19] PDB-009  DB00776 (Oxcarbazepine) ↔ DB01224 (Quetiapine)  class=PD-B
+ddi_type: The risk or severity of CNS depression can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (147 chars / 1 sentences)]:
+Coadministration with inducers of CYP450 3A4 may decrease the plasma concentrations of quetiapine, which is primarily metabolized by the isoenzyme.
+----------------------------------------------------------------------------------------------------
+[FILTERED (147 chars / 1 sent)]:
+Coadministration with inducers of CYP450 3A4 may decrease the plasma concentrations of quetiapine, which is primarily metabolized by the isoenzyme.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[20] PDB-010  DB01244 (Bepridil) ↔ DB06825 (Triptorelin)  class=PD-B
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (393 chars / 2 sentences)]:
+Class IA (e.g., disopyramide, quinidine, procainamide) and class III (e.g., amiodarone, dofetilide, sotalol) antiarrhythmic agents can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (393 chars / 2 sent)]:
+Class IA (e.g., disopyramide, quinidine, procainamide) and class III (e.g., amiodarone, dofetilide, sotalol) antiarrhythmic agents can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[21] PDB-075  DB00554 (Piroxicam) ↔ DB00630 (Alendronic acid)  class=PD-B
+ddi_type: The risk or severity of adverse effects can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1621 chars / 8 sentences)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa. Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as pamidronic acid and zoledronic acid, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1621 chars / 8 sent)]:
+Theoretical concerns exist regarding the potential for increased risk and severity of gastrointestinal toxicity during coadministration of oral bisphosphonates and nonsteroidal anti-inflammatory drugs (NSAIDs) due to additive or synergistic irritant effects on the gastrointestinal mucosa. Because NSAIDs reduce the rate of ulcer healing in the stomach and duodenum, it is also possible that NSAIDs may delay healing and exaggerate the mucosal injury caused by oral bisphosphonates. Theoretical concerns exist regarding the potential for increased risk and severity of renal impairment during coadministration of bisphosphonates with high dosages or chronic use of NSAIDs due to additive or synergistic nephrotoxic effects on the kidney. The use of bisphosphonates has been associated with nephrotoxicity manifested as deterioration of renal function and renal failure. Cases have primarily involved intravenous formulations of the drugs such as pamidronic acid and zoledronic acid, especially when they are administered too rapidly. The risk of hypocalcemia may also be increased, as drug-induced renal tubular damage can lead to renal loss of calcium and other electrolytes such as magnesium. Bisphosphonates alone often cause mild, asymptomatic hypocalcemia via inhibitive effects on bone resorption and possibly chelation of blood calcium. Chronic use of nonsteroidal anti-inflammatory drugs (NSAIDs) may be associated with renal toxicities including elevations in serum creatinine and BUN, tubular necrosis, glomerulitis, renal papillary necrosis, acute interstitial nephritis, nephrotic syndrome, and renal failure.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[22] PKB-108  DB00976 (Telithromycin) ↔ DB11853 (Relugolix)  class=PK-B
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1156 chars / 7 sentences)]:
+Coadministration with inhibitors of the P-glycoprotein (P-gp) efflux transporter may increase the plasma concentrations of relugolix, particularly when the inhibitors are given orally. Relugolix is a substrate for intestinal P-gp. In vitro, it is metabolized primarily by CYP450 3A and, to a lesser extent, by CYP450 2C8. When relugolix was coadministered with erythromycin, a combined P-gp and moderate CYP450 3A inhibitor, relugolix peak plasma concentration (Cmax) and systemic exposure (AUC) increased by 6.2-fold. Increased exposure to relugolix may increase the risk and/or severity of adverse effects such as hot flushes; weight gain; decreased sex drive; erectile function difficulties; QT interval prolongation; musculoskeletal pain; constipation; diarrhea; increases in glucose, triglyceride, and liver transaminase levels; and decreased hemoglobin. Long-term androgen deprivation therapy, including relugolix, can prolong the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1156 chars / 7 sent)]:
+Coadministration with inhibitors of the P-glycoprotein (P-gp) efflux transporter may increase the plasma concentrations of relugolix, particularly when the inhibitors are given orally. Relugolix is a substrate for intestinal P-gp. In vitro, it is metabolized primarily by CYP450 3A and, to a lesser extent, by CYP450 2C8. When relugolix was coadministered with erythromycin, a combined P-gp and moderate CYP450 3A inhibitor, relugolix peak plasma concentration (Cmax) and systemic exposure (AUC) increased by 6.2-fold. Increased exposure to relugolix may increase the risk and/or severity of adverse effects such as hot flushes; weight gain; decreased sex drive; erectile function difficulties; QT interval prolongation; musculoskeletal pain; constipation; diarrhea; increases in glucose, triglyceride, and liver transaminase levels; and decreased hemoglobin. Long-term androgen deprivation therapy, including relugolix, can prolong the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[23] PKB-102  DB06237 (Avanafil) ↔ DB06413 (Armodafinil)  class=PK-B
+ddi_type: The metabolism of can be decreased when combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1109 chars / 6 sentences)]:
+Coadministration with modafinil (the racemate) or armodafinil (the R-enantiomer) may decrease the plasma concentrations of drugs that are substrates of the CYP450 3A4 isoenzyme. Modafinil and armodafinil are modest inducers of CYP450 3A4, and pharmacokinetic studies suggest that their effects may be primarily intestinal rather than hepatic. Thus, clinically significant interactions would most likely be expected with drugs that have low oral bioavailability due to significant intestinal CYP450 3A4-mediated first-pass metabolism (e.g., buspirone, cyclosporine, lovastatin, midazolam, saquinavir, simvastatin, sirolimus, tacrolimus, triazolam, calcium channel blockers). However, the potential for interaction should be considered with any drug metabolized by CYP450 3A4, especially given the high degree of interpatient variability with respect to CYP450-mediated metabolism. Pharmacologic response to these drugs may be altered and should be monitored more closely whenever modafinil or armodafinil is added to or withdrawn from therapy. Dosage adjustments may be required if an interaction is suspected.
+----------------------------------------------------------------------------------------------------
+[FILTERED (409 chars / 3 sent)]:
+Coadministration with modafinil (the racemate) or armodafinil (the R-enantiomer) may decrease the plasma concentrations of drugs that are substrates of the CYP450 3A4 isoenzyme. Modafinil and armodafinil are modest inducers of CYP450 3A4, and pharmacokinetic studies suggest that their effects may be primarily intestinal rather than hepatic. Dosage adjustments may be required if an interaction is suspected.
+----------------------------------------------------------------------------------------------------
+[REMOVED (3 sentences — prescriptive language):
+Thus, clinically significant interactions would most likely be expected with drugs that have low oral bioavailability due to significant intestinal CYP450 3A4-mediated first-pass metabolism (e.g., buspirone, cyclosporine, lovastatin, midazolam, saquinavir, simvastatin, sirolimus, tacrolimus, triazolam, calcium channel blockers).
+  • However, the potential for interaction should be considered with any drug metabolized by CYP450 3A4, especially given the high degree of interpatient variability with respect to CYP450-mediated metabolism.
+  • Pharmacologic response to these drugs may be altered and should be monitored more closely whenever modafinil or armodafinil is added to or withdrawn from therapy.
+
+====================================================================================================
+[24] PDB-040  DB00647 (Dextropropoxyphene) ↔ DB01367 (Rasagiline)  class=PD-B
+ddi_type: The risk or severity of adverse effects can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1081 chars / 7 sentences)]:
+Coadministration of monoamine oxidase inhibitors (MAOIs) with certain opioids has been associated with rare reports of severe and fatal adverse reactions. There appear to be two types of interaction, an excitatory and a depressive one. Symptoms of the excitatory reaction may include agitation, headache, diaphoresis, hyperpyrexia, flushing, shivering, myoclonus, rigidity, tremor, diarrhea, hypertension, tachycardia, seizures, and coma. The exact mechanism of interaction is unknown, but may involve excessive serotonergic activity in the central nervous system (i.e., serotonin syndrome). The interaction is unpredictable and has been reported primarily with meperidine or fentanyl and various MAOIs including phenelzine, tranylcypromine, linezolid, moclobemide, and selegiline. Fatal hyperpyrexia and hypertension have also been observed in animal studies with meperidine and phenelzine or furazolidone. In contrast, symptoms of the depressive reaction probably stem from potentiation of CNS effects by MAOIs and include respiratory depression, cyanosis, hypotension, and coma.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1081 chars / 7 sent)]:
+Coadministration of monoamine oxidase inhibitors (MAOIs) with certain opioids has been associated with rare reports of severe and fatal adverse reactions. There appear to be two types of interaction, an excitatory and a depressive one. Symptoms of the excitatory reaction may include agitation, headache, diaphoresis, hyperpyrexia, flushing, shivering, myoclonus, rigidity, tremor, diarrhea, hypertension, tachycardia, seizures, and coma. The exact mechanism of interaction is unknown, but may involve excessive serotonergic activity in the central nervous system (i.e., serotonin syndrome). The interaction is unpredictable and has been reported primarily with meperidine or fentanyl and various MAOIs including phenelzine, tranylcypromine, linezolid, moclobemide, and selegiline. Fatal hyperpyrexia and hypertension have also been observed in animal studies with meperidine and phenelzine or furazolidone. In contrast, symptoms of the depressive reaction probably stem from potentiation of CNS effects by MAOIs and include respiratory depression, cyanosis, hypotension, and coma.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[25] PDB-161  DB00649 (Stavudine) ↔ DB00900 (Didanosine)  class=PD-B
+ddi_type: The risk or severity of adverse effects can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (1006 chars / 5 sentences)]:
+The concomitant use of the nucleoside reverse transcriptase inhibitors (NRTIs), didanosine (ddI) and stavudine (d4T), has been associated with an increased risk of certain toxicities related to mitochondrial damage, and the addition of hydroxyurea to the combination may further increase that risk. Specifically, concurrent use of ddI and d4T has been associated with an increased risk of pancreatitis, several cases of which have been fatal. Additionally, the risk and severity of NRTI-related peripheral neuropathy may be additively or synergistically increased. Although rare, the syndrome of lactic acidosis and severe hepatomegaly with steatosis (with or without pancreatitis) may also occur more frequently with this combination than with antiretroviral regimens containing either drug alone or other combinations of NRTIs. Fatal lactic acidosis has been reported in pregnant women receiving ddI and d4T with other antiretroviral agents, although it is unclear if pregnancy is a specific risk factor.
+----------------------------------------------------------------------------------------------------
+[FILTERED (1006 chars / 5 sent)]:
+The concomitant use of the nucleoside reverse transcriptase inhibitors (NRTIs), didanosine (ddI) and stavudine (d4T), has been associated with an increased risk of certain toxicities related to mitochondrial damage, and the addition of hydroxyurea to the combination may further increase that risk. Specifically, concurrent use of ddI and d4T has been associated with an increased risk of pancreatitis, several cases of which have been fatal. Additionally, the risk and severity of NRTI-related peripheral neuropathy may be additively or synergistically increased. Although rare, the syndrome of lactic acidosis and severe hepatomegaly with steatosis (with or without pancreatitis) may also occur more frequently with this combination than with antiretroviral regimens containing either drug alone or other combinations of NRTIs. Fatal lactic acidosis has been reported in pregnant women receiving ddI and d4T with other antiretroviral agents, although it is unclear if pregnancy is a specific risk factor.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[26] PDB-103  DB00933 (Mesoridazine) ↔ DB00978 (Lomefloxacin)  class=PD-B
+ddi_type: The risk or severity of QTc prolongation can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (975 chars / 6 sentences)]:
+Mesoridazine can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death. Mesoridazine overdosage has been associated with ventricular arrhythmias and death. The extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). In addition, certain agents with anticholinergic properties (e.g., sedating antihistamines; antispasmodics; neuroleptics; phenothiazines; skeletal muscle relaxants; tricyclic antidepressants; disopyramide) may have additive parasympatholytic and central nervous system-depressant effects when used in combination with mesoridazine. Excessive parasympatholytic effects may include paralytic ileus, hyperthermia, mydriasis, blurred vision, tachycardia, urinary retention, psychosis, and seizures.
+----------------------------------------------------------------------------------------------------
+[FILTERED (975 chars / 6 sent)]:
+Mesoridazine can cause dose-related prolongation of the QT interval. Theoretically, coadministration with other agents that can prolong the QT interval may result in additive effects and increased risk of ventricular arrhythmias including torsade de pointes and sudden death. Mesoridazine overdosage has been associated with ventricular arrhythmias and death. The extent of drug-induced QT prolongation is dependent on the particular drug(s) involved and dosage(s) of the drug(s). In addition, certain agents with anticholinergic properties (e.g., sedating antihistamines; antispasmodics; neuroleptics; phenothiazines; skeletal muscle relaxants; tricyclic antidepressants; disopyramide) may have additive parasympatholytic and central nervous system-depressant effects when used in combination with mesoridazine. Excessive parasympatholytic effects may include paralytic ileus, hyperthermia, mydriasis, blurred vision, tachycardia, urinary retention, psychosis, and seizures.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[27] PDB-062  DB00273 (Topiramate) ↔ DB01176 (Cyclizine)  class=PD-B
+ddi_type: The risk or severity of CNS depression can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (942 chars / 3 sentences)]:
+Certain drugs such as carbonic anhydrase inhibitors and drugs with anticholinergic activity (e.g., antihistamines, antispasmodics, neuroleptics, phenothiazines, skeletal muscle relaxants, tricyclic antidepressants, disopyramide) may potentiate the risk of oligohidrosis and hyperthermia associated occasionally with the use of topiramate, particularly in pediatric patients. These agents may alter electrolyte and fluid balance (carbonic anhydrase inhibition), inhibit peripheral sweating mechanisms (anticholinergic effect), and/or interfere with core body temperature regulation in the hypothalamus (neuroleptics and phenothiazines), resulting in the inability to adjust to temperature changes, especially in hot weather. Also, agents with anticholinergic activity frequently cause drowsiness and other central nervous system-depressant effects, which may be additively or synergistically increased in patients also treated with topiramate.
+----------------------------------------------------------------------------------------------------
+[FILTERED (942 chars / 3 sent)]:
+Certain drugs such as carbonic anhydrase inhibitors and drugs with anticholinergic activity (e.g., antihistamines, antispasmodics, neuroleptics, phenothiazines, skeletal muscle relaxants, tricyclic antidepressants, disopyramide) may potentiate the risk of oligohidrosis and hyperthermia associated occasionally with the use of topiramate, particularly in pediatric patients. These agents may alter electrolyte and fluid balance (carbonic anhydrase inhibition), inhibit peripheral sweating mechanisms (anticholinergic effect), and/or interfere with core body temperature regulation in the hypothalamus (neuroleptics and phenothiazines), resulting in the inability to adjust to temperature changes, especially in hot weather. Also, agents with anticholinergic activity frequently cause drowsiness and other central nervous system-depressant effects, which may be additively or synergistically increased in patients also treated with topiramate.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+
+
+====================================================================================================
+[28] PDB-065  DB00476 (Duloxetine) ↔ DB00813 (Fentanyl)  class=PD-B
+ddi_type: The risk or severity of serotonin syndrome can be increased when is combined with
+----------------------------------------------------------------------------------------------------
+[ORIGINAL (930 chars / 3 sentences)]:
+Concomitant use of agents with serotonergic activity such as serotonin reuptake inhibitors, monoamine oxidase inhibitors, tricyclic antidepressants, 5-HT1 receptor agonists, ergot alkaloids, cyclobenzaprine, lithium, St. John's wort, phenylpiperidine opioids, dextromethorphan, and tryptophan may potentiate the risk of serotonin syndrome, which is a rare but serious and potentially fatal condition thought to result from hyperstimulation of brainstem 5-HT1A and 2A receptors. Symptoms of the serotonin syndrome may include mental status changes such as irritability, altered consciousness, confusion, hallucination, and coma; autonomic dysfunction such as tachycardia, hyperthermia, diaphoresis, shivering, blood pressure lability, and mydriasis; neuromuscular abnormalities such as hyperreflexia, myoclonus, tremor, rigidity, and ataxia; and gastrointestinal symptoms such as abdominal cramping, nausea, vomiting, and diarrhea.
+----------------------------------------------------------------------------------------------------
+[FILTERED (930 chars / 3 sent)]:
+Concomitant use of agents with serotonergic activity such as serotonin reuptake inhibitors, monoamine oxidase inhibitors, tricyclic antidepressants, 5-HT1 receptor agonists, ergot alkaloids, cyclobenzaprine, lithium, St. John's wort, phenylpiperidine opioids, dextromethorphan, and tryptophan may potentiate the risk of serotonin syndrome, which is a rare but serious and potentially fatal condition thought to result from hyperstimulation of brainstem 5-HT1A and 2A receptors. Symptoms of the serotonin syndrome may include mental status changes such as irritability, altered consciousness, confusion, hallucination, and coma; autonomic dysfunction such as tachycardia, hyperthermia, diaphoresis, shivering, blood pressure lability, and mydriasis; neuromuscular abnormalities such as hyperreflexia, myoclonus, tremor, rigidity, and ataxia; and gastrointestinal symptoms such as abdominal cramping, nausea, vomiting, and diarrhea.
+----------------------------------------------------------------------------------------------------
+[REMOVED (0 sentences — prescriptive language):
+

@@ -1,0 +1,55 @@
+Title: Towards Resolving the Implicit Bias of Gradient Descent for Matrix Factorization: Greedy Low-Rank Learning
+Authors: Zhiyuan Li, Yuping Luo, Kaifeng Lyu
+Venue+Year: ICLR 2021
+arXiv-or-DOI: arXiv:2012.09839v2 (11 Apr 2021)
+PDF filename: TOWARDS RESOLVING THE IMPLICIT BIAS OF.pdf
+
+## TL;DR
+For matrix factorization, gradient flow (GF) with INFINITESIMAL initialization is mathematically equivalent to a greedy rank-minimization algorithm the authors name Greedy Low-Rank Learning (GLRL): it learns the solution rank-by-rank (rank 1, then 2, then 3, ...), increasing rank by 1 only when the current rank underfits. This "incremental / sequential rank learning" replaces the (refuted) nuclear-norm-minimization view. The paper also proves the BENEFIT OF DEPTH: for depth L >= 3, the low-rank behavior has a MUCH WEAKER dependence on initialization magnitude, so the rank-minimization bias kicks in at practical (not vanishingly small) init scales -- whereas depth-2 needs a far smaller init.
+
+## Problem & Contributions
+- Same test-bed as Arora et al.: symmetric matrix sensing/completion, W = UU^T, minimize L(U)=1/2 f(UU^T), f convex, overparameterized (r=d, no rank constraint).
+- Refutes Gunasekar et al. 2017's Conjecture 1.1 (GF -> minimum nuclear norm) with an explicit counterexample (Example 5.9): a 4x4 matrix-completion instance whose GF limit is the rank-1 solution M_rank (nuclear norm ~2R^2+2) rather than the minimum-nuclear-norm rank-2 solution M_norm (nuclear norm 4R).
+- Main positive result: GF with infinitesimal init == GLRL (Algorithm 1) generically, for depth-2 (Sections 5.2-5.3), giving a full trajectory-level characterization: GF passes through a sequence of critical points {W_r}, each a local min of f in the rank-<=r PSD set, escaping each in the direction of the top eigenvector of -grad f(W_{r-1}).
+- Extends to deep matrix factorization L >= 3 (Section 6, Deep GLRL Algorithm 2), proving depth weakens the init-magnitude dependence of the low-rank bias.
+
+## Method / Core theory (main theorems in words + key assumptions)
+Setup: GF dU/dt = -grad L(U), end-to-end dW/dt = -W grad f(W) - grad f(W) W (Eq 2). Overparameterized r=d. Init assumptions: infinitesimal scale; for deep case, BALANCED init U_i^T(0)U_i(0)=U_{i+1}(0)U_{i+1}^T(0) and effectively identity init alpha*I.
+
+GLRL (Algorithm 1): phase r appends a small column sqrt(eps)*u_r (u_r = top unit eigenvector of -grad f(W_{r-1})) to the previous stationary point, runs GD to a new critical point W_r, and stops when lambda_1(-grad f(W_r)) <= 0 (W_r is a global min of the convex f in the PSD cone). eps>0 controls perturbation magnitude, taken -> 0.
+
+- Warmup (Section 4): (i) linearizing f around origin gives dU/dt = QU = continuous power iteration -> U(t) becomes approximately rank-1 (top eigenvector of Q=-grad f(0)); (ii) full-observation sensing with U(0)=sqrt(alpha)I: each singular value sigma_i has a SHARP transition from ~0 to mu_i at time ~ (1/(2 mu_i)) log(1/alpha) -> eigenvalues are learned ONE BY ONE in decreasing order. This is the "greedy/incremental" mechanism, and the transition time scales like log(1/alpha).
+- Theorem 5.3 (general dynamical system): for a system with unstable, unique top eigenvalue mu1 at the origin, all infinitesimal-init trajectories with positive alignment to the top left-eigenvector collapse onto ONE limiting trajectory z(t)=phi(alpha v1, t + (1/mu1) log(1/alpha)). Key: time offset ~ (1/mu1) log(1/alpha).
+- Lemma 5.4 + Theorem 5.6 (rank-1 / first phase): GF with infinitesimal PSD init aligned with u1 u1^T converges (after a log(1/alpha)-scale time shift) to the GLRL rank-1 trajectory W_1^G(t). Only assumption: 0 is not a min of f (lambda_1(-grad f(0))>0) and -grad f(0) has an eigengap (Assumption 5.5).
+- Theorem 5.8 + Example 5.9: if the rank-1 GLRL limit is a global min of f, GF finds it -> refutes nuclear-norm conjecture.
+- Theorems 5.10, 5.11 + "Characterization of the trajectory of GF" (Section 5.3): GF splits into K phases through critical points W_0=0, W_1, ..., W_K; in phase r it escapes W_{r-1} along the top principal component of -grad f(W_{r-1}); each W_r is a local min in the rank-<=r PSD set, only W_K is a global min. "The smaller the initialization is, the longer GF stays around each W_r." This is exactly incremental rank learning.
+- Section 6, DEEP CASE (L >= 3), the depth benefit:
+  * End-to-end dynamics Eq 11; Lemma 6.1 reduces it via M = W^{2/L}.
+  * Theorem 6.2: with P=L/2, L>=3, infinitesimal IDENTITY init alpha*I, the trajectory phi(alpha I, alpha^{-(1-1/P)}/(2 mu1 (P-1)) + t) converges to Deep GLRL W(t) with error O(alpha^{1/(P(P+1))}), and the k-th eigenvalue (k>=2) stays O(alpha). Note the escape-time scale is now POLYNOMIAL in 1/alpha (alpha^{-(1-1/P)}), not log(1/alpha) as in depth 2.
+  * Theorem 6.4 + Definition 6.3 (r-low-rankness): THE headline depth result. For depth 2, the 1-low-rankness of the solution is Omega(alpha^{1 - mu2/mu1}) (a power < 1 of alpha, eigengap-dependent). For depth L, the 1-low-rankness is only O(alpha) -- linear in alpha, INDEPENDENT of the eigengap. So per phase, depth multiplies low-rankness by a constant instead of raising it to a fractional power. This means deep factorization achieves stronger low-rank bias at a GIVEN (larger, practical) init scale.
+
+## Key results & numbers (experiments + Section pointers)
+- Figure 1 (Section 5.3, Appendix C.1): depth-2 GD trajectory converges to the GLRL trajectory as init scale ||W(0)||_F -> 0. Ground truth W* in R^{20x20}, rank-3, ||W*||_F=20, 30% entries observed. Init scales swept from 1e-3 down to 1e-96 (illustrating the log(1/alpha) time-to-escape); smaller init => trajectory hugs GLRL longer/closer.
+- Example 5.9 numbers: R=100; M_norm rank-2 nuclear norm = 4R = 400; M_rank rank-1 nuclear norm = 2R^2+2 = 20002. GF converges to M_rank, not M_norm.
+- Figure 2 (Section 6, Appendix C): deep (L=2 vs larger L) matrix sensing; deep factorization attains smaller k-low-rankness than depth-2 at the same init, confirming Theorem 6.4's per-phase constant-vs-power behavior. (Curves, not scalar metrics.)
+- Figure 3: GLRL generalizes better than Rank-1 Matrix Pursuit (R1MP) when ground truth is low-rank (GLRL evolves the whole U per phase, R1MP only fits coefficients).
+
+## Relevance to our cold-start low-rank DDI paper (informs init/optimization of M_A * M_B; the DELTA)
+This is the sharpest theory paper for our init/optimization design of the residual H = H_base + M_A * M_B:
+- It replaces vague "GD prefers low rank" with a concrete MECHANISM: infinitesimal-init GD grows rank INCREMENTALLY, learning the dominant components first. For us this predicts that with a small enough init, M_A*M_B will first capture the single strongest transferable DDI signal (rank-1), then add components only as needed -- exactly the "low-rank residual is enough" inductive bias our method bets on.
+- Init magnitude is THE knob. For depth-2 (our M_A*M_B is a two-matrix product), the escape/transition time scales like log(1/alpha) and the low-rankness is only alpha^{1-mu2/mu1} -- i.e. depth-2's low-rank bias DEGRADES gracefully but requires genuinely small init to be strong. This directly justifies our small-init choices (M_B ~ N(0,1/lambda), residual gate gamma_t = eps small): keep the product near the origin so the greedy rank-1-first dynamics take hold.
+- If we ever want the low-rank bias to be robust at a LARGER/practical init (so we do not have to push init pathologically small), the paper's prescription is to add DEPTH: factor M_A*M_B as a product of >=3 matrices, because Theorem 6.4 shows depth makes low-rankness O(alpha) (eigengap-free) instead of a fractional power. This is an actionable architectural lever for us.
+- DELTA / where our setting differs: (1) theory is for GF fitting a CONVEX f(UU^T) (sensing/completion) with symmetric PSD parameterization and identity/balanced init; our M_A*M_B is an ASYMMETRIC additive residual on H_base inside a nonlinear KG/DDI model, and our init is Gaussian, not balanced identity. So GLRL is a QUALITATIVE guide, not a theorem that applies to our objective. (2) The "one component at a time" picture assumes a clear eigengap in -grad f; whether our DDI residual gradient has a dominant direction is empirical. (3) gamma_t = eps in our method plays a role analogous to eps/alpha here (perturbation/init scale), so this paper says gamma_t (and the M_B variance) should be small AND that if we increase them we lose the greedy low-rank guarantee -- unless we compensate with depth.
+
+## Safe-to-cite claims (section/theorem pointers)
+- "GF with infinitesimal init on matrix factorization is equivalent to Greedy Low-Rank Learning, learning solutions of gradually increasing rank." (Abstract; Theorem 5.6, 5.11; Section 5)
+- "This refutes the conjecture that GF minimizes the nuclear norm." (Example 5.9, Section 5.2)
+- "GF passes through critical points {W_r}, each a local minimizer of f in the rank-<=r PSD set, escaping along the top eigenvector of -grad f; smaller init makes GF linger longer near each W_r." (Section 5.3 characterization)
+- "Benefit of depth: for L>=3 the low-rank convergence has a much weaker dependence on init magnitude; per-phase low-rankness is O(alpha) for deep vs alpha^{1-mu2/mu1} for depth-2, so rank minimization takes effect at practical init scales." (Theorems 6.2, 6.4; Section 6)
+- "In the second warmup, singular values transition sharply from ~0 to their target at time ~ (1/(2 mu_i)) log(1/alpha), learned in decreasing eigenvalue order." (Section 4)
+
+## Do-NOT-overclaim / caveats
+- The GF<->GLRL equivalence is proven for SYMMETRIC PSD matrix factorization with CONVEX f and INFINITESIMAL init; it holds "generically" under stated eigengap/analyticity/regularity assumptions (Assumptions 5.5, 5.7, K.1). Do not claim it holds for arbitrary losses, asymmetric factorizations, or finite init.
+- The depth results (Section 6) assume BALANCED / identity init (alpha*I) and depth L>=3; Theorem 6.2's constant hides technical assumption ||grad f(0)||_2 = lambda_1(-grad f(0)) which the authors admit is a technical assumption they believe removable. The multi-phase depth benefit (constant-per-phase low-rankness) is proven for the FIRST phase and only CONJECTURED (with experimental support, Fig 2) for later phases.
+- "Infinitesimal init" is a limit (alpha -> 0). Real training uses finite init; the paper's own Figure 1 needs init down to 1e-96 to visibly hug the GLRL trajectory at depth 2. So do NOT claim our finite Gaussian init literally realizes GLRL -- it approximates it, more so the smaller the init and the deeper the factorization.
+- Do not conflate this with Arora et al. 2019 (which argues NO norm works and gives a singular-value ODE). This paper gives a constructive ALGORITHMIC (greedy rank) characterization and refutes nuclear norm with an explicit counterexample; cite them for complementary but distinct claims.

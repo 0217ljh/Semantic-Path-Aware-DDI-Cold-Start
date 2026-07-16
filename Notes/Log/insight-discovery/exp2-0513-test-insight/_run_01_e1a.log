@@ -1,0 +1,38 @@
+[E1a] Loading nodes / edges / splits ...
+[E1a] nodes=178029  edges=7099528  drugs=7754
+[E1a] Building adjacency (drug-drug masked) ...
+  built in 4.1s; nodes-with-edges=174944
+
+[E1a] computing SSPL for 2000 sampled train pairs ...
+    progress 200/2000 elapsed=0.0s unreach=5
+    progress 400/2000 elapsed=0.0s unreach=12
+    progress 600/2000 elapsed=0.0s unreach=16
+    progress 800/2000 elapsed=0.0s unreach=22
+    progress 1000/2000 elapsed=0.0s unreach=34
+    progress 1200/2000 elapsed=0.1s unreach=44
+    progress 1400/2000 elapsed=0.1s unreach=52
+    progress 1600/2000 elapsed=0.1s unreach=60
+    progress 1800/2000 elapsed=0.1s unreach=70
+    progress 2000/2000 elapsed=0.1s unreach=81
+  train: median SSPL = 2.0  q25-q75 = [2.0, 2.0]
+  hist: {2: 1545, 3: 248, 4: 124, 5: 2}  unreach within 5 hops: 81
+
+[E1a] computing SSPL for 2000 sampled test_s2 pairs ...
+    progress 200/2000 elapsed=0.0s unreach=6
+    progress 400/2000 elapsed=0.0s unreach=18
+    progress 600/2000 elapsed=0.0s unreach=30
+    progress 800/2000 elapsed=0.0s unreach=36
+    progress 1000/2000 elapsed=0.0s unreach=44
+    progress 1200/2000 elapsed=0.1s unreach=49
+    progress 1400/2000 elapsed=0.1s unreach=57
+    progress 1600/2000 elapsed=0.1s unreach=65
+    progress 1800/2000 elapsed=0.1s unreach=75
+    progress 2000/2000 elapsed=0.1s unreach=85
+  test_s2: median SSPL = 2.0  q25-q75 = [2.0, 2.0]
+  hist: {2: 1517, 3: 276, 4: 121, 5: 1}  unreach within 5 hops: 85
+
+[E1a i2 motivation verdict]
+  train: median=2.0  fraction with SSPL ≥ 3: 19.5%
+  test_s2: median=2.0  fraction with SSPL ≥ 3: 20.8%
+
+[E1a] saved → sspl_distribution.json

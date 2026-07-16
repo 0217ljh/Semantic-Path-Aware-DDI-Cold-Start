@@ -1,0 +1,2207 @@
+Springer Nature 2021 LATEX template
+Accurate and interpretable drug-drug interaction prediction
+enabled by knowledge subgraph learning
+Yaqing Wang1†, Zaifei Yang1,2† and Quanming Yao3*
+1Baidu Research, Baidu Inc., Beijing, China.
+2Institute of Computing Technology, Chinese Academy of Sciences, Beijing, China.
+3Department of Electronic Engineering, Tsinghua University, Beijing, China.
+*Corresponding author(s). E-mail(s): qyaoaa@tsinghua.edu.cn;
+Contributing authors: wangyaqing01@baidu.com; yangzaifei@baidu.com;
+†Equal contribution.
+Abstract
+Background: Discovering potential drug-drug interactions (DDIs) is a long-standing challenge in clin-
+ical treatments and drug developments. Recently, deep learning techniques have been developed for
+DDI prediction. However, they generally require a huge number of samples, while known DDIs are rare.
+Methods:
+In
+this
+work,
+we
+present
+KnowDDI,
+a
+graph
+neural
+network-based
+method
+that
+addresses the above challenge. KnowDDI enhances drug representations by adaptively leveraging
+rich neighborhood information from large biomedical knowledge graphs. Then, it learns a knowl-
+edge
+subgraph
+for
+each
+drug-pair
+to
+interpret
+the
+predicted
+DDI,
+where
+each
+of
+the
+edges
+is associated with a connection strength indicating the importance of a known DDI or resem-
+bling
+strength
+between
+a
+drug-pair
+whose
+connection
+is
+unknown.
+Thus,
+the
+lack
+of
+DDIs
+is
+implicitly
+compensated
+by
+the
+enriched
+drug
+representations
+and
+propagated
+drug
+similarities.
+Results:
+Here
+we
+show
+the
+evaluation
+results
+of
+KnowDDI
+on
+two
+benchmark
+DDI
+datasets.
+Results
+show
+that
+KnowDDI
+obtains
+the
+state-of-the-art
+prediction
+performance
+with
+better
+interpretability.
+We
+also
+find
+that
+KnowDDI
+suffers
+less
+than
+existing
+works
+given
+a
+sparser
+knowledge
+graph.
+This
+indicates
+that
+the
+propagated
+drug
+similarities
+play
+a
+more
+important
+role
+in
+compensating
+for
+the
+lack
+of
+DDIs
+when
+the
+drug
+representations
+are
+less
+enriched.
+Conclusions:
+KnowDDI
+nicely
+combines
+the
+efficiency
+of
+deep
+learning
+techniques
+and
+the
+rich
+prior
+knowledge
+in
+biomedical
+knowledge
+graphs.
+As
+an
+original
+open-source
+tool,
+KnowDDI
+can
+help
+detect
+possible
+interactions
+in
+a
+broad
+range
+of
+relevant
+inter-
+action
+prediction
+tasks,
+such
+as
+protein-protein
+interactions,
+drug-target
+interactions
+and
+disease-gene
+interactions,
+eventually
+promoting
+the
+development
+of
+biomedicine
+and
+healthcare.
+Keywords: Drug Development, Drug-Drug Interaction, Biomedical Network, Knowledge Graph, Deep Learning, Graph
+Neural Network, Bioinformatics
+Plain language summary Understanding how
+drugs interact is crucial for safe healthcare and the
+development of new medicines. We developed a
+computational tool that can analyze the data about
+medicines within large medical databases and pre-
+dict the impact of being treated by multiple drugs
+at the same time on the person taking the drugs.
+Our tool, named KnowDDI, can predict which drugs
+1
+arXiv:2311.15056v2  [cs.LG]  19 Mar 2024
+
+interact with each other and also provide an expla-
+nation for why the interaction is likely to take place.
+We demonstrated that our tool can identify known
+drug interactions. It could potentially be used in
+the future to identify previously unknown or unan-
+ticipated interactions that could have negative con-
+sequences to people being treated with unusual
+combinations of medicines.
+Introduction
+Accurately predicting drug-drug interaction (DDI)
+can play an important role in the field of biomedicine
+and healthcare. On the one hand, combination ther-
+apies, where multiple drugs are used together, can
+be used to treat complex disease and comorbidities,
+such as human immunodeficiency virus (HIV) [1, 2].
+Recent study also shows that combination thera-
+pies, such as a combination of lopinavir and riton-
+avir, may treat coronavirus disease (COVID-19) [3–
+5], the infectious disease which causes global pan-
+demic in the past three years. On the other hand,
+DDI is an important cause of adverse drug reac-
+tions, which accounts for 1% hospitalizations in the
+general population and 2-5% hospital admissions
+in the elderly [6–8]. A concrete example is that if
+warfarin and aspirin enter the body together, they
+will compete for binding to plasma proteins. Then,
+the remained warfarin that cannot be bounded to
+plasma proteins will remain in the blood, which
+results in acute bleeding in patients [9].
+Identifying DDIs by clinical evidence such as
+laboratory studies is extremely costly and time-
+consuming [6, 8]. In recent years, computational
+techniques especially deep learning approaches
+are developed to speed up the discovery of potential
+DDIs. Naturally, DDI fact triplets can be represented
+as a graph where each node corresponds to a drug,
+and each edge represents an interaction between
+two drugs. Provided with DDI fact triplets, a number
+of graph learning methods have been developed to
+identify unknown interactions between drug-pairs.
+Graph neural networks (GNNs) [10, 11], which
+can obtain expressive node embeddings by end-
+to-end learning from the topological structure and
+associated node features, have also been applied
+for DDI prediction problem. However, known DDI
+fact triplets are rare due to the high experimental
+cost and continually emerging new drugs [12]. For
+example, the latest DrugBank database with 14,931
+drug entries only contains 365,984 known DDI fact
+triplets [13], the quantity of which is less than
+1% of the total potential DDIs. This makes over-
+parameterized deep learning models fail to give
+full play to its expressive ability and may perform
+even worse than traditional two-stage embedding
+methods [14, 15].
+In biomedicine and healthcare, many inter-
+national level agencies such as National Cen-
+ter for Biotechnology Information and European
+Bioinformatics Institute are endeavored to regu-
+larly maintain rich publicly available biomedical data
+resources [16]. Researchers then integrate these
+disparate and heterogeneous data resources into
+knowledge graphs (KGs) to facilitate an organized
+use of information. Examples are Hetionet [17, 18],
+PharmKG [19] and PrimeKG [20]. These KGs con-
+tain rich prior knowledge discovered in biomedicine
+and healthcare. A proper usage of them may com-
+pensate for the lack of samples for DDI prediction.
+The pioneer work KGNN [21] firstly leverages exter-
+nal KGs to provide topological information for each
+drug in target drug-pair. In particular, it uniformly
+samples a fixed size set of neighbors around each
+drug, then aggregates drug features and messages
+from the sampled neighbors into the drug repre-
+sentation without considering which drug to interact.
+Later works merge the DDI network with exter-
+nal KGs as a combined network, extract enclosing
+subgraphs for different drug-pairs to encode the
+drug-pair specific information, and then predict DDI
+for the target drug-pair using the concatenation of
+nodes embeddings of drugs and subgraph embed-
+ding of enclosing subgraphs [22–24]. However, as
+these KGs integrate diverse data resources by auto-
+mated process or experts, existing methods fail to
+filter out noise or inconsistent information. As a
+result, properly leveraging external KGs is still a
+challenging problem.
+In this paper, we propose KnowDDI, an accu-
+rate and interpretable method for DDI prediction.
+First, we merge the provided DDI graph and an
+external KG into a combined network, upon which
+generic representations for all nodes are learned
+to encode the generic knowledge. Next, we extract
+a drug-flow subgraph for each drug-pair from the
+combined network. We then learn a knowledge
+subgraph from generic representations and the
+drug-flow subgraph. After optimization, the repre-
+sentations of drugs are transformed to be more
+
+I
+3
+predictive of the DDI types between the target drug-
+pair. In addition, the returned knowledge subgraph
+contains explaining paths to interpret the prediction
+result for the drug-pair, where the explaining paths
+consist of only edges of important known DDIs
+or newly-added edges connecting highly similar
+drugs. In other words, the learned knowledge sub-
+graph helps filter out irrelevant information and adds
+in resembling relationships between drugs whose
+interactions are unknown. This allows the lack of
+DDIs to be implicitly compensated by the enriched
+drug representations and propagated drug similari-
+ties. We perform extensive experimental results on
+benchmark datasets, and observe that KnowDDI
+consistently outperforms existing works. We also
+conduct a series of case studies which further show
+that KnowDDI can discover convincing explain-
+ing paths which help interpret the DDI prediction
+results. KnowDDI has the potential to be used in a
+broad range of relevant interaction prediction tasks,
+such as protein-protein interactions, drug-target
+interactions and disease-gene interactions to help
+detect potential interactions, eventually advancing
+the development of biomedicine and healthcare.
+Methods
+Overview of KnowDDI
+Our KnowDDI (Fig. 1) learns to predict DDIs
+between a drug-pair, i.e., head drug h and tail
+drug t in the DDI graph, by learning with knowl-
+edge subgraph, i.e., denoted as Sh,t. The provided
+DDI graph and an external KG are merged into
+a combined network as the start. Every node of
+the combined network is associated with a unique
+generic embedding which is learned to encode the
+generic knowledge. Given a target drug-pair (h, t),
+a drug-flow subgraph
+¯Sh,t which captures local
+context relevant to (h, t) is extracted from the com-
+bined network. As directly leveraging external KG
+(and hence ¯Sh,t) may bring in irrelevant informa-
+tion, the graph structure and node embeddings of
+¯Sh,t are further iteratively optimized. During this pro-
+cess, the generic embeddings are transformed to
+be more predictive of the DDI types between the
+target drug-pair. In addition, KnowDDI estimates
+a connection strength for every drug-pair in the
+subgraph, representing the importance of a given
+edge between connected nodes in the drug-flow
+subgraph or similarity between two nodes whose
+connection is unknown. Accordingly, a new edge of
+type “resemble” is added between two nodes if their
+node embeddings are highly similar, and existing
+edges can be dropped if the importance is esti-
+mated as low. Thus, only useful information flows
+between nodes are kept. The final optimized sub-
+graph becomes our knowledge subgraph Sh,t which
+consists of explaining paths. The average connec-
+tion strength over all consecutive node-pairs along
+each explaining path indicates its ability of explain-
+ing the current prediction result in the perspective
+of KnowDDI. Supplementary Table 1 shows a sum-
+mary of characteristics comparing KnowDDI with
+existing works.
+Problem setup
+A Drug-Drug Interaction (DDI) graph is denoted as
+GDDI = {VDDI, EDDI, RDDI}, where VDDI is a set of
+drug nodes, EDDI is a set of edges, and RDDI is a set
+of DDI relation types associated with the edges. In
+particular, each edge (u, r, v) ∈EDDI corresponds
+to an observed fact triplet, which records the DDI
+relation type r ∈RDDI associated with (u, v).
+The external Knowledge Graph (KG) is denoted
+as GKG = {VKG, EKG, RKG}, which contains rich
+biomedical knowledge of various kinds of biomedi-
+cal entities. Particularly, VKG consists of |VKG| enti-
+ties ranging from drugs, genes to proteins, RKG
+consists of |RKG| types of interactions occurred in
+GKG, while EKG = {(u, r, v)|u, v ∈VKG, r ∈RKG}
+consists of observed fact triplets in GKG. Usually,
+GKG is much larger than GDDI, such that VDDI ⊆VKG
+and RDDI ⊆RKG hold.
+The combination of GDDI and GKG then forms a
+large combined network G = {V, E, R} = {VDDI ∪
+VKG, EDDI ∪EKG, RDDI ∪RKG}.
+The target of this paper is to learn a mapping
+function from the combined network G, which can
+predict the relation type between new drug-pairs.
+For multiclass DDI prediction, each drug-pair only
+has one specific relation type r ∈RDDI. As for mul-
+tilabel DDI prediction, multiple relation types r1, r2,
+. . . ∈RDDI can co-occur between a drug-pair.
+Architecture of KnowDDI
+The overall architecture of KnowDDI is shown in
+Fig. 1. Here, we provide the details of how drug rep-
+resentations are enriched by an external KG and
+how similarities are propagated in knowledge sub-
+graphs. The complete algorithms of training and
+
+testing KnowDDI are summarized in Supplementary
+Note 1.
+Generic embedding generation
+To encode the generic knowledge of various other
+type of entities in G, which can help enrich rep-
+resentation for drug nodes, we run a GNN on the
+combined network G to obtain generic embedding
+of each node.
+Let e(0)
+v
+denote the feature of node v ∈V. In
+KnowDDI, we follow GraphSAGE [25] and update
+the embedding e(l)
+v
+for node v at the lth layer as:
+a(l)
+v =MEAN
+ {ReLU(W(l)
+a e(l)
+u ):(u, r, v)∈E}
+
+, (1)
+e(l)
+v =W(l)
+c ·
+
+a(l)
+v
+∥e(l−1)
+v
+
+,
+(2)
+where MEAN(·) is element-wise mean pooling,
+W(l)
+a
+and W(l)
+c
+are learnable parameters, and [·∥·]
+concatenates vectors along the last dimension.
+After L layers of message passing, the final node
+embedding e(L)
+v
+is taken as the generic embedding
+of v ∈V.
+Drug-flow subgraph construction
+As each drug-pair can depend on different local
+contexts, i.e., entities and relations, we construct
+a drug-flow subgraph ¯Sh,t specific to (h, t) from
+the combined network G , which transforms drug
+representations obtained in Section 3 to be drug-
+pair-aware.
+For each (h, t), we define its drug-flow subgraph
+¯Sh,t = {¯Vh,t, ¯Eh,t, ¯Rh,t} as a directed subgraph of
+graph G consisting of relational paths {¯ph,t} with
+length at most P pointing from h to t in G, where a
+relational path
+¯ph,t = h
+r1
+→v1
+r2
+→v2 · · ·
+rP
+→t,
+(3)
+is a sequence of nodes connected by relations.
+Here, ¯Vh,t is a set of nodes appearing in ¯Sh,t, ¯Rh,t
+is a set of relation types occurred between nodes in
+¯Vh,t and ¯Eh,t = {(u, r, v)|u, v ∈Vh,t and (u, r, v) ∈
+E} is a set of edges connecting nodes in ¯Vh,t.
+Algorithm ?? in Supplementary Note 1 sum-
+marizes the procedure of extracting ¯Sh,t. Given a
+drug-pair (h, t), we first extract the interaction of
+local neighborhoods of h and t (i.e. K-hop enclos-
+ing subgraph [22], where K is a hyperparameter)
+from G. For computational simplicity, we make all the
+relational paths {¯ph,t} between h and t have length
+P. This is done by augmenting relational paths with
+length less than P by identity relations [26, 27],
+i.e., (t, ridentity, t). If there is no relational path con-
+necting h and t, we return ¯Sh,t = {{h, t}, ∅, ∅}.
+As these K-hop enclosing subgraphs neglect direc-
+tional information, we need to conduct directional
+pruning to remove all nodes and corresponding
+edges which are not on any relational path pointing
+from h to t. Thus, after directional pruning, the resul-
+tant drug-flow subgraph ¯Sh,t only contains nodes
+which supports learning the information flow from h
+to t.
+Knowledge subgraph generation
+Further, we learn a knowledge subgraph Sh,t from
+generic embeddings and the drug-flow subgraph
+¯Sh,t. During this process, irrelevant edges are
+removed and new edges of type “resemble” are
+added between nodes with highly similar node
+embeddings.
+Let ¯Ah,t be a binary third-order tensor with
+size |¯Vh,t| × |¯Vh,t| × | ¯Rh,t|. Its (u, v, r)th entry is
+computed as
+¯Ah,t(u, v, r) =
+(
+1
+if (u, r, v) ∈¯Eh,t
+0
+otherwise
+,
+(4)
+which records whether drug-pair (u, v) is connected
+by relation type r ∈¯Rh,t in ¯Sh,t.
+In addition, we estimate another third-order ten-
+sor Ah,t from ¯Ah,t with elements Ah,t(u, v, r) ∈
+[0, 1] and size |¯Vh,t| × |¯Vh,t| × (| ¯Rh,t| + 1) to record
+the connection strength between nodes u, v ∈¯Vh,t
+w.r.t. relation r. Specifically, if ¯Ah,t(u, v, r) = 1
+but Ah,t(u, v, r)
+=
+0, this means the existing
+edge (u, r, v) is not useful and should be removed.
+Besides, if ¯Ah,t(u, v, r) = 0 for all r ∈¯Rh,t, we
+add an edge of relation type “resemble” rsim ∈R
+to connect u and v. Ah,t(u, v, rsim) > 0 then repre-
+sents the similarity between u and v. Corresponding
+to Ah,t and ¯Sh,t, the knowledge subgraph Sh,t is
+generated as
+Sh,t =
+¯Vh,t, Eh,t, Rh,t
+	
+,
+(5)
+where Rh,t = {rsim} ∪¯Rh,t, and Eh,t = {(u, r, v)}
+with each (u, r, v) constructed as (u, r, v) ∈¯Eh,t if
+¯Ah,t(u, v, r) = 1 ∧Ah,t(u, v, r) > 0, or (u, rsim, v) if
+¯Ah,t(u, v, r) = 0 ∧Ah,t(u, v, rsim) > 0.
+
+I
+5
+To learn such a Ah,t, we conduct graph struc-
+ture learning to alternate the following two steps for
+T times:
+• estimate connection strengths between every pair
+of nodes in ¯Vh,t, and
+• refine node embeddings on the updated sub-
+graph.
+First, we initialize the node embedding of each
+v ∈¯Vh,t as h(0)
+u
+= e(L)
+u
+to encode the global topol-
+ogy of G. Let A(τ)
+h,t be the estimation of Ah,t at the
+τth iteration. We initialize A(0)
+h,t = ¯Ah,t. Next, we
+estimate relevance score C(τ)
+h,t(u, v, r) for each rela-
+tion r ∈Rh,t between every node-pair (u, v) in Sh,t
+as
+C(τ)
+h,t(u, v, r)=MLP
+ 
+hτ−1
+uv
+∥hr
+ 
+,
+(6)
+where hτ−1
+uv
+= exp(−|h(τ−1)
+u
+−h(τ−1)
+v
+|), | · | returns
+the element-wise absolute value, MLP is multi-layer
+perception, and hr is the learnable relation embed-
+ding of relation r. We set C(τ)
+h,t(v, v, r) = 1 for all
+v ∈¯Vh,t and r ∈Rh,t.
+This learned C(τ)
+h,t reveals how the model under-
+stands the connection between different node-pairs
+at the τth iteration. It helps filter out irrelevant
+information and captures resembling relationships
+between drugs whose interactions are unknown. In
+the early stage of optimization, C(τ)
+h,t can be less
+trustworthy. Hence, we merge this learned subgraph
+with ¯Ah,t to obtain A(τ)
+h,t, i.e.,
+A(τ)
+h,t =ReLU
+ δ
+ αA(0)
+h,t+(1−α)C(τ)
+h,t
+
+−γ
+
+,
+(7)
+where hyperparameter α is used to balance their
+contribution in the final prediction, the threshold
+γ ≥0 is used to screen out those less informative
+edges, and [ReLU(x)] = max(x, 0). Considering
+that nodes are connected by different numbers of
+neighbors, we use function δ(·) to ensure that the
+relevance scores of incoming edges for v sum into
+1, i.e.,
+X
+i∈¯Vh,t
+X
+r∈Rh,t A(τ)
+h,t(i, v, r) = 1.
+(8)
+Here, we instantiate δ(·) as edge softmax func-
+tion which computes softmax over attention weights
+of
+incoming
+edges
+regardless
+of
+their
+rela-
+tion types for every node, i.e., softmax(xi)
+=
+exp(xi)/ P
+j∈N(i) exp(xj) where N(i)
+=
+{j
+:
+(j, r, i) ∈Eh,t}. Let H(τ)
+h,t be embeddings of all
+nodes in ¯Vh,t where the vth row corresponds to
+node embedding h(τ)
+v
+of v ∈¯Vh,t, and
+Q(τ)
+h,t,r = ReLU
+
+A(τ)
+h,t(:, :, r)H(τ−1)
+h,t
+Wr
+
+,
+(9)
+where A(τ)
+h,t(:, :, r) is the rth slice of A(τ)
+h,t and Wr is
+a learnable parameter. Then, H(τ)
+h,t is updated as
+H(τ)
+h,t = MEAN({Q(τ)
+h,t,r : r ∈Rh,t}).
+(10)
+After T iterations, the representations of drugs
+are transformed to be more predictive of the DDI
+types between the target drug-pair, and Sh,t only
+keeps edges of important known DDIs or newly-
+added edges connecting highly similar drugs. We
+set hv = h(T )
+v
+as the final node embedding, and
+return Ah,t = A(T )
+h,t which records the updated
+graph structure of Sh,t. Learning subgraph embed-
+ding of Sh,t is commonly adopted to encode the
+subgraph topology [22, 23, 25]. Hence, we follow
+this routine and obtain the subgraph embedding
+hSh,t of Sh,t as
+hSh,t = MEAN
+
+{hv|v ∈¯Vh,t}
+
+.
+(11)
+Finally, we predict the relation for (h, t) as
+ˆyh,t = δ
+
+Wc ·
+
+hSh,t ∥hh ∥ht
+ 
+,
+(12)
+where Wc is the classifier parameter.
+The results of applying different knowledge sub-
+graph generation strategies are shown in Supple-
+mentary Fig. 1 and analyzed in Supplementary Note
+2.
+Learning and inference
+Let θg and θk denote the collection of parameters
+associated with generic embedding generation and
+knowledge subgraph generation respectively. Fur-
+ther, let yh,t = [yh,t(i)] be a vector where the ith
+element yh,t(i) = 1 if relation i ∈RDDI occurs in
+(h, t) and 0 otherwise.
+For multiclass DDI prediction, we optimize
+KnowDDI w.r.t. the cross entropy loss:
+min
+θg,θk ℓCE ≡
+X
+(h,r,t)∈EDDI −y⊤
+h,t · log (ˆyh,t) .
+(13)
+
+As for multilabel DDI prediction, drug-pairs are
+associated with varying number of relations. We fur-
+ther use a loss function with negative sampling. Fol-
+lowing related works [22, 23], we construct negative
+triplets to prevent KnowDDI from selecting those
+unknown relations. For each (h, r, t) ∈EDDI, we
+replace t by a randomly sampled drug w ∈VDDI to
+form (h, r, w) whose label vector yh,w = [0, . . . , 0]
+contains zeros only. Let Eneg = {(h, r, w)|(h, r, t) ∈
+EDDI and (h, r, w) /∈EDDI} collectively contains the
+negative triplets. We optimize KnowDDI w.r.t. the
+following loss for multilabel DDI prediction:
+min
+θg,θk ℓCE +
+X
+(h,r,w)∈Eneg−1⊤· log (1 −ˆyh,w) , (14)
+where 1 is a vector of all 1s. Note that equation
+(14) only penalizes wrong prediction of known rela-
+tions between drug-pairs. In other words, for triplets
+that are not observed in EDDI, we regard them as
+unknown.
+During inference, given a new drug-pair (h′, t′)
+where h′, t′ ∈V, we directly use KnowDDI with
+optimized θg, θk to obtain the class prediction vec-
+tor ˆyh′,t′. For multiclass prediction, the class is
+predicted as the relation which obtains the high-
+est possibility in ˆyh′,t′. As for multilabel prediction,
+the complete ˆyh′,t′ is returned. Please refer to
+Algorithm ?? in Supplementary Note 1 for details.
+Identifying explaining paths
+To explain the predicted DDI for (h, t), we take
+out the explaining paths from Sh,t. In particular, an
+explaining path
+ph,t = h
+Ah,t(h,v1,r1)
+−−−−−−−−→v1
+Ah,t(v1,v2,r2)
+−−−−−−−−−→v2
+(15)
+· · ·
+Ah,t(vP −1,t,rP )
+−−−−−−−−−−→t,
+(16)
+is a sequence of nodes, where node vi and node
+vi+1 are connected by relation ri+1
+∈R with
+a connection strength indicated by Ah,t(vi, vj, rj).
+We then obtain the average connection strength of
+ph,t by averaging over Ah,t(vi, vj, rj) of consecu-
+tive pairs of nodes in ph,t. This average connection
+strength reflects the ability of the explaining path to
+interpret the prediction result from the perspective
+of KnowDDI.
+Training details
+In KnowDDI, we use a two-layer GraphSAGE [25]
+to obtain the generic node embedding e(l)
+v
+whose
+dimension is set as 32. For drug-flow subgraph
+extraction, we extract 2-hop neighborhood and
+then extract relational paths with length at most
+4 pointing from h to t. The dimension of edge
+embedding hr in equation (6) is set as 32. We
+alternate between estimating connection strengths
+and refining node embeddings for 3 times (T in
+Algorithm ??). We select γ in equation (7) from
+[0.05, 0.2] and α in equation (10) from [0.3, 0.7]. We
+train the model for a maximum number of 50 epochs
+using Adam [28] with learning rate 5 ∗10−3 and
+weight decay rate 10−5. We early stop training if the
+validation loss does not decrease for 10 consecutive
+epochs. We set dropout rate as 0.2 and batch size
+as 256. All results are averaged over five runs and
+are obtained on a 32GB NVIDIA Tesla V100 GPU. A
+summary of hyperparameters used by KnowDDI is
+provided in Supplementary Table 2. Their sensitivity
+analysis results are shown in Supplementary Fig. 2
+and discussed in Supplementary Note 3.
+Results
+Data
+In this study, we perform experiments on two
+publicly available benchmark DDI datasets: (i)
+Drugbank [13] is a multiclass DDI prediction dataset
+consisting of 86 types of pharmacological relations
+occurred between drugs; and (ii) TWOSIDES [29]
+is a multilabel DDI prediction dataset recording mul-
+tiple DDI side effects between drugs. We adopt
+Hetionet [17, 18], which is a benchmark biomedical
+KG for various tasks within drug discovery, as the
+external KG in this paper. Other recent developed
+biomedical KGs such as ogbl-biokg [30], OpenBi-
+oLink [31], and PharmKG [19] can also be used.
+Data preprocessing
+We preprocess the two benchmark DDI datasets
+DrugBank [13, 32] and TWOSIDES [29, 33] follow-
+ing the same procedure adopted by SumGNN [23].
+In DrugBank, relations are skewed. Each drug-
+pair is filtered to have one relation only [23]. In
+TWOSIDES, 200 commonly occurring relations are
+selected. In particular, relations are ranked by
+decreasing number of associating fact triplets, and
+
+I
+7
+the 200 relations ranked between 600 to 800 are
+kept such that each relation is associated with at
+least 900 fact triplets [10]. Thus, relations in TWO-
+SIDES are associated with comparable number
+of fact triplets. We formulate the benchmark DDI
+datasets as DDI graphs separately, whose statistics
+are summarized in Table 1. The fact triplets in DDI
+datasets are split into training, validation, and test-
+ing sets with a ratio of 7:1:2 following SumGNN [23]
+for fair comparison. We remove from external KG
+the drug-drug edges contained in DDI graph to
+avoid information leakage, then merge the resultant
+external KG and DDI graph into a large combined
+network. Eventually, the DDI graph of DrugBank is
+merged with a graph of 33765 nodes and 1690693
+edges extracted from Hetionet, and the DDI graph
+of TWOSIDES is merged with a graph of 28132
+nodes and 1666632 edges extracted from Hetionet,
+respectively. During training, the drug-drug edges in
+validation and testing sets are unseen. After tuning
+hyperparameters on fact triplets in validation set, the
+model performance is evaluated on fact triplets in
+testing set.
+Evaluation metric
+We evaluate the multiclass DDI prediction perfor-
+mance by three metrics: (i) Macro-averaged F1
+which is averaged over class-wise F1 scores, (ii)
+Accuracy (ACC) which is the micro-averaged F1
+score calculated using all testing fact triplets, and
+(iii) Cohen’s κ which measures the inter-annotator
+agreement. As for multilabel DDI prediction, we
+report the results averaged over all relation types.
+The performance is evaluated by (i) AUROC which
+is the average area under the receiver operating
+characteristics (ROC) curve, (ii) AUPRC which is
+the average area under the precision-recall (PR)
+curve, and (iii) AP@50 which is the average preci-
+sion at 50.
+Comparison with the state-of-the-art
+We consider multi-typed DDI prediction problem
+where interactions between drugs can have multi-
+ple relation types. For example, a drug-pair (drug A,
+drug B) can have two relation types “the matabolism
+of drug A can be decreased when combined with
+drug B” and “the therapeutic efficacy of drug A can
+be increased when combined with drug B”. In par-
+ticular, we compare the proposed KnowDDI with the
+following models:
+• Traditional two-stage methods (w/o external KG).
+(i) KG embedding-based methods use shal-
+low linear models to encode drug entities and
+their associated relations into low-dimentional
+embeddings, then feed the drug embeddings
+into a separately learned classifier for DDI pre-
+diction. Exemplar methods are TransE [34],
+KG-DDI [35, 36], and MSTE [15, 37]. (ii) Net-
+work embedding-based methods which use neu-
+ral networks to encode structural information into
+node embeddings of drugs, and predict the rela-
+tion types by a linear layer. Exemplar methods
+are DeepWalk [14, 38], node2vec [39, 40], and
+LINE [41, 42].
+• GNN-based methods (w/o external KG) formu-
+late the existing DDI fact triplets into the form
+of a graph where each node corresponds to a
+drug and each edge between two drugs repre-
+sents one relation type, then solve the resultant
+link prediction problem on the DDI graph using
+GNNs [43], including GAT [44, 45], Decagon [10,
+46], and SkipGNN [11, 47].
+• GNN-based methods (w/ external KG) leverage
+an external KG to provide rich organized biomed-
+ical knowledge, and aggregate the messages
+from neighboring nodes of drugs by GNNs. Exist-
+ing methods include GraIL [22, 48], KGNN [21,
+49], DDKG [50, 51], SumGNN [23, 52], and
+LaGAT [24, 53].
+We implement the baselines using public codes
+of the respective authors, except TransE [34] which
+is implemented by us.
+Overall performance
+Table 1 shows the results obtained on two bench-
+mark DDI datasets. Overall, we can see that GNN-
+based methods (w/ external KG) generally per-
+form the best and traditional two-stage methods
+generally perform the worst. Comparing with tra-
+ditional two-stage methods, GNN-based methods
+(w/o external KG) can better propagate information
+among connected nodes (i.e., drugs) by modeling
+the fact triplets integrally as a graph and jointly
+learning all model parameters w.r.t. the objective in
+an end-to-end manner. However, due to the lack of
+DDI fact triplets and the over-parameterization of
+GNN, they may not consistently be better than tra-
+ditional two-stage methods. This can be supported
+
+by the observation that DeepWalk and KG-DDI
+perform better than the deep GAT.
+Next, GNN-based methods ((w/ external KG))
+leverage rich biomedical knowledge to alleviate
+the data scarcity problem. Among these methods,
+KGNN performs the worst. In contrast to pure GNN,
+KGNN uniformly samples N nodes as neighbors
+of each node during message passing to reduce
+computational overhead. DDKG improves KGNN by
+assigning attention weights to the N nodes during
+message passing, where the attention weights are
+obtained by calculating the similarity between ini-
+tial node embeddings constructed from SMILES. In
+the end, each drug obtains its representation with-
+out considering which drug to interact in KGNN
+and DDKG. While GraIL, SumGNN, LaGAT and our
+KnowDDI merge the DDI graph with an external KG
+as a large combined network, then learn to encode
+more local semantic information from the combined
+network by extracting subgraphs w.r.t. drug-pairs.
+A drug can be represented differently in different
+subgraphs. Thus, these methods can obtain drug-
+pair-aware representations that can be beneficial
+to predict DDI types. In particular, GraIL directly
+propagates messages on the extracted subgraphs,
+LaGAT aggregates messages with attention weights
+calculated using node embeddings, and SumGNN
+only prunes edges based on node features that are
+randomly initialized or pretrained on other tasks and
+then fixes the subgraphs. They all cannot adaptively
+adjust the structure of subgraphs during learning.
+Finally, KnowDDI learns to remove irrelevant
+edges and add new edge of type “resemble” based
+on learned node embeddings. Upon the purified
+subgraph (i.e., knowledge subgraph) of target drug-
+pair, KnowDDI transforms generic node embed-
+dings to be more predictive of DDI types. The per-
+formance gain of KnowDDI over existing methods
+validates its effectiveness.
+Relation-wise performance
+Next, we take a closer look at the performance
+gain w.r.t. different relations grouped by frequency.
+Fig. 2(a) shows the relation-wise F1 score (%)
+grouped into bins according to the number of fact
+triplets associated with the relation. We compare
+the proposed KnowDDI with SkipGNN which per-
+forms the best among GNN-based methods (w/o
+external KG), and SumGNN which obtains the
+second-best among GNN-based methods (w/ exter-
+nal KG). In addition, we compare with KnowDDI
+(w/o resemble), a variant of KnowDDI which does
+not add new edges of type “resemble” between
+nodes with highly similar node embeddings.
+As shown, by comparing the performance of
+SkipGNN and the other methods, we can see that
+external KG plays an important role. In general,
+KnowDDI and KnowDDI (w/o resemble) consis-
+tently obtain better performance than SumGNN,
+and the performance gap is larger on relations
+with fewer known fact triplets. This shows that
+enriched drug representations and adjusted sub-
+graphs can be helpful to compensate for the lack
+of known DDI fact triplets. KnowDDI performs the
+best, which further shows the contribution of learn-
+ing to propagate resembling relationships between
+highly similar nodes. Additionally, Supplementary
+Fig. 3 shows statistics of relation frequency and
+Supplementary Fig. 4 shows relation-wise perfor-
+mance improvement of KnowDDI over SumGNN
+on DrugBank, TWOSIDES and a larger version of
+TWOSIDES with more relations. We also examine
+the performance of KnowDDI and the second-best
+method SumGNN obtained on some important and
+commonly studied adverse drug reactions (ADRs)
+in Supplementary Table 3. Results consistently
+show that KnowDDI obtains better performance. An
+extended discussion is provided in Supplementary
+Note 4.
+Compensating unknown DDIs
+Recall that the lack of DDI fact triplets is compen-
+sated by both enriched drug representations and
+propagated drug similarities in KnowDDI. Here, we
+pay a closer look to the effectiveness of these two
+designs. To achieve this goal, we examine the per-
+formance of proposed KnowDDI and KnowDDI (w/o
+resemble) with different amount of fact triplets intro-
+duced from external KG to the combined network.
+We compare them with SumGNN which obtains
+the second-best among GNN-based methods (w/
+external KG), and take SkipGNN from GNN-based
+methods (w/o external KG) as a reference.
+Fig. 2(b) plots the performance changes w.r.t
+varying portion (%) of fact triplets sampled from
+the external KG. First, SumGNN, KnowDDI and
+KnowDDI (w/o resemble) all perform worse given
+fewer fact triplets from the external KG. This is
+
+I
+9
+because a sparser external KG means less informa-
+tion introduced into DDI datasets, which reduces the
+information gap between GNN-based methods w/
+or w/o external KG. Then, KnowDDI (w/o resemble)
+consistently outperforms the other two methods as it
+keeps information that is more relevant to predicting
+DDI for the drug-pair at hand both during subgraph
+construction and learning. Besides, KnowDDI is the
+best, as it further learns drug similarities by propa-
+gating resembling relationships between drugs with
+highly similar representations. As a result, KnowDDI
+suffers the least from a sparser KG. However, the
+performance gap between KnowDDI (w/o resem-
+ble) and KnowDDI gets larger with fewer triples.
+This means removing irrelevant edges and propa-
+gating drug similarities have a larger influence on
+compensatingq for the lack of DDIs when drug rep-
+resentations are less enriched. Finally, let us pay
+special attention to the case of given 0% triples,
+which means external KG is not used. Still, we
+can observe that both KnowDDI (w/o resemble) and
+SumGNN still outperform SkipGNN. This can be
+attributed to the different subgraph extraction strate-
+gies adopted in these three methods, which will be
+carefully examined in Section 3.
+Effectiveness of knowledge subgraph
+Here, we pay a closer look at knowledge subgraph
+Sh,t designed in KnowDDI, and compare it with
+other choices of subgraphs in terms of performance
+and interpretability.
+Subgraph extraction strategy
+To empirically validate the effectiveness of the pro-
+posed knowledge subgraph, we consider the follow-
+ing subgraphs: (i) Random subgraph consists of a
+fixed-size set of nodes uniformly sampled from the
+neighborhoods of h and t in G, which is adopted
+in KGNN [21] to reduce the computation overhead;
+(ii) Enclosing subgraph is the interaction of K-hop
+neighborhoods of h and t in G, which is adopted in
+GraIL [22], and SumGNN [23]; (iii) Drug-flow sub-
+graph ¯Sh,t consists of relational paths pointing from
+h to t in G with length at least P; and (iv) Knowledge
+subgraph Sh,t consists of explaining paths from h
+to t, which is obtained by iteratively refining the
+graph structure and node embeddings of ¯Sh,t. Apart
+from them, we further compare with the knowledge
+subgraphs obtained by KnowDDI (w/o resemble),
+and denote the results as knowledge subgraph (w/o
+resemble).
+Fig.
+3(a)
+shows
+the
+results
+obtained
+by
+KnowDDI on DrugBank with different subgraphs
+and different percentages of fact triplets from exter-
+nal KG. Enlarged enclosing subgraphs are provided
+in Supplementary Fig. 5. As shown, leveraging
+subgraphs consistently leads to performance gain,
+regardless of the subgraph type. This shows the
+necessity of modeling local contexts of target drug-
+pairs. Among these subgraphs, learning with knowl-
+edge subgraph obtains the best performance. As
+random subgraph consists of uniformly sampled
+nodes without considering the node importance, the
+selected nodes may not contribute to recognize the
+relationships between head and tail drugs. Enclos-
+ing subgraph keeps the local neighborhood of head
+and tail drugs intact, thus it does not lose informa-
+tion. However, directly learning on these subgraphs
+may lead to bad performance, if irrelevant edges
+exist. In contrast, drug-flow subgraph focuses on
+relational paths pointing from head drug to tail
+drug, and knowledge subgraph further only keeps
+explaining paths. They all remove irrelevant nodes
+which do not appear in any paths. Besides, by
+comparing the performance of drug-flow subgraph
+and knowledge subgraph under different percent-
+ages of fact triplets, we can see that both enriched
+drug representations and propagated drug similar-
+ities contribute to the performance improvements.
+However, the performance gain is larger when fewer
+fact triplets are used. This means removing irrele-
+vant edges and propagating drug similarities play a
+stronger influence on compensating for the lack of
+DDIs when drug representations are less enriched.
+In summary, learning knowledge subgraph is effec-
+tive.
+Interpretability
+As discussed, being able to understand the DDI
+between drug-pairs helps drug discovery. Here, we
+show that KnowDDI can explain why two drugs
+associate with each other by leveraging explaining
+paths in knowledge subgraphs Sh,t.
+Fig. 3 shows the subgraphs of four drug-
+pairs. Random subgraphs are not plotted, as
+they
+naturally
+loses
+semantic
+information.
+As
+can be observed, drug-flow subgraphs contain
+fewer
+nodes
+in
+comparison
+to
+the
+enclosing
+subgraphs. Particularly, as we take Hetionet as
+
+the external KG, where only drugs have incom-
+ing
+edges
+with
+drugs
+and
+the
+relation
+type
+is “Compound–resembles–Compound”, drug-flow
+subgraphs only contain drugs. Knowledge sub-
+graphs further adjust the graph structure. In par-
+ticular, KnowDDI assigns a connection strength
+between each node-pair from both direction. It rep-
+resents the importance of a given edge between
+two connected nodes in the drug-flow subgraph or
+similarity between two nodes whose interactions are
+unknown. Even if two nodes are connected in the
+¯Sh,t, KnowDDI can delete an existing edge if the
+estimated connection strength is too small, such
+as the edge pointing from 575 to 284 in Fig. 3(d).
+Likewise, two originally disconnected nodes can be
+connected after learning, if the estimated connec-
+tion strength is large. This reveals that KnowDDI
+thinks the connected drugs are highly similar and
+can contribute to explaining the DDI type between
+two drugs, such as the edge pointing from 121 to
+622 in Fig. 3(c). Supplementary Fig. 6 shows the
+node-pair whose connection strength is the largest
+on each of knowledge graph, including their molec-
+ular graphs and drug efficacy.
+Further, Table 2 shows the explaining paths with
+the largest average connection strengths assigned
+by KnowDDI (see Section 3) for the four drug-
+pairs in Fig. 3. We use Hetionet KG and DrugBank
+database to help interpret these explaining paths.
+As can be seen, these explaining paths indeed dis-
+cover reasonable explanations. Moreover, note that
+in the second drug-pair, without the newly added
+edge of relation type “resemble” pointing from 121
+to 622, the discovered explaining path no longer
+exists. This validates the necessity of learning with
+knowledge subgraphs.
+Embedding visualization
+Finally, we wish to show that KnowDDI helps bet-
+ter shape the embeddings of drug-pairs and rela-
+tions to be more predictive of DDI types between
+target drug-pairs. From the DDI dataset, we ran-
+domly sample ten DDI relations, then randomly
+sample fifty fact triplets per relation. Given a drug-
+pair (h, t), it is represented as the concatenation
+of drug embeddings which correspond to the node
+embeddings of h and t. For methods operating on
+subgraphs, the drug-pair embedding is obtained
+by concatenating drug embeddings with subgraph
+embedding which is obtained by mean pooling
+over node embeddings of all nodes in the sub-
+graph [22, 23]. In this way, local context of target
+drug-pair is leveraged to obtain better prediction
+results. We compare KnowDDI with SumGNN and
+KnowDDI (w/o resemble). In addition, we also show
+the drug-pair embeddings obtained by simply learn-
+ing generic node embeddings without refining them
+on subgraphs.
+Fig.
+4
+shows
+the
+t-SNE
+visualization
+[54]
+obtained on DrugBank. First, we can see from
+generic embeddings in Fig. 4(b), to KnowDDI (w/o
+resemble) in Fig. 4(c), to KnowDDI in Fig. 4(d),
+drug-pair with the same relation type are getting
+closer while drug-pair with different relation types
+are moving farther apart. Also, as can be seen, the
+clusters are more obvious in KnowDDI (Fig. 4(c)
+and Fig. 4(d)) than that of SumGNN (Fig. 4(a)).
+This means that learning knowledge subgraphs
+is beneficial to obtain more distinctive drug-pair
+embeddings.
+Discussion
+In this study, we are motivated to develop an effec-
+tive solution to accurately construct a DDI predic-
+tor from the rare DDI fact triplets. The proposed
+KnowDDI achieves the goal by taking advantage
+of rich knowledge in biomedicine and healthcare
+and the plasticity of deep learning approaches. In
+KnowDDI, the enriched drug representations and
+propagated drug similarities together implicitly com-
+pensate for the lack of known DDIs. We first com-
+bine the provided DDI graph and an external KG
+into a combined network, and manage to encode
+the rich knowledge recorded in KG into the generic
+node representations. Then, we extract a drug-
+flow subgraph for each drug-pair from the com-
+bined network, and learn a knowledge subgraph
+from generic representations and the drug-flow sub-
+graph. During learning, the knowledge subgraph is
+optimized, where irrelevant edges are removed and
+new edges are added if two disconnected nodes
+have highly similar node representations. Finally,
+the representations of drugs are transformed to be
+more predictive of the DDI types between the tar-
+get drug-pair while knowledge subgraph contains
+explaining paths to interpret the prediction result.
+The performance gap between KnowDDI and other
+approaches gets larger for relation types given a
+
+11
+smaller number of known DDI fact triplets, which
+validates the effectiveness of KnowDDI.
+Due to the popularity of GNN for learning from
+graphs, existing works have applied it to solve
+link prediction problem. Early works, like GAT [44]
+and R-GCN [55], usually obtain the representa-
+tion for each node by running message passing
+on the whole graph, then feed the representa-
+tion of two target nodes into a predictor to esti-
+mate the existence of a link between two target
+nodes. Decagon [10], SkipGNN [11], KGNN [21]
+and DDKG [50] compared in Table 1 also follow this
+routine. In particular, KGNN uniformly samples a
+fixed number of nodes as neighbors of each node
+during message passing to reduce the computation
+overhead. DDKG improves the message passing
+part of KGNN by assigning attention weights to
+the uniformly sampled neighboring nodes, where
+the attention weights are obtained by calculating
+the similarities between initial node embeddings
+constructed from SMILES. These works treat all
+nodes equally and ignore pair-wise information
+when propagating messages. Each drug will get a
+representation without considering which drug to
+interact. Thus, the performance of these methods
+can be worse than classical hand-designed heuris-
+tics, which count common neighbors or connected
+paths between a node-pair [56]. As a result, recent
+work GraIL [22] proposes a pipeline to learn with
+subgraphs, i.e., first extracting a subgraph con-
+taining the two target nodes, then obtaining the
+node representation from the subgraph, finally esti-
+mating the link between two target nodes using
+the node-pair representation which consists of the
+node embeddings of two target nodes and the sub-
+graph embedding. KnowDDI, SumGNN [23] and
+LaGAT [24] compared in Table 1 follow this pipeline.
+They adopt different strategies to learn with sub-
+graphs. In particular, LaGAT extracts a subgraph
+consisting of a fixed number of nodes around the
+head and tail drugs, updates node embeddings by
+aggregating neighboring nodes based on attention
+weights calculated using node embeddings, and
+leaves the subgraph unchanged. While SumGNN
+extracts the enclosing subgraph of each drug-pair,
+then prunes edges based on the node features.
+By encoding local context within subgraphs, these
+methods obtain node-pair-aware representations,
+i.e., a drug can be represented different depend-
+ing on which drug to interact. Our KnowDDI also
+learns with subgraphs, while two major design dif-
+ferences makes it obtain better and more inter-
+pretable results. The first difference is that KnowDDI
+learns generic node embeddings on the combined
+network to enrich the drug representations, then
+transforms them on knowledge subgraphs to incor-
+porate with the local context of drug-pairs. The
+second difference is the adjustment of subgraphs
+where existing edges can be dropped if their esti-
+mated importance are low, and new edges of type
+“resemble” can be added between disconnected
+nodes if their node embeddings are highly sim-
+ilar. This allows KnowDDI to capture explaining
+paths pointing from head drug to tail drug. While
+SumGNN directly learns drug-pair-aware represen-
+tations from the extracted subgraphs. With the
+two differences, KnowDDI achieves the balance of
+generic information and drug-pair-aware local con-
+text during learning.
+The architecture of KnowDDI can be further
+improved. For instance, pretraining GNN from other
+large datasets which may provide better initialized
+parameters and therefore reduce the training time.
+Besides, we do not use any molecular features
+of drugs in order to test the ability of KnowDDI
+learning solely from the combination of external
+KG and DDI fact triplets. Taking these predefined
+node features may improve the predictive perfor-
+mance of KnowDDI in the future. Although we
+implement KnowDDI to handle DDI prediction in
+this paper, KnowDDI is a general approach which
+can be applied to other relevant applications, to
+help detect possible protein–protein interactions,
+drug–target interactions, and disease-gene interac-
+tions. Relevant practitioners can easily leverage the
+rich biomedical knowledge existing in large KGs
+to obtain good and explainable prediction results.
+We believe our open-source KnowDDI can act as
+an original algorithm and unique deep learning
+tool to promote the development of biomedicine
+and healthcare. For example, it can help detect
+possible interactions of new drugs, accelerating
+the speed of drug design. Given drug profiles of
+patients, KnowDDI can be used to identify possible
+adverse reactions. These results have the poten-
+tial to serve as a valuable resource for alerting
+clinicians and healthcare providers when devising
+management plans for polypharmacy, as well as
+for guiding the inclusion criteria of participants in
+clinical trials. Beyond biomedicine and healthcare,
+similar approaches can be developed to adaptively
+
+leverage domain-specific large KGs to help solve
+downstream applications in low-data regimes.
+Data availability
+All data used in this study are available in sup-
+plementary data and public repositories. Source
+data underlying Fig. 2-4 can be found in Supple-
+mentary Data 1. For the benchmark DDI datasets,
+DrugBank dataset [13] can be downloaded from
+https://bitbucket.org/kaistsystemsbiology/
+deepddi/src/master/data/
+[32],
+and
+TWO-
+SIDES dataset [29] can be downloaded from
+https://tatonettilab.org/resources/nsides/
+[33].
+The external KG Hetionet [17] is obtained from
+https://het.io [18]. The processed data analyzed
+in this paper is available in GitHub repository at
+https://github.com/LARS-research/KnowDDI/
+tree/main/data [57].
+Code availability
+The code implementing KnowDDI is deposited
+in public available GitHub repository at https://
+github.com/LARS-research/KnowDDI [58]. The
+version for this publication is provided in Zen-
+odo with the identifier: https://doi.org/10.5281/
+zenodo.10285646 [59].
+Acknowledgment
+Q. Y. is supported by research fund of National Nat-
+ural Science Foundation of China (No. 92270106),
+and Independent Research Plan of the Department
+of Electronic Engineering Department at Tsinghua
+University,
+Author contributions
+For this manuscript, Y. W. contributes to the idea
+development, experiment design, paper presenta-
+tion and writing; Z. Y. contributes to the code imple-
+mentations, obtaining and analysis results; Q. Y.
+contributes to the idea development, result analysis,
+paper presentation and writing.
+Competing interests
+The authors declare no competing interests.
+
+KnowDDI
+13
+Tables
+Table 1: Performance (%) is evaluated on two benchmark DDI datasets DrugBank and TWOSIDES.
+Dataset
+DrugBank (multiclass)
+TWOSIDES (multilabel)
+Statistics
+|V| = 1710, |R| = 86, |E| = 192284
+|V| = 604, |R| = 200, |E| = 41270
+Avg.
+Metric
+F1
+ACC
+Cohen’s κ
+AUROC
+AUPRC
+AP@50
+Rank
+TransE
+18.32±0.16 64.60±0.11 57.19±1.22 77.53±0.02 70.16±0.02 77.54±0.03
+15
+Traditional
+KG-DDI
+37.21±0.36 82.74±0.10 78.71±0.33 90.64±0.09 87.99±0.11 83.50±0.06
+10
+Two-stage
+MSTE
+53.96±0.07 77.76±0.11 73.35±0.05 89.40±0.04 83.06±0.06 79.38±0.03
+12
+(w/o external node2vec 50.00±1.67 62.39±0.99 56.27±0.89 90.62±0.43 89.42±0.47 82.21±0.54
+12
+KG)
+DeepWalk 49.17±1.38 62.90±0.37 56.77±0.44 91.77±0.26 90.56±0.23 84.13±0.35
+9
+LINE
+48.89±1.38 59.87±0.92 52.15±1.51 88.63±0.20 87.02±0.22 80.80±0.20
+14
+GNN-based
+GAT
+35.05±0.41 78.02±0.14 74.68±0.21 91.22±0.13 89.79±0.10 83.05±0.18
+11
+(w/o external Decagon 56.24±0.27 86.97±0.31 86.12±0.09 91.83±0.14 90.79±0.18 82.49±0.36
+7
+KG)
+SkipGNN 62.36±0.96 88.04±0.66 85.71±0.81 92.31±0.15 90.84±0.03 84.23±0.19
+6
+GraIL
+75.92±0.69 89.63±0.39 87.63±0.47 93.73±0.10 92.26±0.07 86.89±0.11
+3
+GNN-based
+KGNN
+74.08±0.92 88.30±0.08 86.09±0.10 92.93±0.10 90.11±0.14 87.43±0.09
+5
+(w/ external
+DDKG
+75.84±0.22 88.70±0.39 87.53±0.21 93.15±0.18 91.09±0.39 87.50±0.43
+4
+KG)
+SumGNN 86.88±0.63 91.86±0.23 90.34±0.28 94.61±0.06 93.13±0.15 88.38±0.07
+2
+LaGAT
+83.69±0.74 88.86±0.12 87.33±0.14 88.72±0.22 84.03±0.43 82.46±0.41
+8
+KnowDDI 91.53±0.24 93.17±0.09 91.89±0.11 95.43±0.02 94.14±0.03 89.54±0.03
+1
+Average (Avg.) rank of each method is reported in the last column, which is averaged over the six columns of
+performance. The best and comparable results (according to the pairwise t-test with 95% confidence) are highlighted in
+bold, and the second-best results are underlined. | · | counts the number of elements in a set. V is the set of drug nodes,
+E is the set of fact triplets, and R is the set of relation types.
+
+14
+KnowDDI
+Table 2: Explaining paths with the largest average connection strengths assigned by KnowDDI for
+four drug-pairs in DrugBank.
+Drug-Pair
+(309, 610)
+DDI Type
+The metabolism of Atomoxetine (610) can be decreased when combined with Reboxetine (309).
+Explaining
+Path
+309 resembles
+−−−−−−→16879 resembles
+−−−−−−→610
+Explana-
+tion
+Reboxetine (309) resembles Diphenylpyraline (16879), while Diphenylpyraline (16879) resembles
+Atomoxetine (610). We can deduce that Reboxetine (309) resembles Atomoxetine (610). When taking two
+similar drugs, the body may absorb less of the Atomoxetine (610).
+Drug-Pair
+(103, 1127)
+DDI Type
+The serum concentration of Betamethasone (103) can be increased if combined with Estriol (1127).
+Explaining
+Path
+103 resembles
+−−−−−−→121
+resembles (new edge)
+−−−−−−−−−−−−−→622 resembles
+−−−−−−→1127
+Explana-
+tion
+Betamethasone (103) bears resemblance to Desonide (121). Although the interaction between Desonide
+(121) and Mestranol (622) is not provided, our search within DrugBank reveals that combining Mestranol
+(622) with Budesonide can elevate the serum concentration of Budesonide. Furthermore, Budesonide is
+similar to Desonide (121), and Mestranol (622) is similar to Estriol (1127). Given the tendency for similar
+drugs to exhibit akin properties, it is plausible that the serum concentration of Betamethasone (103) could
+rise when used alongside Estriol (1127).
+Drug-Pair
+(284, 882)
+DDI Type
+The therapeutic efficacy of Sulfadiazine (284) can be increased when used in combination with
+Gatifloxacin (882).
+Explaining
+Path
+284
+therapeutic efficacy increased
+−−−−−−−−−−−−−−−−−→852 resembles
+−−−−−−→882
+Explana-
+tion
+The combined use of Sulfadiazine (282) and Pefloxacin (852) can improve the efficacy. Meanwhile,
+Pefloxacin (852) resembles Gatifloxacin (882). It can be deduced that the therapeutic efficacy of
+Sulfadiazine (282) can be increased when used in combination with Gatifloxacin (882).
+Drug-Pair
+(47, 51)
+DDI Type
+The risk or severity of adverse effects can be increased when Atropine (47) is combined with Scopolamine
+(51).
+Explaining
+Path
+47 resembles
+−−−−−−→16892 resembles
+−−−−−−→51
+Explana-
+tion
+Atropine (47) resembles Homatropine methylbromide (16892), while Homatropine methylbromide (16892)
+resembles Scopolamine (51). We can deduce that Atropine (47) resembles Scopolamine (51). The
+similarities between the two drugs can also be seen through the chemical structures of the drugs. As the
+two drugs are similar in structure, the effects of using both drugs at the same time should be similar to the
+side effects of overdose of either drug, which can cause serious side effects. Based on DrugBank,
+Scopolamine (51) overdose may manifest as lethargy, somnolence, coma, confusion, agitation,
+hallucinations, convulsion, visual disturbance, dry flushed skin, dry mouth, decreased bowel sounds,
+urinary retention, tachycardia, hypertension and supraventricular arrhythmias, while Atropine (47)
+overdose may cause palpitation, dilated pupils, difficulty swallowing, hot dry skin, thirst, dizziness,
+restlessness, tremor, fatigue and ataxia.
+Possible explanations are discovered from Hetionet and DrugBank.
+
+KnowDDI
+15
+Figures
+Fig. 1: Overview of KnowDDI.
+Predicted DDI 
+Types
+Target 
+Drug Pairs
+Combined Network with 
+Generic Embeddings
+Generic  
+Embedding 
+Generation
+Drug-flow 
+Subgraph 
+Construction
+Knowledge 
+Subgraph 
+Generation
+……
+Drug-flow
+Subgraph
+Knowledge 
+Subgraph
+?
+?
+Classifier
+Combined Network
+?
+?
+✗
+✗
+?
+?
+✗
+✗
+✗
+……
+……
+Head
+Drug
+Tail
+Drug
+Other Entities in KG
+Drug in KG
+Edge in DDI Graph
+Drug in DDI Graph
+Edge in KG
+Edge learned by KnowDDI
+Node Embeddings
+On a combined network which merges the drug-drug interaction (DDI) graph with an external knowledge
+graph (KG), generic embeddings of all nodes are firstly learned to capture generic knowledge. Then for each
+target drug-pair, a drug-flow subgraph is extracted from the combined network, whose node embeddings are
+initialized as the generic embeddings. Via propagating drug resembling relationships, the generic embeddings
+are transformed to be more predictive of the DDI types between the drug-pair, and the drug-flow subgraph is
+adapted as knowledge subgraph which contains explaining paths to interpret the prediction result.
+
+16
+KnowDDI
+Fig. 2: A closer examination and comparison of KnowDDI with SumGNN, SkipGNN and KnowDDI (w/o
+resemble).
+a
+b
+a, F1 (%) obtained for relations with different number of DDI fact triplets on DrugBank. b, F1 (%) obtained
+with different portion (%) of fact triplets sampled from the external KG on DrugBank. SkipGNN, which does
+not use external KG, is plotted just for reference. This bar plot illustrates the test performance (%), with each
+bar’s height representing the mean result and the error bars indicating the standard deviation, both derived
+from five independent runs (n=5).
+
+KnowDDI
+17
+Fig. 3: Comparing different subgraphs extraction strategy.
+103
+1127
+82
+622
+121
+47
+51
+12
+1293
+655
+18
+530
+1048
+16924
+416
+40
+1066
+686
+695
+184
+572
+63
+961
+70
+585
+74
+587
+1012
+16892
+309
+610
+648
+141
+173
+1465
+955
+191
+198
+76
+989
+16879
+635
+381
+284
+882
+575
+852
+1503
+309
+610
+1019
+648
+141
+29070
+147
+28825
+28445
+28446
+28704
+28833
+28714
+173
+1076
+28725
+1465
+28859
+955
+191
+198
+76
+28622
+28623
+28370
+28499
+12115
+4054
+18777
+1114
+28509
+28510 28411
+989
+28515
+28646
+28395
+1005
+16879
+28401
+29178
+635
+381
+284
+882
+575
+852
+1503
+284
+882
+575
+852
+1503
+d
+103
+1127
+82
+622
+121
+103
+1127
+82
+622
+121
+c
+1127
+103
+82
+622
+121
+882
+284
+575
+1503
+852
+309
+610
+648
+141
+173
+1465
+955
+191
+198
+76
+989
+16879
+635
+381
+309
+610
+648
+141
+173
+1465
+955
+191
+198
+76
+989
+16879
+635
+381
+b
+635
+381
+309
+610
+648
+141
+173
+1465
+955
+191
+198
+76
+989
+16879
+a
+Enclosing Subgraph
+Knowledge Subgraph 
+(w/o resemble)
+Knowledge Subgraph
+47
+51
+12
+1293
+655
+18
+530
+1048
+16924
+416
+40
+1066
+686
+695
+184
+572
+63
+961
+70
+585
+74
+587
+1012
+16892
+47
+51
+12
+1293
+655
+18
+530
+1048
+16924
+416
+40
+1066
+686
+695
+184
+572
+63
+961
+70
+585
+74
+587
+1012
+16892
+e
+503
+18
+655
+1293
+12
+51
+47
+16892
+1012
+587
+74
+585
+70
+961
+63
+572
+184
+695
+686
+1066
+40
+416
+16924
+1048
+103
+1127
+7956
+794
+3877
+555
+1078
+7095
+28474
+2885
+15563
+82
+28633
+91
+92
+28895
+622
+28913
+121
+284
+882
+28800
+258
+388
+521
+28556
+533
+28565
+28440
+29081
+537
+28446
+292
+28463
+314
+28474
+827
+575
+582
+1356
+460
+28883
+28500
+852
+342
+1499
+349
+1503
+28392
+243
+502
+375
+28792
+124
+47
+51
+28803
+28927
+264
+1289
+1290
+12
+1293
+655
+18
+530
+28562
+28437
+24
+1048
+28443
+16924
+5535
+416
+29089
+1315
+12835
+28451
+28577
+15399
+40
+1066
+29099
+28461
+686
+28589
+695
+184
+28474
+572
+28733
+63
+961
+29253
+70
+29383
+28614
+585
+74
+138975872849028633602 1243285122890028773
+28646
+28396
+28398
+28400
+1012
+28917
+29560
+28921
+28539
+16892
+1279
+Drug-flow Subgraph
+F1
+w/o Subgraph
+Random
+Subgraph
+Enclosing
+Subgraph
+Drug-ﬂow
+Subgraph
+Knowledge
+Subgraph
+100%
+86.74± 0.48
+89.49± 0.59
+90.03± 0.28
+90.63± 0.20
+91.53± 0.24
+5%
+80.77± 1.19
+84.82± 0.92
+85.06± 0.50
+85.32± 0.63
+87.92± 0.50
+0%
+72.71± 0.92
+75.88± 1.16
+77.74± 0.25
+78.99± 0.43
+81.91± 0.94
+a, F1 (%) obtained with different portion (%) of fact triplets sampled from the external KG on DrugBank. b-e,
+four exemplar drug-pairs (h, t)s in DrugBank and their enclosing subgraphs (first column), drug-flow sub-
+graphs (second column), knowledge subgraphs without propagating resembling relationships (third column),
+and knowledge subgraphs (fourth column). Drugs from DDI graph are colored in blue, drugs from external
+KG are colored in gray, while the other entities are colored in green. In particular, we draw a red dashed cir-
+cle encompassing the target drug-pair, and mark the head drug h by filled plus and the tail drug t by star. We
+mark edges from DDI graph and external KG in solid blue lines and solid gray lines respectively. We specially
+use undirected edges to represent relation type“resemble” as the semantics of resemble are not directive,
+and plot new edges of relation type“resemble” estimated by KnowDDI with dotted gray lines. The thickness of
+an edge is used to reveal the magnitude of the connection strength learned by KnowDDI.
+
+18
+KnowDDI
+Fig. 4: T-SNE visualization of drug-pair embeddings, where the four graphs share the same relations
+(n=10) and drug-pairs (for each relation, n=50).
+Generic Node Embeddings
+SumGNN
+KnowDDI
+KnowDDI (w/o resemble)
+2
+3
+13
+19 
+39
+57
+59
+ 72
+73
+75
+a
+b
+c
+d
+a, T-SNE of drug-pair embeddings obtained by SumGNN. b, T-SNE of drug-pair embeddings which are com-
+posed of concatenated generic node embeddings. c, T-SNE of drug-pair embeddings obtained by KnowDDI
+(w/o resemble). d, T-SNE of drug-pair embeddings obtained by KnowDDI.
+
+KnowDDI
+19
+References
+[1] Juurlink, D. N., Mamdani, M., Kopp, A., Laupacis, A. & Redelmeier, D. A. Drug-drug interactions
+among elderly patients hospitalized for drug toxicity. JAMA 289 (13), 1652–1658 (2003) .
+[2] Bangalore, S., Kamalakkannan, G., Parkar, S. & Messerli, F. H. Fixed-dose combinations improve
+medication compliance: A meta-analysis. The American Journal of Medicine 120 (8), 713–719 (2007)
+.
+[3] Scavone, C. et al. Current pharmacological treatments for COVID-19: What’s next? British Journal
+of Pharmacology 177 (21), 4813–4824 (2020) .
+[4] Chakraborty, C., Sharma, A. R., Bhattacharya, M., Agoramoorthy, G. & Lee, S.-S. The drug repur-
+posing for COVID-19 clinical trials provide very effective therapeutic combinations: Lessons learned
+from major clinical studies. Frontiers in Pharmacology 12 (2021) .
+[5] Akinbolade, S. et al.
+Combination therapies for COVID-19: An overview of the clinical trials
+landscape. British Journal of Clinical Pharmacology 88 (4), 1590–1597 (2022) .
+[6] Percha, B. & Altman, R. B. Informatics confronts drug–drug interactions. Trends in Pharmacological
+Sciences 34 (3), 178–184 (2013) .
+[7] Letinier, L. et al. Risk of drug-drug interactions in out-hospital drug dispensings in france: Results
+from the drug-drug interaction prevalence study. Frontiers in Pharmacology 10, 265 (2019) .
+[8] Jiang, H. et al. Adverse drug reactions and correlations with drug–drug interactions: A retrospective
+study of reports from 2011 to 2020. Frontiers in Pharmacology 13 (2022) .
+[9] Marijon, E. et al.
+Causes of death and influencing factors in patients with atrial fibrillation: A
+competing-risk analysis from the randomized evaluation of long-term anticoagulant therapy study.
+Circulation 128 (20), 2192–2201 (2013) .
+[10] Zitnik, M., Agrawal, M. & Leskovec, J. Modeling polypharmacy side effects with graph convolutional
+networks. Bioinformatics 34 (13), i457–i466 (2018) .
+[11] Huang, K., Xiao, C., Glass, L. M., Zitnik, M. & Sun, J. SkipGNN: Predicting molecular interactions
+with skip-graph networks. Scientific Reports 10 (1), 1–16 (2020) .
+[12] Derry, S., Kong Loke, Y. & Aronson, J. K. Incomplete evidence: The inadequacy of databases in
+tracing published adverse drug reactions in clinical trials. BMC Medical Research Methodology 1 (1),
+1–6 (2001) .
+[13] Wishart, D. S. et al. DrugBank 5.0: A major update to the DrugBank database for 2018. Nucleic
+Acids Research 46 (D1), D1074–D1082 (2018) .
+[14] Perozzi, B., Al-Rfou, R. & Skiena, S.
+Macskassy, S. A., Perlich, C., Leskovec, J., Wang, W. &
+Ghani, R. (eds) DeepWalk: Online learning of social representations. (eds Macskassy, S. A., Perlich,
+C., Leskovec, J., Wang, W. & Ghani, R.) The 20th ACM SIGKDD International Conference on
+Knowledge Discovery and Data Mining, 701–710 (2014).
+[15] Yao, J., Sun, W., Jian, Z., Wu, Q. & Wang, X. Effective knowledge graph embeddings based on
+multidirectional semantics relations for polypharmacy side effects prediction. Bioinformatics 38 (8),
+2315–2322 (2022) .
+
+20
+KnowDDI
+[16] Bonner, S. et al. A review of biomedical datasets relating to drug discovery: A knowledge graph
+perspective. arXiv preprint arXiv:2102.10062 (2021) .
+[17] Himmelstein, D. S. & Baranzini, S. E. Heterogeneous network edge prediction: A data integration
+approach to prioritize disease-associated genes. PLoS Computational Biology 11 (7), e1004259 (2015)
+.
+[18] Himmelstein, D. S. & Baranzini, S. E. Heterogeneous network edge prediction: A data integration
+approach to prioritize disease-associated genes (2015). URL https://het.io/. Hetionet Knowledge
+Graph.
+[19] Zheng, S. et al. PharmKG: A dedicated knowledge graph benchmark for bomedical data mining.
+Briefings in Bioinformatics 22 (4), bbaa344 (2021) .
+[20] Chandak, P., Huang, K. & Zitnik, M. Building a knowledge graph to enable precision medicine.
+Scientific Data 10 (1), 67 (2023) .
+[21] Lin, X., Quan, Z., Wang, Z.-J., Ma, T. & Zeng, X. Bessiere, C. (ed.) KGNN: Knowledge graph neural
+network for drug-drug interaction prediction. (ed.Bessiere, C.) International Joint Conference on
+Artificial Intelligence, Vol. 380, 2739–2745 (2020).
+[22] Teru, K., Denis, E. & Hamilton, W. III, H. D. & Singh, A. (eds) Inductive relation prediction by
+subgraph reasoning. (eds III, H. D. & Singh, A.) International Conference on Machine Learning,
+9448–9457 (2020).
+[23] Yu, Y. et al.
+SumGNN: Multi-typed drug interaction prediction via efficient knowledge graph
+summarization. Bioinformatics 37 (18), 2988–2995 (2021) .
+[24] Hong, Y., Luo, P., Jin, S. & Liu, X. LaGAT: link-aware graph attention network for drug–drug
+interaction prediction. Bioinformatics 38 (24), 5406–5412 (2022) .
+[25] Hamilton, W., Ying, Z. & Leskovec, J. Guyon, I. et al. (eds) Inductive representation learning on
+large graphs. (eds Guyon, I. et al.) Advances in Neural Information Processing Systems, 1024–1034
+(2017).
+[26] Vashishth, S., Sanyal, S., Nitin, V. & Talukdar, P. Composition-based multi-relational graph con-
+volutional networks (2020).
+Paper presented at the 8th International Conference on Learning
+Representations.
+[27] Sadeghian, A., Armandpour, M., Ding, P. & Wang, D. Wallach, H. M. et al. (eds) DRUM: End-to-
+end differentiable rule mining on knowledge graphs. (eds Wallach, H. M. et al.) Advances in Neural
+Information Processing Systems, 15347–15357 (2019).
+[28] Kingma, D. P. & Ba, J. Adam: A method for stochastic optimization (2015). Paper presented at
+the 3rd International Conference on Learning Representations.
+[29] Tatonetti, N. P., Patrick, P. Y., Daneshjou, R. & Altman, R. B. Data-driven prediction of drug
+effects and interactions. Science Translational Medicine 4 (125), 125ra31 (2012) .
+[30] Hu, W. et al. Larochelle, H., Ranzato, M., Hadsell, R., Balcan, M. & Lin, H. (eds) Open graph
+benchmark: Datasets for machine learning on graphs. (eds Larochelle, H., Ranzato, M., Hadsell, R.,
+Balcan, M. & Lin, H.) Advances in Neural Information Processing Systems, Vol. 33, 22118–22133
+(2020).
+
+KnowDDI
+21
+[31] Breit, A., Ott, S., Agibetov, A. & Samwald, M.
+OpenBioLink: A benchmarking framework for
+large-scale biomedical link prediction. Bioinformatics 36 (13), 4097–4098 (2020) .
+[32] Wishart, D. S. et al. DrugBank 5.0: A major update to the DrugBank database for 2018 (2018).
+URL https://www.drugbank.ca/. DrugBank Database.
+[33] Tatonetti, N. P., Patrick, P. Y., Daneshjou, R. & Altman, R. B. Data-driven prediction of drug effects
+and interactions (2012). URL https://tatonettilab.org/resources/nsides/. TWOSIDES Database.
+[34] Bordes, A., Usunier, N., Garcia-Duran, A., Weston, J. & Yakhnenko, O. Burges, C. J. C., Bottou,
+L., Ghahramani, Z. & Weinberger, K. Q. (eds) Translating embeddings for modeling multi-relational
+data. (eds Burges, C. J. C., Bottou, L., Ghahramani, Z. & Weinberger, K. Q.) Advances in Neural
+Information Processing Systems, 2787–2795 (2013).
+[35] Karim, M. R. et al. Shi, X. M., Buck, M., Ma, J. & Veltri, P. (eds) Drug-drug interaction prediction
+based on knowledge graph embeddings and convolutional-LSTM network. (eds Shi, X. M., Buck, M.,
+Ma, J. & Veltri, P.) ACM International Conference on Bioinformatics, Computational Biology and
+Health Informatics, 113–123 (2019).
+[36] Karim,
+M.
+R.
+et
+al.
+Drug-drug
+interaction
+prediction
+based
+on
+knowledge
+graph
+embeddings and convolutional-LSTM network (2019).
+URL https://github.com/rezacsedu/
+Drug-Drug-Interaction-Prediction. Codes of KG-DDI.
+[37] Yao, J., Sun, W., Jian, Z., Wu, Q. & Wang, X. Effective knowledge graph embeddings based on
+multidirectional semantics relations for polypharmacy side effects prediction (2022). URL https:
+//github.com/galaxysunwen/MSTE-master. Codes of MSTE.
+[38] Perozzi, B., Al-Rfou, R. & Skiena, S. DeepWalk: Online learning of social representations (2014).
+URL https://github.com/phanein/deepwalk. Codes of DeepWalk.
+[39] Grover, A. & Leskovec, J. Krishnapuram, B. et al. (eds) node2vec: Scalable feature learning for
+networks. (eds Krishnapuram, B. et al.) ACM SIGKDD International Conference on Knowledge
+Discovery and Data Mining, 855–864 (2016).
+[40] Grover, A. & Leskovec, J. node2vec: Scalable feature learning for networks (2016). URL https:
+//github.com/shenweichen/GraphEmbedding. Codes of node2vec.
+[41] Tang, J. et al. Gangemi, A., Leonardi, S. & Panconesi, A. (eds) LINE: Large-scale information
+network embedding. (eds Gangemi, A., Leonardi, S. & Panconesi, A.) International Conference on
+World Wide Web, 1067–1077 (2015).
+[42] Tang, J. et al. LINE: Large-scale information network embedding (2015). URL https://github.com/
+tangjianpku/LINE. Codes of LINE.
+[43] Kipf, T. & Welling, M. Semi-supervised classification with graph convolutional networks (2017).
+Paper presented at the 5th International Conference on Learning Representations.
+[44] Veliˇckovi´c, P. et al. Graph attention networks (2018). Paper presented at the 6th International
+Conference on Learning Representations.
+[45] Veliˇckovi´c, P. et al.
+Graph attention networks (2018).
+URL https://github.com/PetarV-/GAT.
+Codes of GAT.
+
+22
+KnowDDI
+[46] Zitnik, M., Agrawal, M. & Leskovec, J. Modeling polypharmacy side effects with graph convolutional
+networks (2018). URL https://github.com/mims-harvard/decagon. Codes of Decagon.
+[47] Huang, K., Xiao, C., Glass, L. M., Zitnik, M. & Sun, J. SkipGNN: Predicting molecular interactions
+with skip-graph networks (2020). URL https://github.com/kexinhuang12345/SkipGNN. Codes of
+SkipGNN.
+[48] Teru, K., Denis, E. & Hamilton, W. Inductive relation prediction by subgraph reasoning (2020).
+URL https://github.com/kkteru/grail. Codes of GraIL.
+[49] Lin, X., Quan, Z., Wang, Z.-J., Ma, T. & Zeng, X.
+KGNN: Knowledge graph neural network
+for drug-drug interaction prediction. (2020). URL https://github.com/xzenglab/KGNN. Codes of
+KGNN.
+[50] Su, X., Hu, L., You, Z., Hu, P. & Zhao, B. Attention-based knowledge graph representation learning
+for predicting drug-drug interactions. Briefings in Bioinformatics 23 (3) (2022) .
+[51] Su, X., Hu, L., You, Z., Hu, P. & Zhao, B. Attention-based knowledge graph representation learning
+for predicting drug-drug interactions (2022). URL https://github.com/Blair1213/DDKG. Codes of
+DDKG.
+[52] Yu, Y. et al.
+SumGNN: Multi-typed drug interaction prediction via efficient knowledge graph
+summarization (2021). URL https://github.com/yueyu1030/SumGNN. Codes of SumGNN.
+[53] Hong, Y., Luo, P., Jin, S. & Liu, X. LaGAT: link-aware graph attention network for drug–drug
+interaction prediction (2022). URL https://github.com/Azra3lzz/LaGAT. Codes of LaGAT.
+[54] Van der Maaten, L. & Hinton, G. Visualizing data using t-SNE. Journal of Machine Learning
+Research 9 (11) (2008) .
+[55] Schlichtkrull, M. et al. Gangemi, A. et al. (eds) Modeling relational data with graph convolutional
+networks.
+(eds Gangemi, A. et al.) The Semantic Web: 15th International Conference, 593–607
+(2018).
+[56] Zhang, M. & Chen, Y. Bengio, S. et al. (eds) Link prediction based on graph neural networks. (eds
+Bengio, S. et al.) Advances in Neural Information Processing Systems, 5171–5181 (2018).
+[57] Wang, Y., Yang, Z. & Yao, Q. Accurate and interpretable drug-drug interaction prediction enabled
+by knowledge subgraph learning (2024). URL https://github.com/LARS-research/KnowDDI/tree/
+main/data. Processed data used in KnowDDI.
+[58] Wang, Y., Yang, Z. & Yao, Q. Accurate and interpretable drug-drug interaction prediction enabled
+by knowledge subgraph learning (2024). URL https://github.com/LARS-research/KnowDDI. Codes
+of KnowDDI hosted by GitHub.
+[59] Wang, Y., Yang, Z. & Yao, Q. Accurate and interpretable drug-drug interaction prediction enabled by
+knowledge subgraph learning (2023). URL https://doi.org/10.5281/zenodo.10285646. Code version
+submitted for review available at Zenodo.

@@ -1,0 +1,47 @@
+{
+  "model": "claude-sonnet-4-5-20250929",
+  "design": "pair-conditional composition selector \u2192 reasoner",
+  "modality": "effect only",
+  "sample_sizes": {
+    "PD_pos": 30,
+    "PK_pos": 30,
+    "neg": 30
+  },
+  "results": {
+    "PD_effect_paircond": {
+      "n_pos": 30,
+      "n_neg": 30,
+      "auc": 0.62,
+      "auc_ci_95": [
+        0.4765227422830923,
+        0.761092259399551
+      ],
+      "pos_mean": 0.468,
+      "neg_mean": 0.36233333333333334
+    },
+    "PK_effect_paircond": {
+      "n_pos": 30,
+      "n_neg": 30,
+      "auc": 0.48500000000000004,
+      "auc_ci_95": [
+        0.3420743427579366,
+        0.6239731703459517
+      ],
+      "pos_mean": 0.32233333333333325,
+      "neg_mean": 0.36233333333333334
+    }
+  },
+  "selection_stats": {
+    "mean_pairs_per_drug_pair": 0.9333333333333333,
+    "zero_sel": 17,
+    "one_sel": 62,
+    "two_sel": 11
+  },
+  "tokens": {
+    "selector_in": 46938,
+    "selector_out": 3786,
+    "reasoner_in": 15494,
+    "reasoner_out": 4876
+  },
+  "cost_usd_est": 0.317226
+}

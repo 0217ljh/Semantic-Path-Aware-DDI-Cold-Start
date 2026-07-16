@@ -1,0 +1,32 @@
+{
+  "train": {
+    "n_sampled": 2000,
+    "n_reachable": 1919,
+    "n_unreachable_within_5_hops": 81,
+    "median": 2.0,
+    "mean": 2.2615945805106827,
+    "q25": 2.0,
+    "q75": 2.0,
+    "hist": {
+      "2": 1545,
+      "3": 248,
+      "4": 124,
+      "5": 2
+    }
+  },
+  "test_s2": {
+    "n_sampled": 2000,
+    "n_reachable": 1915,
+    "n_unreachable_within_5_hops": 85,
+    "median": 2.0,
+    "mean": 2.2720626631853786,
+    "q25": 2.0,
+    "q75": 2.0,
+    "hist": {
+      "2": 1517,
+      "3": 276,
+      "4": 121,
+      "5": 1
+    }
+  }
+}

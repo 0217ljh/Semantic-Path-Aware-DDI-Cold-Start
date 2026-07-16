@@ -1,0 +1,90 @@
+{
+  "model": "claude-sonnet-4-5-20250929",
+  "design": "two-stage (selector name-blind \u2192 reasoner anonymized)",
+  "sample_sizes": {
+    "PD_pos": 30,
+    "PK_pos": 30,
+    "neg": 30,
+    "unique_drugs": 136
+  },
+  "two_stage_results": {
+    "PD_effect_two": {
+      "n_pos": 30,
+      "n_neg": 30,
+      "auc": 0.6133333333333333,
+      "auc_ci_95": [
+        0.49157483878968256,
+        0.7354921048280423
+      ],
+      "pos_mean": 0.2813333333333334,
+      "neg_mean": 0.1806666666666667
+    },
+    "PD_molecular_two": {
+      "n_pos": 30,
+      "n_neg": 30,
+      "auc": 0.5094444444444444,
+      "auc_ci_95": [
+        0.3633194444444445,
+        0.6503035420513682
+      ],
+      "pos_mean": 0.16300000000000006,
+      "neg_mean": 0.11666666666666665
+    },
+    "PK_effect_two": {
+      "n_pos": 30,
+      "n_neg": 30,
+      "auc": 0.5183333333333333,
+      "auc_ci_95": [
+        0.3947758009453782,
+        0.6403579266899624
+      ],
+      "pos_mean": 0.21233333333333337,
+      "neg_mean": 0.1806666666666667
+    },
+    "PK_molecular_two": {
+      "n_pos": 30,
+      "n_neg": 30,
+      "auc": 0.5416666666666666,
+      "auc_ci_95": [
+        0.4004202802916038,
+        0.6763217656274828
+      ],
+      "pos_mean": 0.19,
+      "neg_mean": 0.11666666666666665
+    }
+  },
+  "two_stage_paired_diffs": {
+    "PD": {
+      "effect_minus_molecular": {
+        "mean": 0.1133627445540837,
+        "ci": [
+          -0.07064794215795332,
+          0.3030138156114719
+        ]
+      },
+      "n": 60
+    },
+    "PK": {
+      "effect_minus_molecular": {
+        "mean": -0.021458512202257213,
+        "ci": [
+          -0.21820922745952284,
+          0.18522778892082215
+        ]
+      },
+      "n": 60
+    }
+  },
+  "tokens": {
+    "selector_in": 73188,
+    "selector_out": 5700,
+    "reasoner_in": 43151,
+    "reasoner_out": 12979
+  },
+  "cost_usd_est": 0.629202,
+  "selection_stats": {
+    "mean": 2.8419117647058822,
+    "min": 1,
+    "max": 3
+  }
+}

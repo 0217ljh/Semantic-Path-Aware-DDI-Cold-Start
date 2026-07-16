@@ -1,0 +1,169 @@
+============ Initialized logger ============
+add_feat_emb: True	 add_ht_emb: True	 add_sb_emb: True	 add_transe_emb: True	 add_traspose_rels: False	 attn_rel_emb_dim: 32	 batch_size: 256	 clip: 1000	 constrained_neg_prob: 0.0	 dataset: drugbank	 disable_cuda: False	 dropout: 0.3	 early_stop: 100	 edge_dropout: 0.4	 emb_dim: 32	 enclosing_sub_graph: True	 eval_every: 3	 eval_every_iter: 5	 exp_dir: utils/../experiments/drugbank_gate	 experiment_name: drugbank_gate	 feat: morgan	 feat_dim: 1024	 gamma: 0.2	 gnn_agg_type: sum	 gpu: 0	 has_attn: True	 has_kg: True	 hop: 2	 kge_model: TransE	 l2: 1e-05	 load_model: False	 lr: 0.005	 main_dir: utils/..	 max_links: 3000	 max_nodes_per_hop: 200	 model_type: dgl	 num_bases: 10	 num_epochs: 1	 num_gcn_layers: 2	 num_neg_samples_per_link: 0	 num_workers: 8	 optimizer: Adam	 rel_emb_dim: 32	 save_every: 10	 seed: 42	 test_file: test	 train_file: train	 use_kge_embeddings: False	 valid_file: dev
+============================================
+Sampling negative links for train
+Sampling negative links for valid
+Sampling negative links for test
+============ Initialized logger ============
+add_feat_emb: True	 add_ht_emb: True	 add_sb_emb: True	 add_transe_emb: True	 add_traspose_rels: False	 attn_rel_emb_dim: 32	 batch_size: 256	 clip: 1000	 constrained_neg_prob: 0.0	 dataset: drugbank	 disable_cuda: False	 dropout: 0.3	 early_stop: 100	 edge_dropout: 0.4	 emb_dim: 32	 enclosing_sub_graph: True	 eval_every: 3	 eval_every_iter: 5	 exp_dir: utils/../experiments/drugbank_gate	 experiment_name: drugbank_gate	 feat: morgan	 feat_dim: 1024	 gamma: 0.2	 gnn_agg_type: sum	 gpu: 0	 has_attn: True	 has_kg: True	 hop: 2	 kge_model: TransE	 l2: 1e-05	 load_model: False	 lr: 0.005	 main_dir: utils/..	 max_links: 3000	 max_nodes_per_hop: 200	 model_type: dgl	 num_bases: 10	 num_epochs: 1	 num_gcn_layers: 2	 num_neg_samples_per_link: 0	 num_workers: 8	 optimizer: Adam	 rel_emb_dim: 32	 save_every: 10	 seed: 42	 test_file: test	 train_file: train	 use_kge_embeddings: False	 valid_file: dev
+============================================
+Sampling negative links for train
+Sampling negative links for valid
+Sampling negative links for test
+Extracting enclosing subgraphs for positive links in train set
+Extracting enclosing subgraphs for negative links in train set
+Extracting enclosing subgraphs for positive links in valid set
+============ Initialized logger ============
+add_feat_emb: True	 add_ht_emb: True	 add_sb_emb: True	 add_transe_emb: True	 add_traspose_rels: False	 attn_rel_emb_dim: 32	 batch_size: 256	 clip: 1000	 constrained_neg_prob: 0.0	 dataset: drugbank	 disable_cuda: False	 dropout: 0.3	 early_stop: 100	 edge_dropout: 0.4	 emb_dim: 32	 enclosing_sub_graph: True	 eval_every: 3	 eval_every_iter: 8	 exp_dir: utils/../experiments/drugbank_gate	 experiment_name: drugbank_gate	 feat: morgan	 feat_dim: 1024	 gamma: 0.2	 gnn_agg_type: sum	 gpu: 0	 has_attn: True	 has_kg: True	 hop: 2	 kge_model: TransE	 l2: 1e-05	 load_model: False	 lr: 0.005	 main_dir: utils/..	 max_links: 3000	 max_nodes_per_hop: 200	 model_type: dgl	 num_bases: 10	 num_epochs: 6	 num_gcn_layers: 2	 num_neg_samples_per_link: 0	 num_workers: 12	 optimizer: Adam	 rel_emb_dim: 32	 save_every: 10	 seed: 42	 test_file: test	 train_file: train	 use_kge_embeddings: False	 valid_file: dev
+============================================
+Sampling negative links for train
+Sampling negative links for valid
+Sampling negative links for test
+Extracting enclosing subgraphs for positive links in train set
+Extracting enclosing subgraphs for negative links in train set
+Extracting enclosing subgraphs for positive links in valid set
+Extracting enclosing subgraphs for negative links in valid set
+Extracting enclosing subgraphs for positive links in test set
+Extracting enclosing subgraphs for negative links in test set
+Max distance from sub : 2, Max distance from obj : 2
+============ Initialized logger ============
+add_feat_emb: True	 add_ht_emb: True	 add_sb_emb: True	 add_transe_emb: True	 add_traspose_rels: False	 attn_rel_emb_dim: 32	 batch_size: 256	 clip: 1000	 constrained_neg_prob: 0.0	 dataset: drugbank	 disable_cuda: False	 dropout: 0.3	 early_stop: 100	 edge_dropout: 0.4	 emb_dim: 32	 enclosing_sub_graph: True	 eval_every: 3	 eval_every_iter: 8	 exp_dir: utils/../experiments/drugbank_gate	 experiment_name: drugbank_gate	 feat: morgan	 feat_dim: 1024	 gamma: 0.2	 gnn_agg_type: sum	 gpu: 0	 has_attn: True	 has_kg: True	 hop: 2	 kge_model: TransE	 l2: 1e-05	 load_model: False	 lr: 0.005	 main_dir: utils/..	 max_links: 3000	 max_nodes_per_hop: 200	 model_type: dgl	 num_bases: 10	 num_epochs: 6	 num_gcn_layers: 2	 num_neg_samples_per_link: 0	 num_workers: 12	 optimizer: Adam	 rel_emb_dim: 32	 save_every: 10	 seed: 42	 test_file: test	 train_file: train	 use_kge_embeddings: False	 valid_file: dev
+============================================
+Max distance from sub : 2, Max distance from obj : 2
+============ Initialized logger ============
+add_feat_emb: True	 add_ht_emb: True	 add_sb_emb: True	 add_transe_emb: True	 add_traspose_rels: False	 attn_rel_emb_dim: 32	 batch_size: 256	 clip: 1000	 constrained_neg_prob: 0.0	 dataset: drugbank	 disable_cuda: False	 dropout: 0.3	 early_stop: 100	 edge_dropout: 0.4	 emb_dim: 32	 enclosing_sub_graph: True	 eval_every: 3	 eval_every_iter: 8	 exp_dir: utils/../experiments/drugbank_gate	 experiment_name: drugbank_gate	 feat: morgan	 feat_dim: 1024	 gamma: 0.2	 gnn_agg_type: sum	 gpu: 0	 has_attn: True	 has_kg: True	 hop: 2	 kge_model: TransE	 l2: 1e-05	 load_model: False	 lr: 0.005	 main_dir: utils/..	 max_links: 3000	 max_nodes_per_hop: 200	 model_type: dgl	 num_bases: 10	 num_epochs: 6	 num_gcn_layers: 2	 num_neg_samples_per_link: 0	 num_workers: 12	 optimizer: Adam	 rel_emb_dim: 32	 save_every: 10	 seed: 42	 test_file: test	 train_file: train	 use_kge_embeddings: False	 valid_file: dev
+============================================
+Max distance from sub : 2, Max distance from obj : 2
+Max distance from sub : 2, Max distance from obj : 2
+Max distance from sub : 2, Max distance from obj : 2
+Device: cuda:0  inp_dim=6 num_rels=86 aug_num_rels=109
+No existing model found. Initializing new model..
+Total number of parameters: 1217018
+Starting SumGNN gate training...
+============ Initialized logger ============
+add_feat_emb: True	 add_ht_emb: True	 add_sb_emb: True	 add_transe_emb: True	 add_traspose_rels: False	 attn_rel_emb_dim: 32	 batch_size: 256	 clip: 1000	 constrained_neg_prob: 0.0	 dataset: drugbank	 disable_cuda: False	 dropout: 0.3	 early_stop: 100	 edge_dropout: 0.4	 emb_dim: 32	 enclosing_sub_graph: True	 eval_every: 3	 eval_every_iter: 8	 exp_dir: utils/../experiments/drugbank_gate	 experiment_name: drugbank_gate	 feat: morgan	 feat_dim: 1024	 gamma: 0.2	 gnn_agg_type: sum	 gpu: 0	 has_attn: True	 has_kg: True	 hop: 2	 kge_model: TransE	 l2: 1e-05	 load_model: False	 lr: 0.005	 main_dir: utils/..	 max_links: 3000	 max_nodes_per_hop: 200	 model_type: dgl	 num_bases: 10	 num_epochs: 6	 num_gcn_layers: 2	 num_neg_samples_per_link: 0	 num_workers: 12	 optimizer: Adam	 rel_emb_dim: 32	 save_every: 10	 seed: 42	 test_file: test	 train_file: train	 use_kge_embeddings: False	 valid_file: dev
+============================================
+Max distance from sub : 2, Max distance from obj : 2
+Max distance from sub : 2, Max distance from obj : 2
+Max distance from sub : 2, Max distance from obj : 2
+Device: cuda:0  inp_dim=6 num_rels=86 aug_num_rels=109
+No existing model found. Initializing new model..
+Total number of parameters: 1217018
+Starting SumGNN gate training...
+============ Initialized logger ============
+add_feat_emb: True	 add_ht_emb: True	 add_sb_emb: True	 add_transe_emb: True	 add_traspose_rels: False	 attn_rel_emb_dim: 32	 batch_size: 256	 clip: 1000	 constrained_neg_prob: 0.0	 dataset: drugbank	 disable_cuda: False	 dropout: 0.3	 early_stop: 100	 edge_dropout: 0.4	 emb_dim: 32	 enclosing_sub_graph: True	 eval_every: 3	 eval_every_iter: 8	 exp_dir: utils/../experiments/drugbank_gate	 experiment_name: drugbank_gate	 feat: morgan	 feat_dim: 1024	 gamma: 0.2	 gnn_agg_type: sum	 gpu: 0	 has_attn: True	 has_kg: True	 hop: 2	 kge_model: TransE	 l2: 1e-05	 load_model: False	 lr: 0.005	 main_dir: utils/..	 max_links: 3000	 max_nodes_per_hop: 200	 model_type: dgl	 num_bases: 10	 num_epochs: 6	 num_gcn_layers: 2	 num_neg_samples_per_link: 0	 num_workers: 12	 optimizer: Adam	 rel_emb_dim: 32	 save_every: 10	 seed: 42	 test_file: test	 train_file: train	 use_kge_embeddings: False	 valid_file: dev
+============================================
+Max distance from sub : 2, Max distance from obj : 2
+Max distance from sub : 2, Max distance from obj : 2
+Max distance from sub : 2, Max distance from obj : 2
+Device: cuda:0  inp_dim=6 num_rels=86 aug_num_rels=109
+No existing model found. Initializing new model..
+Total number of parameters: 1217018
+Starting SumGNN gate training...
+[95m Eval Performance:{'auc': 0.015206903724578646, 'microf1': 0.352, 'k': 0.06431367440105318}in 173.35040521621704[0m
+[93m Test Performance:{'auc': 0.015057922803550478, 'microf1': 0.34833333333333333, 'k': 0.07038464202517603}in 173.35105085372925[0m
+Better models found w.r.t accuracy. Saved it!
+[93m Test Performance Per Class:{'f1': array([0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.07317073, 0.        , 0.49179446, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.42885772, 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        ])}in 173.43332529067993[0m
+Epoch 1 with loss: 3.3625575412403452, training auc: 0.014518054562243816, training auc_pr: 0.25633333333333336, best validation AUC: 0.015206903724578646, weight_norm: 126.04060363769531 in 287.6856746673584
+[95m Eval Performance:{'auc': 0.03414694653410809, 'microf1': 0.45666666666666667, 'k': 0.2651293192061833}in 173.53955078125[0m
+[93m Test Performance:{'auc': 0.033442454432805274, 'microf1': 0.45666666666666667, 'k': 0.26968610391873893}in 173.54019951820374[0m
+Better models found w.r.t accuracy. Saved it!
+[93m Test Performance Per Class:{'f1': array([0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.4858156 , 0.        , 0.57652711, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.57918552, 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.53900709, 0.        , 0.02666667, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        ])}in 173.61819744110107[0m
+[95m Eval Performance:{'auc': 0.051449558503529336, 'microf1': 0.4806666666666667, 'k': 0.2892490324495681}in 173.4925549030304[0m
+[93m Test Performance:{'auc': 0.046383028086632076, 'microf1': 0.4876666666666667, 'k': 0.30604217385336674}in 173.4931514263153[0m
+Better models found w.r.t accuracy. Saved it!
+[93m Test Performance Per Class:{'f1': array([0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.11111111, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.6       , 0.        , 0.58799593, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.55172414,
+       0.57303371, 0.        , 0.        , 0.        , 0.1       ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.53741497, 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        ])}in 173.56395649909973[0m
+Epoch 2 with loss: 2.3043782060796563, training auc: 0.04241377594578577, training auc_pr: 0.47933333333333333, best validation AUC: 0.051449558503529336, weight_norm: 132.7930450439453 in 450.7997980117798
+[95m Eval Performance:{'auc': 0.08860656146743442, 'microf1': 0.5673333333333334, 'k': 0.4347346417373128}in 173.43588399887085[0m
+[93m Test Performance:{'auc': 0.08885598244526338, 'microf1': 0.5683333333333334, 'k': 0.43970141638001536}in 173.4364767074585[0m
+Better models found w.r.t accuracy. Saved it!
+[93m Test Performance Per Class:{'f1': array([0.        , 0.4       , 0.07894737, 0.        , 0.13559322,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.62275449, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.4       , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.7167955 , 0.        , 0.65856622, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.72222222,
+       0.63207547, 0.        , 0.        , 0.        , 0.55172414,
+       0.        , 0.        , 0.13095238, 0.        , 0.        ,
+       0.5880597 , 0.        , 0.22680412, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        ])}in 173.50908946990967[0m
+Epoch 3 with loss: 1.7636519236998125, training auc: 0.09039004392471615, training auc_pr: 0.5803333333333334, best validation AUC: 0.08860656146743442, weight_norm: 142.8739471435547 in 279.6100695133209
+[95m Eval Performance:{'auc': 0.13794231395607556, 'microf1': 0.6023333333333334, 'k': 0.4882225406869515}in 175.9072196483612[0m
+[93m Test Performance:{'auc': 0.13422056019216472, 'microf1': 0.6086666666666667, 'k': 0.4997650799097588}in 175.9077751636505[0m
+Better models found w.r.t accuracy. Saved it!
+[93m Test Performance Per Class:{'f1': array([0.        , 0.5       , 0.43165468, 0.        , 0.59340659,
+       0.        , 0.        , 0.        , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.02150538, 0.        ,
+       0.        , 0.        , 0.66326531, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.52631579, 0.        ,
+       0.        , 0.81481481, 0.        , 0.        , 0.        ,
+       0.        , 0.19607843, 0.        , 0.        , 0.        ,
+       0.76300578, 0.        , 0.68613139, 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.77777778,
+       0.61666667, 0.        , 0.        , 0.        , 0.81081081,
+       0.        , 0.        , 0.15568862, 0.        , 0.15789474,
+       0.61786237, 0.        , 0.3923445 , 0.        , 0.        ,
+       0.        , 0.        , 0.        , 0.        , 0.13333333,
+       0.        ])}in 175.98112297058105[0m
+============ Initialized logger ============
+add_feat_emb: True	 add_ht_emb: True	 add_sb_emb: True	 add_transe_emb: True	 add_traspose_rels: False	 attn_rel_emb_dim: 32	 batch_size: 256	 clip: 1000	 constrained_neg_prob: 0.0	 dataset: drugbank	 disable_cuda: False	 dropout: 0.3	 early_stop: 100	 edge_dropout: 0.4	 emb_dim: 32	 enclosing_sub_graph: True	 eval_every: 3	 eval_every_iter: 100000	 exp_dir: utils/../experiments/drugbank_gate	 experiment_name: drugbank_gate	 feat: morgan	 feat_dim: 1024	 gamma: 0.2	 gnn_agg_type: sum	 gpu: 0	 has_attn: True	 has_kg: True	 hop: 2	 kge_model: TransE	 l2: 1e-05	 load_model: False	 lr: 0.005	 main_dir: utils/..	 max_links: 12000	 max_nodes_per_hop: 200	 model_type: dgl	 num_bases: 10	 num_epochs: 10	 num_gcn_layers: 2	 num_neg_samples_per_link: 0	 num_workers: 14	 optimizer: Adam	 rel_emb_dim: 32	 save_every: 10	 seed: 42	 test_file: test	 train_file: train	 use_kge_embeddings: False	 valid_file: dev
+============================================
+Sampling negative links for train
+Sampling negative links for valid
+Sampling negative links for test
+Extracting enclosing subgraphs for positive links in train set
+Extracting enclosing subgraphs for negative links in train set
+Extracting enclosing subgraphs for positive links in valid set
+============ Initialized logger ============
+add_feat_emb: True	 add_ht_emb: True	 add_sb_emb: True	 add_transe_emb: True	 add_traspose_rels: False	 attn_rel_emb_dim: 32	 batch_size: 256	 clip: 1000	 constrained_neg_prob: 0.0	 dataset: drugbank	 disable_cuda: False	 dropout: 0.3	 early_stop: 100	 edge_dropout: 0.4	 emb_dim: 32	 enclosing_sub_graph: True	 eval_every: 3	 eval_every_iter: 100000	 exp_dir: utils/../experiments/drugbank_gate	 experiment_name: drugbank_gate	 feat: morgan	 feat_dim: 1024	 gamma: 0.2	 gnn_agg_type: sum	 gpu: 0	 has_attn: True	 has_kg: True	 hop: 2	 kge_model: TransE	 l2: 1e-05	 load_model: False	 lr: 0.005	 main_dir: utils/..	 max_links: 3000	 max_nodes_per_hop: 200	 model_type: dgl	 num_bases: 10	 num_epochs: 1	 num_gcn_layers: 2	 num_neg_samples_per_link: 0	 num_workers: 10	 optimizer: Adam	 rel_emb_dim: 32	 save_every: 10	 seed: 42	 test_file: test	 train_file: train	 use_kge_embeddings: False	 valid_file: dev
+============================================
+Max distance from sub : 2, Max distance from obj : 2
+Max distance from sub : 2, Max distance from obj : 2
+Max distance from sub : 2, Max distance from obj : 2
+Device: cuda:0  inp_dim=6 num_rels=86 aug_num_rels=109
+No existing model found. Initializing new model..
+Total number of parameters: 1217018
+Starting SumGNN gate training...

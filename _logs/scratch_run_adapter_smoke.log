@@ -1,0 +1,40 @@
+[coverage] dropped (drug outside model KG): train=0 cold_val=0 cold_test=0 seen_ddi=108
+[ep 1/3] loss=0.6913 cold_val auroc=nan | {'acc': 0.0, 'auroc': nan, 'f1': 0.0} (1s)
+[ep 2/3] loss=0.6969 cold_val auroc=nan | {'acc': 0.75, 'auroc': nan, 'f1': 0.857143} (0s)
+[ep 3/3] loss=0.6836 cold_val auroc=nan | {'acc': 0.89, 'auroc': nan, 'f1': 0.941799} (0s)
+[warn] no cold-val selection made (val metric NaN?); using final-epoch state
+[select] cold-best auroc=nan @ep3 (train 2s)
+[cold-test] {'acc': 1.0, 'auroc': nan, 'f1': 1.0}
+[done] scratch_run_adapter_smoke (total 7s)
+[coverage] dropped (drug outside model KG): train=0 cold_val=0 cold_test=0 seen_ddi=108
+[ep 1/3] loss=0.6913 cold_val auroc=nan | {'acc': 0.0, 'auroc': nan, 'f1': 0.0} (1s)
+[ep 2/3] loss=0.6969 cold_val auroc=nan | {'acc': 0.75, 'auroc': nan, 'f1': 0.857143} (0s)
+[ep 3/3] loss=0.6836 cold_val auroc=nan | {'acc': 0.89, 'auroc': nan, 'f1': 0.941799} (0s)
+[warn] no cold-val selection made (val metric NaN?); using final-epoch state
+[select] cold-best auroc=nan @ep3 (train 2s)
+[cold-test] {'acc': 1.0, 'auroc': nan, 'f1': 1.0}
+[done] scratch_run_adapter_smoke (total 6s)
+[coverage] dropped (drug outside model KG): train=0 cold_val=0 cold_test=0 seen_ddi=108
+[ep 1/3] loss=0.6911 cold_val auroc=nan | {'acc': 0.0, 'auroc': nan, 'f1': 0.0} (2s)
+[ep 2/3] loss=0.6961 cold_val auroc=nan | {'acc': 0.77, 'auroc': nan, 'f1': 0.870056} (1s)
+[ep 3/3] loss=0.6837 cold_val auroc=nan | {'acc': 0.74, 'auroc': nan, 'f1': 0.850575} (1s)
+[warn] no cold-val selection made (val metric NaN?); using final-epoch state
+[select] cold-best auroc=nan @ep3 (train 5s)
+[cold-test] {'acc': 0.98, 'auroc': nan, 'f1': 0.98989898989899}
+[done] scratch_run_adapter_smoke (total 10s)
+[coverage] dropped (drug outside model KG): train=0 cold_val=0 cold_test=0 seen_ddi=108
+[ep 1/3] loss=0.6897 cold_val auroc=nan | {'acc': 0.0, 'auroc': nan, 'f1': 0.0} (1s)
+[ep 2/3] loss=0.6893 cold_val auroc=nan | {'acc': 0.79, 'auroc': nan, 'f1': 0.882682} (1s)
+[ep 3/3] loss=0.6807 cold_val auroc=nan | {'acc': 0.63, 'auroc': nan, 'f1': 0.773006} (0s)
+[warn] no cold-val selection made (val metric NaN?); using final-epoch state
+[select] cold-best auroc=nan @ep3 (train 3s)
+[cold-test] {'acc': 0.67, 'auroc': nan, 'f1': 0.8023952095808383}
+[done] scratch_run_adapter_smoke (total 11s)
+[coverage] dropped (drug outside model KG): train=0 cold_val=0 cold_test=0 seen_ddi=108
+[ep 1/3] loss=0.6825 cold_val auroc=nan | {'acc': 0.02, 'auroc': nan, 'f1': 0.039216} (2s)
+[ep 2/3] loss=0.6654 cold_val auroc=nan | {'acc': 0.45, 'auroc': nan, 'f1': 0.62069} (1s)
+[ep 3/3] loss=0.6585 cold_val auroc=nan | {'acc': 0.38, 'auroc': nan, 'f1': 0.550725} (1s)
+[warn] no cold-val selection made (val metric NaN?); using final-epoch state
+[select] cold-best auroc=nan @ep3 (train 4s)
+[cold-test] {'acc': 0.33, 'auroc': nan, 'f1': 0.49624060150375937}
+[done] scratch_run_adapter_smoke (total 12s)

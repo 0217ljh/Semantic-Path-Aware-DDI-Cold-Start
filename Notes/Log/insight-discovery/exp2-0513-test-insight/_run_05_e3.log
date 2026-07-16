@@ -1,0 +1,311 @@
+[E3] device=cuda
+[E3] Loading nodes / edges / splits ...
+[E3] nodes=178029  edges=7099528
+[E3] Building edge_index ...
+[E3] edge_index shape: torch.Size([2, 7848735])
+[E3] train pairs: 408938  test_s2 pairs: 108738
+[E3] Building init features ...
+[E3] type_onehot dim = 23
+[E3] encoding 178029 strings via PubMedBERT (batch=128) ...
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 28611.91it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.predictions.decoder.weight             | UNEXPECTED |  | 
+cls.predictions.decoder.bias               | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+    128/178029 elapsed=0.3s
+    6528/178029 elapsed=0.9s
+    12928/178029 elapsed=1.8s
+    19328/178029 elapsed=2.6s
+    25728/178029 elapsed=3.2s
+    32128/178029 elapsed=3.8s
+    38528/178029 elapsed=4.4s
+    44928/178029 elapsed=5.3s
+    51328/178029 elapsed=6.1s
+    57728/178029 elapsed=7.5s
+    64128/178029 elapsed=8.5s
+    70528/178029 elapsed=9.1s
+    76928/178029 elapsed=9.6s
+    83328/178029 elapsed=10.2s
+    89728/178029 elapsed=10.8s
+    96128/178029 elapsed=11.6s
+    102528/178029 elapsed=12.4s
+    108928/178029 elapsed=13.3s
+    115328/178029 elapsed=14.2s
+    121728/178029 elapsed=14.5s
+    128128/178029 elapsed=15.3s
+    134528/178029 elapsed=16.2s
+    140928/178029 elapsed=17.0s
+    147328/178029 elapsed=17.8s
+    153728/178029 elapsed=18.6s
+    160128/178029 elapsed=19.5s
+    166528/178029 elapsed=20.5s
+    172928/178029 elapsed=21.6s
+[E3] cached → pubmedbert_real.npz
+[E3] encoding 178029 strings via PubMedBERT (batch=128) ...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 15950.97it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.predictions.decoder.weight             | UNEXPECTED |  | 
+cls.predictions.decoder.bias               | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+    128/178029 elapsed=0.0s
+    6528/178029 elapsed=0.7s
+    12928/178029 elapsed=1.6s
+    19328/178029 elapsed=2.4s
+    25728/178029 elapsed=3.1s
+    32128/178029 elapsed=3.8s
+    38528/178029 elapsed=4.5s
+    44928/178029 elapsed=5.4s
+    51328/178029 elapsed=6.1s
+    57728/178029 elapsed=7.0s
+    64128/178029 elapsed=7.9s
+    70528/178029 elapsed=8.5s
+    76928/178029 elapsed=9.1s
+    83328/178029 elapsed=9.7s
+    89728/178029 elapsed=10.4s
+    96128/178029 elapsed=11.2s
+    102528/178029 elapsed=12.1s
+    108928/178029 elapsed=13.2s
+    115328/178029 elapsed=14.2s
+    121728/178029 elapsed=15.2s
+    128128/178029 elapsed=16.3s
+    134528/178029 elapsed=17.3s
+    140928/178029 elapsed=18.3s
+    147328/178029 elapsed=19.1s
+    153728/178029 elapsed=19.9s
+    160128/178029 elapsed=20.8s
+    166528/178029 elapsed=21.8s
+    172928/178029 elapsed=22.9s
+[E3] cached → pubmedbert_shuffled.npz
+[E3] encoding 178029 strings via PubMedBERT (batch=128) ...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 19368.51it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.predictions.decoder.weight             | UNEXPECTED |  | 
+cls.predictions.decoder.bias               | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+    128/178029 elapsed=0.0s
+    6528/178029 elapsed=0.5s
+    12928/178029 elapsed=1.0s
+    19328/178029 elapsed=1.6s
+    25728/178029 elapsed=2.1s
+    32128/178029 elapsed=2.6s
+    38528/178029 elapsed=3.1s
+    44928/178029 elapsed=3.7s
+    51328/178029 elapsed=4.2s
+    57728/178029 elapsed=4.8s
+    64128/178029 elapsed=5.2s
+    70528/178029 elapsed=5.7s
+    76928/178029 elapsed=6.3s
+    83328/178029 elapsed=6.8s
+    89728/178029 elapsed=7.3s
+    96128/178029 elapsed=7.8s
+    102528/178029 elapsed=8.3s
+    108928/178029 elapsed=8.8s
+    115328/178029 elapsed=9.3s
+    121728/178029 elapsed=9.9s
+    128128/178029 elapsed=10.4s
+    134528/178029 elapsed=10.9s
+    140928/178029 elapsed=11.4s
+    147328/178029 elapsed=11.9s
+    153728/178029 elapsed=12.4s
+    160128/178029 elapsed=12.9s
+    166528/178029 elapsed=13.4s
+    172928/178029 elapsed=13.9s
+[E3] cached → pubmedbert_typename.npz
+
+[E3] training init=random  proj=random  seed=42
+    epoch  1/25  loss=0.6753  test_AUC=0.6123  best=0.6123
+    epoch  5/25  loss=0.6325  test_AUC=0.6271  best=0.6271
+    epoch 10/25  loss=0.6211  test_AUC=0.6281  best=0.6281
+    epoch 15/25  loss=0.6140  test_AUC=0.6302  best=0.6302
+    epoch 20/25  loss=0.6020  test_AUC=0.6216  best=0.6339
+    epoch 25/25  loss=0.5923  test_AUC=0.6258  best=0.6339
+    final best AUC=0.6339  time=39.6s
+
+[E3] training init=random  proj=random  seed=43
+    epoch  1/25  loss=0.6753  test_AUC=0.6122  best=0.6122
+    epoch  5/25  loss=0.6342  test_AUC=0.6337  best=0.6337
+    epoch 10/25  loss=0.6212  test_AUC=0.6370  best=0.6392
+    epoch 15/25  loss=0.6102  test_AUC=0.6385  best=0.6402
+    epoch 20/25  loss=0.5965  test_AUC=0.6397  best=0.6445
+    epoch 25/25  loss=0.5840  test_AUC=0.6382  best=0.6445
+    final best AUC=0.6445  time=38.4s
+
+[E3] training init=type_onehot  proj=random  seed=42
+    epoch  1/25  loss=0.6837  test_AUC=0.6212  best=0.6212
+    epoch  5/25  loss=0.6547  test_AUC=0.6506  best=0.6542
+    epoch 10/25  loss=0.6482  test_AUC=0.6626  best=0.6626
+    epoch 15/25  loss=0.6415  test_AUC=0.6738  best=0.6738
+    epoch 20/25  loss=0.6368  test_AUC=0.6721  best=0.6808
+    epoch 25/25  loss=0.6343  test_AUC=0.6842  best=0.6842
+    final best AUC=0.6842  time=38.8s
+
+[E3] training init=type_onehot  proj=random  seed=43
+    epoch  1/25  loss=0.6818  test_AUC=0.6267  best=0.6267
+    epoch  5/25  loss=0.6533  test_AUC=0.6578  best=0.6578
+    epoch 10/25  loss=0.6474  test_AUC=0.6661  best=0.6661
+    epoch 15/25  loss=0.6409  test_AUC=0.6721  best=0.6742
+    epoch 20/25  loss=0.6379  test_AUC=0.6870  best=0.6870
+    epoch 25/25  loss=0.6353  test_AUC=0.6807  best=0.6870
+    final best AUC=0.6870  time=38.8s
+
+[E3] training init=real_pubmedbert  proj=random  seed=42
+    epoch  1/25  loss=2.9169  test_AUC=0.6126  best=0.6126
+    epoch  5/25  loss=0.6668  test_AUC=0.6420  best=0.6420
+    epoch 10/25  loss=0.6641  test_AUC=0.6463  best=0.6463
+    epoch 15/25  loss=0.6557  test_AUC=0.6513  best=0.6513
+    epoch 20/25  loss=0.6532  test_AUC=0.6430  best=0.6568
+    epoch 25/25  loss=0.6529  test_AUC=0.6551  best=0.6568
+    final best AUC=0.6568  time=38.6s
+
+[E3] training init=real_pubmedbert  proj=random  seed=43
+    epoch  1/25  loss=2.6320  test_AUC=0.5982  best=0.5982
+    epoch  5/25  loss=0.6677  test_AUC=0.6290  best=0.6290
+    epoch 10/25  loss=0.6624  test_AUC=0.6409  best=0.6409
+    epoch 15/25  loss=0.6607  test_AUC=0.6437  best=0.6483
+    epoch 20/25  loss=0.6922  test_AUC=0.5135  best=0.6506
+    epoch 25/25  loss=0.6933  test_AUC=0.4979  best=0.6506
+    final best AUC=0.6506  time=39.2s
+
+[E3] training init=real_pubmedbert  proj=pca  seed=42
+    epoch  1/25  loss=0.7442  test_AUC=0.6446  best=0.6446
+    epoch  5/25  loss=0.6246  test_AUC=0.6956  best=0.6956
+    epoch 10/25  loss=0.5799  test_AUC=0.7017  best=0.7017
+    epoch 15/25  loss=0.5499  test_AUC=0.7006  best=0.7031
+    epoch 20/25  loss=0.5280  test_AUC=0.6994  best=0.7105
+    epoch 25/25  loss=0.5148  test_AUC=0.6968  best=0.7105
+    final best AUC=0.7105  time=39.2s
+
+[E3] training init=real_pubmedbert  proj=pca  seed=43
+    epoch  1/25  loss=0.7140  test_AUC=0.6450  best=0.6450
+    epoch  5/25  loss=0.6152  test_AUC=0.6996  best=0.6996
+    epoch 10/25  loss=0.5730  test_AUC=0.7054  best=0.7054
+    epoch 15/25  loss=0.5405  test_AUC=0.6984  best=0.7058
+    epoch 20/25  loss=0.5193  test_AUC=0.6994  best=0.7058
+    epoch 25/25  loss=0.5036  test_AUC=0.6904  best=0.7058
+    final best AUC=0.7058  time=38.9s
+
+[E3] training init=shuffled_pubmedbert  proj=random  seed=42
+    epoch  1/25  loss=2.8882  test_AUC=0.6098  best=0.6098
+    epoch  5/25  loss=0.6944  test_AUC=0.5220  best=0.6101
+    epoch 10/25  loss=0.6933  test_AUC=0.5254  best=0.6101
+    epoch 15/25  loss=0.6932  test_AUC=0.5337  best=0.6101
+    epoch 20/25  loss=0.6931  test_AUC=0.5316  best=0.6101
+    epoch 25/25  loss=0.6931  test_AUC=0.5302  best=0.6101
+    final best AUC=0.6101  time=39.3s
+
+[E3] training init=shuffled_pubmedbert  proj=random  seed=43
+    epoch  1/25  loss=2.6226  test_AUC=0.6121  best=0.6121
+    epoch  5/25  loss=0.6774  test_AUC=0.6057  best=0.6121
+    epoch 10/25  loss=0.6744  test_AUC=0.6121  best=0.6121
+    epoch 15/25  loss=0.6944  test_AUC=0.6175  best=0.6175
+    epoch 20/25  loss=0.6933  test_AUC=0.5191  best=0.6175
+    epoch 25/25  loss=0.6932  test_AUC=0.5186  best=0.6175
+    final best AUC=0.6175  time=39.4s
+
+[E3] training init=shuffled_pubmedbert  proj=pca  seed=42
+    epoch  1/25  loss=0.7348  test_AUC=0.5816  best=0.5816
+    epoch  5/25  loss=0.6521  test_AUC=0.6352  best=0.6352
+    epoch 10/25  loss=0.6223  test_AUC=0.6496  best=0.6504
+    epoch 15/25  loss=0.6079  test_AUC=0.6425  best=0.6504
+    epoch 20/25  loss=0.5885  test_AUC=0.6446  best=0.6504
+    epoch 25/25  loss=0.5689  test_AUC=0.6540  best=0.6540
+    final best AUC=0.6540  time=38.8s
+
+[E3] training init=shuffled_pubmedbert  proj=pca  seed=43
+    epoch  1/25  loss=0.7121  test_AUC=0.6023  best=0.6023
+    epoch  5/25  loss=0.6409  test_AUC=0.6446  best=0.6446
+    epoch 10/25  loss=0.6172  test_AUC=0.6467  best=0.6467
+    epoch 15/25  loss=0.5988  test_AUC=0.6531  best=0.6531
+    epoch 20/25  loss=0.5730  test_AUC=0.6534  best=0.6534
+    epoch 25/25  loss=0.5493  test_AUC=0.6516  best=0.6534
+    final best AUC=0.6534  time=39.5s
+
+[E3] training init=typename_pubmedbert  proj=random  seed=42
+    epoch  1/25  loss=3.3931  test_AUC=0.5956  best=0.5956
+    epoch  5/25  loss=0.6808  test_AUC=0.6235  best=0.6312
+    epoch 10/25  loss=0.6711  test_AUC=0.6276  best=0.6312
+    epoch 15/25  loss=0.6675  test_AUC=0.6327  best=0.6396
+    epoch 20/25  loss=0.6734  test_AUC=0.5893  best=0.6396
+    epoch 25/25  loss=0.6627  test_AUC=0.6406  best=0.6406
+    final best AUC=0.6406  time=39.5s
+
+[E3] training init=typename_pubmedbert  proj=random  seed=43
+    epoch  1/25  loss=2.6375  test_AUC=0.5981  best=0.5981
+    epoch  5/25  loss=0.6754  test_AUC=0.6334  best=0.6334
+    epoch 10/25  loss=0.6940  test_AUC=0.6065  best=0.6423
+    epoch 15/25  loss=0.6734  test_AUC=0.6290  best=0.6423
+    epoch 20/25  loss=0.6685  test_AUC=0.6289  best=0.6423
+    epoch 25/25  loss=0.6620  test_AUC=0.6409  best=0.6423
+    final best AUC=0.6423  time=38.6s
+
+[E3] training init=typename_pubmedbert  proj=pca  seed=42
+    epoch  1/25  loss=0.7595  test_AUC=0.5971  best=0.5971
+    epoch  5/25  loss=0.6669  test_AUC=0.6420  best=0.6420
+    epoch 10/25  loss=0.6509  test_AUC=0.6578  best=0.6578
+    epoch 15/25  loss=0.6472  test_AUC=0.6622  best=0.6627
+    epoch 20/25  loss=0.6439  test_AUC=0.6665  best=0.6714
+    epoch 25/25  loss=0.6394  test_AUC=0.6759  best=0.6759
+    final best AUC=0.6759  time=36.9s
+
+[E3] training init=typename_pubmedbert  proj=pca  seed=43
+    epoch  1/25  loss=0.8379  test_AUC=0.6057  best=0.6057
+    epoch  5/25  loss=0.6622  test_AUC=0.6465  best=0.6465
+    epoch 10/25  loss=0.6529  test_AUC=0.6507  best=0.6527
+    epoch 15/25  loss=0.6489  test_AUC=0.6595  best=0.6595
+    epoch 20/25  loss=0.6451  test_AUC=0.6587  best=0.6617
+    epoch 25/25  loss=0.6415  test_AUC=0.6641  best=0.6677
+    final best AUC=0.6677  time=36.9s
+
+[E3] real - shuffled (random projection): Δ-AUC=+0.0466  [95% CI +0.0435, +0.0498]
+
+[E3] real - shuffled (pca projection): Δ-AUC=+0.0565  [95% CI +0.0530, +0.0601]
+
+[E3] saved → init_comparison.json
+
+[E3] SUMMARY:
+  random                 random : AUC mean=0.6392 ± 0.0053  (seeds=[0.6338781953599305, 0.6445105579703978])
+  type_onehot            random : AUC mean=0.6856 ± 0.0014  (seeds=[0.6841868667416494, 0.6869851697284928])
+  real_pubmedbert        random : AUC mean=0.6537 ± 0.0031  (seeds=[0.6567757965387873, 0.65063009719544])
+  real_pubmedbert        pca    : AUC mean=0.7081 ± 0.0024  (seeds=[0.7105043172058901, 0.7057926780715547])
+  shuffled_pubmedbert    random : AUC mean=0.6138 ± 0.0037  (seeds=[0.6101496679844112, 0.6174775374886896])
+  shuffled_pubmedbert    pca    : AUC mean=0.6537 ± 0.0003  (seeds=[0.6540140667701408, 0.6533605049509532])
+  typename_pubmedbert    random : AUC mean=0.6415 ± 0.0008  (seeds=[0.6406471861035306, 0.6422546634482275])
+  typename_pubmedbert    pca    : AUC mean=0.6718 ± 0.0041  (seeds=[0.6758550921679419, 0.6677131094572066])
+
+[E3] Paired Δ-AUC (real - shuffled):
+  random : +0.0466  CI=[0.043482804604513495, 0.04978256186285244]
+  pca    : +0.0565  CI=[0.05299708113837187, 0.06006677346004308]

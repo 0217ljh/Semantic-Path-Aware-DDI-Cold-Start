@@ -1,0 +1,50 @@
+Title: Low-Rank Transfer Subspace Learning
+Authors: Ming Shao, Carlos Castillo, Zhenghong Gu, Yun Fu (Northeastern University; SUNY at Buffalo)
+Venue+Year: IEEE ICDM 2012 (12th International Conference on Data Mining)
+arXiv-or-DOI: DOI 10.1109/ICDM.2012.102
+PDF filename: Transfer Subspace Learning via Low-Rank.pdf
+
+## TL;DR
+A transfer-learning framework (LTSL) that jointly learns a subspace projection P and a LOW-RANK coefficient matrix Z so that each target-domain sample, once projected into P, can be linearly reconstructed by SOURCE-domain samples lying in the corresponding source subspace; the nuclear-norm (low-rank) constraint on Z enforces that only ONE aligned source subspace (not the whole over-complete source dictionary) is used per target point.
+
+## Problem & Contributions
+- Transductive transfer learning / domain adaptation (Sec I): transfer knowledge from a label-rich SOURCE domain to a slightly different TARGET domain with limited target data; only a few labeled target samples needed.
+- Core idea: use low-rank REPRESENTATION to learn the transfer mapping (novel at the time — LRR had been used for subspace segmentation but not for learning transfer mappings). Prefer "simple" transfer hypotheses over complex ones.
+- Generic framework: any subspace-learning method (PCA, LDA, LPP, NPE, MFA, DLA) can be plugged in as the F(P,X_s) term, yielding low-rank transfer versions (LT-PCA, LT-LDA, ... — Table I lists objectives + gradients).
+- Theorem 1 (Eq. 4): the target-domain subspace-learning energy F(P, T_i) is lower-bounded by F(P, S_i)||Z_i^{-1}||_F^{-2} + xi, linking source and target energies under a mild invertibility perturbation.
+
+## Method / Core mechanism (key equations in words)
+- Notation: X_s = source data (dictionary), X_t = target test data, P = projection matrix (learned subspace), Z = low-rank coefficient (linear relation from source to target), E = sample-specific error.
+- Basic problem (Eq. 1): min over P,Z of [ F(P,X_s) + rank(Z) ] s.t. P^T X_t = P^T X_s Z. F is a general subspace-learning objective; rank(Z) constrains knowledge transfer in the projected space.
+- With outlier/error term (Eq. 2-3): min F(P,X_s) + ||Z||_* + lambda ||E||_{2,1} s.t. P^T X_t = P^T X_s Z + E. Nuclear norm ||Z||_* is the convex surrogate for rank(Z); the L_{2,1} norm on E captures sample-specific (per-column) errors so that a target point not representable by its source subspace is flagged as an outlier rather than corrupting the mapping (Fig. 2, Fig. 3).
+- Why low-rank: for over-complete source data spanning the whole feature space, X_t = X_s Z always has trivial solutions; low-rank on Z forces the reconstruction to use only ONE aligned source subspace S_i (Fig. 2B), i.e. structure-preserving transfer (Sec II.A).
+- Optimization (Algorithm 1, Sec II.B): inexact Augmented Lagrange Multiplier (ALM) with 4 blocks (Z, E, J, P). J update via singular value thresholding (SVT); E update via L_{2,1} shrinkage; P update via gradient descent using method-specific grad F(P,X_s) from Table I. Convergence not generally guaranteed with 4 blocks but works in practice under full-column-rank X_s and monotone optimality gap.
+- Complexity (Sec II.C): dominant cost is SVD; per-iteration O(mnr + nr^2 + r^3) with r = rank of source, total O(m^2 n) + O(N(mnr + nr^2 + r^3)).
+
+## Key results & numbers (datasets + metrics, with pointers)
+- Synthetic 3D->1D data (Sec IV.A, Fig. 4 left/middle): shows target data become separable in the learned 1D subspace where each target point is linearly represented by a source class.
+- UB KinFace kinship verification (Sec IV.B, Table II): "Our Method" (low-rank transfer) beats No-Transfer and TSL across PCA/LPP/NPE/MFA/DLA backbones. Best cells: ULPP 63.72% (dim 11) vs No-Transfer ULPP 57.74% and TSL 54.02%; SLPP 57.17% vs 55.00%/54.02%. Human performance on this dataset is only ~56% (Sec IV.D). Also beats FEDA (SVM-based domain adaptation), Fig. 4 right.
+- Yale B -> CMU PIE face recognition, problem "Y2P" (Sec IV.C, Table III): "Our Method" substantially beats No-Transfer and TSL, e.g. SLPP 86.1% (dim 75) vs 80.7% / 75.7%; SNPE 85.2% vs 78.6% / 67.0%; PCA 77.6% vs 28.6% / 30.9%. TSL is noted to DEGRADE performance (sensitive to data size / KDE density estimation), while LTSL stays robust.
+- Fig. 5 / Fig. 6: verification / recognition rate vs subspace dimension curves, LT-* variants dominate their plain and "T-" counterparts.
+
+## Relevance to our cold-start low-rank DDI paper
+- RW STREAM: Stream A (OOD / transfer / domain-generalization low-rank). This is a foundational / classic transfer-subspace-learning-via-low-rank citation. Its low-rank motivation is Stream-A flavored: low-rank on the cross-domain coefficient matrix Z enforces that each target point aligns to a SINGLE small source subspace (the shared intersection between source and target is small), rather than the whole over-complete source dictionary.
+- HOW WE'D CITE: as an early, well-cited instance of "low-rank constraints govern how knowledge transfers across a source-target gap," establishing the lineage that transfer regularity is compressible / low-rank. Group it with LTSL-type domain-adaptation low-rank work when contrasting Stream A vs our (Stream-B-leaning) setting.
+- CONCRETE DELTA vs us:
+  1. EXPLICIT source vs target domains: LTSL requires a separate labeled SOURCE domain X_s used as a reconstruction dictionary for the TARGET X_t. We have NO exogenous source/target split — one biomedical KG, and the shift is ENDOGENOUS (train vs test drug entities disjoint). There is no source dictionary to linearly reconstruct unseen drug pairs.
+  2. Object of low-rank: LTSL puts low-rank on Z, the source->target reconstruction COEFFICIENT matrix (a data-to-data mapping). Our low-rank is on the interaction RESIDUAL H = H_base + M_A M_B built from shared typed KG-mediators, not a source-reconstruction of target samples.
+  3. Task: LTSL does per-sample classification/verification (faces, kinship) via nearest-neighbor in the learned subspace. We do relational, pairwise DDI interaction scoring on a KG. Drugs act as selectors of shared typed mediators, not as columns of a reconstruction dictionary.
+  4. Learning style: LTSL is transductive (needs target samples at training to solve for Z, P). Our cold-start test drugs are unseen and never appear as reconstruction anchors; we rely on frozen base reps + shared mediators, which is cold-safe by construction. LTSL is not designed for entities absent from both source and any training set.
+
+## Safe-to-cite claims (with section pointers)
+- Low-rank (nuclear-norm) constraint on the source->target coefficient matrix forces each target sample to be represented by a single aligned source subspace, avoiding trivial full-dictionary solutions (Sec II.A, Eq. 1-3, Fig. 2).
+- L_{2,1} error term E handles sample-specific outliers/large source-target margins (Eq. 2-3, Fig. 3).
+- Framework is generic over classical subspace methods (PCA/LDA/LPP/NPE/MFA/DLA), Table I (Sec III).
+- LTSL only needs a FEW labeled target samples, unlike prior TSL (Bregman-divergence) methods that need many target samples for density estimation (Sec I.A, Sec IV.D).
+- Empirical superiority over No-Transfer, TSL, FEDA on UB KinFace and Yale B->CMU PIE (Tables II, III; Figs. 4-6).
+
+## Do-NOT-overclaim / caveats
+- 2012 classical (shallow) method on hand-crafted features (Gabor filters, raw cropped faces); NOT deep, NOT relational, NOT a KG method. Metrics are face verification/recognition accuracy, unrelated to DDI.
+- "Low-rank" here = nuclear-norm constraint on a data reconstruction coefficient matrix Z between two EXPLICIT domains. This is not the intrinsic-dimension / LoRA-style low-rank (Stream B) and not a subspace-recovery guarantee (unlike ISR). Cite it for the transfer-mapping-is-low-rank intuition only.
+- Theorem 1 is a bound on subspace-learning energies under a small invertibility perturbation (gamma I); it is not a generalization guarantee for unseen entities.
+- Requires TARGET samples during training (transductive) and a full-column-rank source dictionary for convergence; convergence of the 4-block inexact ALM is not proven in general (Sec II.B). Not applicable off-the-shelf to a single-domain, entity-disjoint cold-start setting.

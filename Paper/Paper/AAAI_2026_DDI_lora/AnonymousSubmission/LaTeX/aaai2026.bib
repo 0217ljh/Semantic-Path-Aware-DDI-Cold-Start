@@ -1,0 +1,1171 @@
+% BibTeX for the literature review matrix (Table: tab:lit_review_matrix).
+% Keys are author-year-topic. Author lists are best-effort; DOIs are authoritative.
+% Some volume/page fields omitted where uncertain — DOI resolves the entry.
+
+% Introduction. Under the S2 cold-start setting, where both drugs are unseen at test time, the transferable DDI signal is intrinsically low-rank, with rank saturation appearing early and consistently across tasks and backbones.
+
+% Gap. Low-rank is necessary but not sufficient, because an unconstrained full-capacity model may allocate that limited subspace to dominant or higher-variance structure rather than to the transferable invariant directions, and prior work on invariant-feature subspace recovery shows that such invariant directions need not coincide with top-variance directions and therefore may require explicit recovery.
+
+% Motivation. Once the transferable signal is low-rank and the S2 setting prohibits drug-identity cues, the representation should be built from a compact identity-free basis grounded in node-level KG semantics, which motivates a typed prototype space routed by semantic information.
+
+% Method. The proposed method instantiates this design as a semantically-typed low-rank adaptation over a KG-structure prototype space, with typed prototype bases in $M_B$ and pair-conditioned block-sparse routing in $M_A^{(u,v)}$ driven by frozen ontology text embeddings $z_m$, cold-start safe by construction.
+
+% Experiments. Across diverse backbones, this design yields consistent gains on the S2 cold-start setting.
+
+% Analysis. The analysis then establishes the mechanism through spectral quantification of the low-rank structure, component ablations, within-type semantic shuffling as a causal control, and biological attribution that highlights the PD mechanism class where structure-only models fail and semantic routing recovers performance.
+
+%%%%%%%%%%%%%%%
+
+@article{ddi-burden,
+  title={Drug--drug interactions and the risk of adverse drug reaction-related hospital admissions in the older population},
+  author={Hughes, John E and Moriarty, Frank and Bennett, Kathleen E and Cahir, Caitriona},
+  journal={British journal of clinical pharmacology},
+  volume={90},
+  number={4},
+  pages={959--975},
+  year={2024},
+  publisher={Wiley Online Library}
+}
+
+@article{ddi-review,
+  title={Comprehensive evaluation of deep and graph learning on drug--drug interactions prediction},
+  author={Lin, Xuan and Dai, Lichang and Zhou, Yafang and Yu, Zu-Guo and Zhang, Wen and Shi, Jian-Yu and Cao, Dong-Sheng and Zeng, Li and Chen, Haowen and Song, Bosheng and others},
+  journal={Briefings in bioinformatics},
+  volume={24},
+  number={4},
+  pages={bbad235},
+  year={2023},
+  publisher={Oxford University Press}
+}
+
+@article{ddi-difficult,
+  title={Cold-start problems in data-driven prediction of drug--drug interaction effects},
+  author={Dewulf, Pieter and Stock, Michiel and De Baets, Bernard},
+  journal={Pharmaceuticals},
+  volume={14},
+  number={5},
+  pages={429},
+  year={2021},
+  publisher={MDPI}
+}
+
+@inproceedings{Method-RGCN,
+  title={Modeling relational data with graph convolutional networks},
+  author={Schlichtkrull, Michael and Kipf, Thomas N and Bloem, Peter and Van Den Berg, Rianne and Titov, Ivan and Welling, Max},
+  booktitle={European semantic web conference},
+  pages={593--607},
+  year={2018},
+  organization={Springer}
+}
+
+@article{Method-Emergnn,
+  title={Emerging drug interaction prediction enabled by a flow-based graph neural network with biomedical network},
+  author={Zhang, Yongqi and Yao, Quanming and Yue, Ling and Wu, Xian and Zhang, Ziheng and Lin, Zhenxi and Zheng, Yefeng},
+  journal={Nature Computational Science},
+  volume={3},
+  number={12},
+  pages={1023--1033},
+  year={2023},
+  publisher={Nature Publishing Group US New York}
+}
+
+@article{Method-Knowddi,
+  title={Accurate and interpretable drug-drug interaction prediction enabled by knowledge subgraph learning},
+  author={Wang, Yaqing and Yang, Zaifei and Yao, Quanming},
+  journal={Communications Medicine},
+  volume={4},
+  number={1},
+  pages={59},
+  year={2024},
+  publisher={Nature Publishing Group UK London}
+}
+
+@book{Stockley-book-2018,
+  title={Stockley's Drug Interactions},
+  editor={Preston, Claire L.},
+  edition={11},
+  year={2016},
+  address={London},
+  publisher={Pharmaceutical Press}
+}
+
+@inproceedings{ISR-ICML-2022,
+  title={Provable domain generalization via invariant-feature subspace recovery},
+  author={Wang, Haoxiang and Si, Haozhe and Li, Bo and Zhao, Han},
+  booktitle={International Conference on Machine Learning},
+  pages={23018--23033},
+  year={2022},
+  organization={PMLR}
+}
+
+@article{Lora-ICLR-2022,
+  title={Lora: Low-rank adaptation of large language models.},
+  author={Hu, Edward J and Shen, Yelong and Wallis, Phillip and Allen-Zhu, Zeyuan and Li, Yuanzhi and Wang, Shean and Wang, Liang and Chen, Weizhu and others},
+  journal={Iclr},
+  volume={1},
+  number={2},
+  pages={3},
+  year={2022}
+}
+
+@inproceedings{Method-Adapter-ICML-2019,
+  title={Parameter-efficient transfer learning for NLP},
+  author={Houlsby, Neil and Giurgiu, Andrei and Jastrzebski, Stanislaw and Morrone, Bruna and De Laroussilhe, Quentin and Gesmundo, Andrea and Attariyan, Mona and Gelly, Sylvain},
+  booktitle={International conference on machine learning},
+  pages={2790--2799},
+  year={2019},
+  organization={PMLR}
+}
+
+@article{BKG-Hetionet,
+  title={Systematic integration of biomedical knowledge prioritizes drugs for repurposing},
+  author={Himmelstein, Daniel Scott and Lizee, Antoine and Hessler, Christine and Brueggeman, Leo and Chen, Sabrina L and Hadley, Dexter and Green, Ari and Khankhanian, Pouya and Baranzini, Sergio E},
+  journal={elife},
+  volume={6},
+  pages={e26726},
+  year={2017},
+  publisher={eLife Sciences Publications, Ltd}
+}
+
+@article{BKG-Primekg,
+  title={Building a knowledge graph to enable precision medicine},
+  author={Chandak, Payal and Huang, Kexin and Zitnik, Marinka},
+  journal={Scientific data},
+  volume={10},
+  number={1},
+  pages={67},
+  year={2023},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{Method-DDKG,
+  title={Attention-based knowledge graph representation learning for predicting drug-drug interactions},
+  author={Su, Xiaorui and Hu, Lun and You, Zhuhong and Hu, Pengwei and Zhao, Bowei},
+  journal={Briefings in bioinformatics},
+  volume={23},
+  number={3},
+  pages={bbac140},
+  year={2022},
+  publisher={Oxford University Press}
+}
+
+@inproceedings{Method-KGNN,
+  title={KGNN: Knowledge graph neural network for drug-drug interaction prediction.},
+  author={Lin, Xuan and Quan, Zhe and Wang, Zhi-Jie and Ma, Tengfei and Zeng, Xiangxiang},
+  booktitle={Ijcai},
+  volume={380},
+  pages={2739--2745},
+  year={2020}
+}
+
+@inproceedings{Method-K_paths,
+  title={K-paths: Reasoning over graph paths for drug repurposing and drug interaction prediction},
+  author={Abdullahi, Tassallah and Gemou, Ioanna and Nayak, Nihal V and Murtaza, Ghulam and Bach, Stephen H and Eickhoff, Carsten and Singh, Ritambhara},
+  booktitle={Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V. 2},
+  pages={5--16},
+  year={2025}
+}
+
+@article{Method-Sumgnn,
+  title={SumGNN: multi-typed drug interaction prediction via efficient knowledge graph summarization},
+  author={Yu, Yue and Huang, Kexin and Zhang, Chao and Glass, Lucas M and Sun, Jimeng and Xiao, Cao},
+  journal={Bioinformatics},
+  volume={37},
+  number={18},
+  pages={2988--2995},
+  year={2021},
+  publisher={Oxford University Press}
+}
+
+@article{Method-SSI_DDI,
+  title={SSI--DDI: substructure--substructure interactions for drug--drug interaction prediction},
+  author={Nyamabo, Arnold K and Yu, Hui and Shi, Jian-Yu},
+  journal={Briefings in Bioinformatics},
+  volume={22},
+  number={6},
+  pages={bbab133},
+  year={2021},
+  publisher={Oxford University Press}
+}
+
+@article{Method-HDN_DDI,
+  title={HDN-DDI: a novel framework for predicting drug-drug interactions using hierarchical molecular graphs and enhanced dual-view representation learning},
+  author={Sun, Jinchen and Zheng, Haoran},
+  journal={BMC bioinformatics},
+  volume={26},
+  number={1},
+  pages={28},
+  year={2025},
+  publisher={Springer}
+}
+
+@inproceedings{GRAIL-PMLR-2020,
+  title={Inductive relation prediction by subgraph reasoning},
+  author={Teru, Komal and Denis, Etienne and Hamilton, Will},
+  booktitle={International conference on machine learning},
+  pages={9448--9457},
+  year={2020},
+  organization={PMLR}
+}
+
+@article{NBF-NIPS-2021,
+  title={Neural bellman-ford networks: A general graph neural network framework for link prediction},
+  author={Zhu, Zhaocheng and Zhang, Zuobai and Xhonneux, Louis-Pascal and Tang, Jian},
+  journal={Advances in neural information processing systems},
+  volume={34},
+  pages={29476--29490},
+  year={2021}
+}
+
+@inproceedings{LTS-ICDM-2012,
+  title={Low-rank transfer subspace learning},
+  author={Shao, Ming and Castillo, Carlos and Gu, Zhenghong and Fu, Yun},
+  booktitle={2012 IEEE 12th International Conference on Data Mining},
+  pages={1104--1109},
+  year={2012},
+  organization={IEEE}
+}
+
+@article{DEEPDG-ITIP-2017,
+  title={Deep domain generalization with structured low-rank constraint},
+  author={Ding, Zhengming and Fu, Yun},
+  journal={IEEE Transactions on Image Processing},
+  volume={27},
+  number={1},
+  pages={304--313},
+  year={2017},
+  publisher={IEEE}
+}
+
+@inproceedings{ISR-ICML-2022,
+  title={Provable domain generalization via invariant-feature subspace recovery},
+  author={Wang, Haoxiang and Si, Haozhe and Li, Bo and Zhao, Han},
+  booktitle={International Conference on Machine Learning},
+  pages={23018--23033},
+  year={2022},
+  organization={PMLR}
+}
+
+@article{INTRINSICDIM-ICLR-2018,
+  title={Measuring the intrinsic dimension of objective landscapes},
+  author={Li, Chunyuan and Farkhoor, Heerad and Liu, Rosanne and Yosinski, Jason},
+  journal={arXiv preprint arXiv:1804.08838},
+  year={2018}
+}
+
+@article{Method-Decagon,
+  title={Modeling polypharmacy side effects with graph convolutional networks},
+  author={Zitnik, Marinka and Agrawal, Monica and Leskovec, Jure},
+  journal={Bioinformatics},
+  volume={34},
+  number={13},
+  pages={i457--i466},
+  year={2018},
+  publisher={Oxford University Press}
+}
+
+@article{Method-CTF_ddi,
+  title={CTF-DDI: Constrained tensor factorization for drug--drug interactions prediction},
+  author={Han, Guosheng and Peng, Lingzhi and Ding, Aocheng and Zhang, Yan and Lin, Xuan},
+  journal={Future Generation Computer Systems},
+  volume={161},
+  pages={26--34},
+  year={2024},
+  publisher={Elsevier}
+}
+
+@article{Method-TMFUF,
+  title={TMFUF: a triple matrix factorization-based unified framework for predicting comprehensive drug-drug interactions of new drugs},
+  author={Shi, Jian-Yu and Huang, Hua and Li, Jia-Xin and Lei, Peng and Zhang, Yan-Ning and Dong, Kai and Yiu, Siu-Ming},
+  journal={BMC bioinformatics},
+  volume={19},
+  number={Suppl 14},
+  pages={411},
+  year={2018},
+  publisher={Springer}
+}
+
+
+
+
+%%%%%% Introduction Part 1 & 2
+
+@article{DeepDDI_2018,
+  title={Deep learning improves prediction of drug--drug and drug--food interactions},
+  author={Ryu, Jae Yong and Kim, Hyun Uk and Lee, Sang Yup},
+  journal={Proceedings of the national academy of sciences},
+  volume={115},
+  number={18},
+  pages={E4304--E4311},
+  year={2018},
+  publisher={National Academy of Sciences}
+}
+
+@article{drugbank5_dataset,
+  title={DrugBank 5.0: a major update to the DrugBank database for 2018},
+  author={Wishart, David S and Feunang, Yannick D and Guo, An C and Lo, Elvis J and Marcu, Ana and Grant, Jason R and Sajed, Tanvir and Johnson, Daniel and Li, Carin and Sayeeda, Zinat and others},
+  journal={Nucleic acids research},
+  volume={46},
+  number={D1},
+  pages={D1074--D1082},
+  year={2018},
+  publisher={Oxford University Press}
+}
+
+@article{ddi_review_1,
+  title={Comprehensive evaluation of deep and graph learning on drug--drug interactions prediction},
+  author={Lin, Xuan and Dai, Lichang and Zhou, Yafang and Yu, Zu-Guo and Zhang, Wen and Shi, Jian-Yu and Cao, Dong-Sheng and Zeng, Li and Chen, Haowen and Song, Bosheng and others},
+  journal={Briefings in bioinformatics},
+  volume={24},
+  number={4},
+  pages={bbad235},
+  year={2023},
+  publisher={Oxford University Press}
+}
+
+
+@article{cold-start-with_modality,
+  title={Evaluation of knowledge graph embedding approaches for drug-drug interaction prediction in realistic settings},
+  author={Celebi, Remzi and Uyar, Huseyin and Yasar, Erkan and Gumus, Ozgur and Dikenelli, Oguz and Dumontier, Michel},
+  journal={BMC bioinformatics},
+  volume={20},
+  number={1},
+  pages={726},
+  year={2019},
+  publisher={Springer}
+}
+
+@article{cold-start-challenge,
+  title={Drug--Drug Interaction Prediction: Paradigm Shifts, Key Bottlenecks, and Future Directions},
+  author={Ru, Xiaoqing and Li, Zhen and Wei, Leyi and Liu, Yuanan and Zou, Quan},
+  journal={Wiley Interdisciplinary Reviews: Computational Molecular Science},
+  volume={15},
+  number={6},
+  pages={e70056},
+  year={2025},
+  publisher={Wiley Online Library}
+}
+
+@article{setting-for-cold-start,
+  title={Cold-start problems in data-driven prediction of drug--drug interaction effects},
+  author={Dewulf, Pieter and Stock, Michiel and De Baets, Bernard},
+  journal={Pharmaceuticals},
+  volume={14},
+  number={5},
+  pages={429},
+  year={2021},
+  publisher={MDPI}
+}
+
+%%%%%% Introduction Part 3
+
+
+@article{CSMDDI-2022,
+  title={Predict multi-type drug--drug interactions in cold start scenario},
+  author={Liu, Zun and Wang, Xing-Nan and Yu, Hui and Shi, Jian-Yu and Dong, Wen-Min},
+  journal={BMC bioinformatics},
+  volume={23},
+  number={1},
+  pages={75},
+  year={2022},
+  publisher={Springer}
+}
+
+
+
+@article{GMPNN-CS-2022,
+  title={Drug--drug interaction prediction with learnable size-adaptive molecular substructures},
+  author={Nyamabo, Arnold K and Yu, Hui and Liu, Zun and Shi, Jian-Yu},
+  journal={Briefings in Bioinformatics},
+  volume={23},
+  number={1},
+  pages={bbab441},
+  year={2022},
+  publisher={Oxford University Press}
+}
+
+@article{DSN-DDI-2023,
+  title={DSN-DDI: an accurate and generalized framework for drug--drug interaction prediction by dual-view representation learning},
+  author={Li, Zimeng and Zhu, Shichao and Shao, Bin and Zeng, Xiangxiang and Wang, Tong and Liu, Tie-Yan},
+  journal={Briefings in Bioinformatics},
+  volume={24},
+  number={1},
+  pages={bbac597},
+  year={2023},
+  publisher={Oxford University Press}
+}
+
+
+
+@inproceedings{TextDDI-2023,
+  title={Learning to describe for predicting zero-shot drug-drug interactions},
+  author={Zhu, Fangqi and Zhang, Yongqi and Chen, Lei and Qin, Bing and Xu, Ruifeng},
+  booktitle={Proceedings of the 2023 conference on empirical methods in natural language processing},
+  pages={14855--14870},
+  year={2023}
+}
+
+@article{RADDI-2026,
+  title={RADDI: A retrieval augmented framework for drug-drug interaction prediction},
+  author={Zhang, Hengbo and Wang, Yingying and Gao, Xinyu and Xiong, Yun},
+  journal={Big Data Mining and Analytics},
+  volume={9},
+  number={2},
+  pages={360--375},
+  year={2026},
+  publisher={TUP}
+}
+
+
+
+%%%%%% Introduction Part 4
+@article{DDI-LLM-2025,
+  title={DDI-LLM: Predicting Unseen Drug--Drug Interactions Using Large Language Models and Molecular Graphs},
+  author={Tanhaei, Mohammad},
+  journal={Intelligent Pharmacy},
+  year={2025},
+  publisher={Elsevier}
+}
+
+
+
+@article{Distribution-shift-2025,
+  title={Benchmarking drug--drug interaction prediction methods: a perspective of distribution changes},
+  author={Shen, Zhenqian and Zhou, Mingyang and Zhang, Yongqi and Yao, Quanming},
+  journal={Bioinformatics},
+  volume={41},
+  number={11},
+  pages={btaf569},
+  year={2025},
+  publisher={Oxford University Press}
+}
+
+
+@article{review-2,
+  title={LLMs for Drug-Drug Interaction Prediction Using Textual Drug Descriptors},
+  author={De Vito, Gabriele and Ferrucci, Filomena and Angelakis, Athanasios},
+  journal={Knowledge-Based Systems},
+  pages={115486},
+  year={2026},
+  publisher={Elsevier}
+}
+
+@article{ogb-2020,
+  title={Open Graph Benchmark: Datasets for Machine Learning on Graphs},
+  author={Hu, Weihua and Fey, Matthias and Zitnik, Marinka and Dong, Yuxiao and Ren, Hongyu and Liu, Bowen and Catasta, Michele and Leskovec, Jure},
+  journal={Advances in Neural Information Processing Systems},
+  volume={33},
+  pages={22118--22133},
+  year={2020}
+}
+
+@article{ddinter2-2025,
+  title={DDInter 2.0: an enhanced drug interaction resource with expanded data coverage, new interaction types, and improved user interface},
+  author={Tian, Yao and Yi, Jiacai and Wang, Ningning and Wu, Chengkun and Peng, Jinfu and Liu, Shao and Yang, Guoping and Cao, Dongsheng},
+  journal={Nucleic Acids Research},
+  volume={53},
+  number={D1},
+  pages={D1356--D1362},
+  year={2025},
+  publisher={Oxford University Press}
+}
+
+@inproceedings{tdc-2021,
+  title={Therapeutics Data Commons: Machine Learning Datasets and Tasks for Drug Discovery and Development},
+  author={Huang, Kexin and Fu, Tianfan and Gao, Wenhao and Zhao, Yue and Roohani, Yusuf and Leskovec, Jure and Coley, Connor W. and Xiao, Cao and Sun, Jimeng and Zitnik, Marinka},
+  booktitle={Advances in Neural Information Processing Systems 34, Datasets and Benchmarks Track},
+  year={2021},
+  url={https://arxiv.org/abs/2102.09548}
+}
+
+
+%%%%%%%%%% dataset construction
+@article{dataset-construction-for-metal,
+  title={Machine learning-based prediction of drug--drug interactions by integrating drug phenotypic, therapeutic, chemical, and genomic properties},
+  author={Cheng, Feixiong and Zhao, Zhongming},
+  journal={Journal of the American Medical Informatics Association},
+  volume={21},
+  number={e2},
+  pages={e278--e286},
+  year={2014},
+  publisher={BMJ Publishing Group BMA House, Tavistock Square, London, WC1H 9JR}
+}
+
+%%%%%% early work, before DNN
+
+
+
+
+
+% Removed Similarity-2: duplicate of CSMDDI
+
+%%%%% current work:  Transfer Learning for cold start
+
+
+%%%%% current work: Meta-Learning for cold start
+
+
+
+
+%%%%% current work: Graph methods for cold start
+@article{SumGNN-2021,
+  title={SumGNN: multi-typed drug interaction prediction via efficient knowledge graph summarization},
+  author={Yu, Yue and Huang, Kexin and Zhang, Chao and Glass, Lucas M and Sun, Jimeng and Xiao, Cao},
+  journal={Bioinformatics},
+  volume={37},
+  number={18},
+  pages={2988--2995},
+  year={2021},
+  publisher={Oxford University Press}
+}
+
+%%%%% current work: pre-trained models for cold 
+
+
+
+
+######################## General DDI work
+@inproceedings{MKG-FENN-2024,
+  title={Mkg-fenn: A multimodal knowledge graph fused end-to-end neural network for accurate drug--drug interaction prediction},
+  author={Wu, Di and Sun, Wu and He, Yi and Chen, Zhong and Luo, Xin},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={38},
+  number={9},
+  pages={10216--10224},
+  year={2024}
+}
+
+############################## Mess
+@article{writing_style_reference_1,
+  title={Evaluating and Enhancing the Vulnerability Reasoning Capabilities of Large Language Models},
+  author={Lu, Li and Zhao, Yanjie and Rao, Hongzhou and Zhang, Kechi and Wang, Haoyu},
+  journal={arXiv preprint arXiv:2602.06687},
+  year={2026}
+}
+
+@inproceedings{TIGER-2024,
+  title={Dual-channel learning framework for drug-drug interaction prediction via relation-aware heterogeneous graph transformer},
+  author={Su, Xiaorui and Hu, Pengwei and You, Zhu-Hong and Yu, Philip S and Hu, Lun},
+  booktitle={Proceedings of the AAAI conference on artificial intelligence},
+  volume={38},
+  number={1},
+  pages={249--256},
+  year={2024}
+}
+
+
+
+@inproceedings{lora-2022,
+  title={{LoRA}: Low-Rank Adaptation of Large Language Models},
+  author={Hu, Edward J. and Shen, Yelong and Wallis, Phillip and
+               Allen-Zhu, Zeyuan and Li, Yuanzhi and Wang, Shean and
+               Wang, Lu and Chen, Weizhu},
+  booktitle={International Conference on Learning Representations},
+  year={2022},
+  url={https://openreview.net/forum?id=nZeVKeeFYf9}
+}
+
+
+
+@article{EmerGNN-2023,
+  title={Emerging drug interaction prediction enabled by a flow-based graph neural network with biomedical network},
+  author={Zhang, Yongqi and Yao, Quanming and Yue, Ling and Wu, Xian and Zhang, Ziheng and Lin, Zhenxi and Zheng, Yefeng},
+  journal={Nature Computational Science},
+  volume={3},
+  number={12},
+  pages={1023--1033},
+  year={2023},
+  publisher={Nature Publishing Group US New York}
+}
+
+@article{DDInter-2022,
+  title={DDInter: an online drug--drug interaction database towards improving clinical decision-making and patient safety},
+  author={Xiong, Guoli and Yang, Zhijiang and Yi, Jiacai and Wang, Ningning and Wang, Lei and Zhu, Huimin and Wu, Chengkun and Lu, Aiping and Chen, Xiang and Liu, Shao and others},
+  journal={Nucleic acids research},
+  volume={50},
+  number={D1},
+  pages={D1200--D1207},
+  year={2022},
+  publisher={Oxford University Press}
+}
+
+
+
+@article{DDI-GPT-2024,
+  title={Ddi-gpt: Explainable prediction of drug-drug interactions using large language models enhanced with knowledge graphs},
+  author={Xu, Chengqi and Bulusu, Krishna C and Pan, Heng and Elemento, Olivier},
+  journal={BioRxiv},
+  pages={2024--12},
+  year={2024},
+  publisher={Cold Spring Harbor Laboratory}
+}
+
+@article{openddi-2026,
+  title={OpenDDI: A Comprehensive Benchmark for DDI Prediction},
+  author={Jin, Xinmo and Fan, Bowen and Li, Xunkai and Sun, Henan and Zeng, YuXin and Chen, Zekai and Sun, Yuxuan and Li, Jia and Dai, Qiangqiang and Qin, Hongchao and others},
+  journal={arXiv preprint arXiv:2602.00539},
+  year={2026}
+}
+
+@book{Stockley-book-2018,
+  title={Stockley's Drug Interactions},
+  editor={Preston, Claire L.},
+  edition={11},
+  year={2016},
+  publisher={Pharmaceutical Press}
+}
+
+@book{G-and-G-book-2018,
+  title={Goodman \& Gilman's the pharmacological basis of therapeutics},
+  author={Brunton, Laurence L and Knollmann, Bj{\"o}rn C and Hilal-Dandan, Randa and others},
+  volume={13},
+  year={2018},
+  publisher={McGraw-Hill Education New York}
+}
+
+@article{DrugGPT-2025,
+  title={A collaborative large language model for drug analysis},
+  author={Zhou, Hongjian and Liu, Fenglin and Wu, Jinge and Zhang, Wenjun and Huang, Guowei and Clifton, Lei and Eyre, David and Luo, Haochen and Liu, Fengyuan and Branson, Kim and others},
+  journal={Nature Biomedical Engineering},
+  pages={1--12},
+  year={2025},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{DDI-Judge-2025,
+  title={Improving drug-drug interaction prediction via in-context learning and judging with large language models},
+  author={Qi, He and Li, Xiaoqiang and Zhang, Chengcheng and Zhao, Tianyi},
+  journal={Frontiers in Pharmacology},
+  volume={16},
+  pages={1589788},
+  year={2025},
+  publisher={Frontiers Media SA}
+}
+
+@inproceedings{ZeroDDI-2024,
+  title={ZeroDDI: A Zero-Shot Drug-Drug Interaction Event Prediction Method with Semantic Enhanced Learning and Dual-Modal Uniform Alignment},
+  author={Wang, Ziyan and Xiong, Zhankun and Huang, Feng and Liu, Xuan and Zhang, Wen},
+  booktitle={Proceedings of the Thirty-Third International Joint Conference on Artificial Intelligence (IJCAI)},
+  pages={6076--6084},
+  year={2024}
+}
+
+@article{Rare-event-2025,
+  title={Predicting rare drug-drug interaction events with dual-granular structure-adaptive and pair variational representation},
+  author={Ren, Zhonghao and Zeng, Xiangxiang and Lao, Yizhen and You, Zhuhong and Shang, Yifan and Zou, Quan and Lin, Chen},
+  journal={Nature Communications},
+  volume={16},
+  number={1},
+  pages={3997},
+  year={2025},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{TWOSIDES-2012,
+  title={Data-driven prediction of drug effects and interactions},
+  author={Tatonetti, Nicholas P and Ye, Patrick P and Daneshjou, Roxana and Altman, Russ B},
+  journal={Science translational medicine},
+  volume={4},
+  number={125},
+  pages={125ra31--125ra31},
+  year={2012},
+  publisher={American Association for the Advancement of Science}
+}
+
+@article{LLAMA2-2023,
+  title={Llama 2: Open foundation and fine-tuned chat models},
+  author={Touvron, Hugo and Martin, Louis and Stone, Kevin and Albert, Peter and Almahairi, Amjad and Babaei, Yasmine and Bashlykov, Nikolay and Batra, Soumya and Bhargava, Prajjwal and Bhosale, Shruti and others},
+  journal={arXiv preprint arXiv:2307.09288},
+  year={2023}
+}
+
+@article{QWEN2_5-2024,
+  title={Qwen2. 5 Technical Report},
+  author={Yang, An and Yang, Baosong and Zhang, Beichen and Hui, Binyuan and Zheng, Bo and Yu, Bowen and Li, Chengyuan and Liu, Dayiheng and Huang, Fei and Wei, Haoran and others},
+  journal={arXiv preprint arXiv:2412.15115},
+  year={2024}
+}
+
+@article{GEMMA3-2025,
+  title={Gemma 3 Technical Report},
+  author={Gemma Team Aishwarya Kamath and Johan Ferret and others},
+  journal={ArXiv},
+  year={2025},
+  volume={abs/2503.19786},
+  url={https://api.semanticscholar.org/CorpusID:277313563}
+}
+
+@article{GPT4-2023,
+  title={Gpt-4 technical report},
+  author={Achiam, Josh and Adler, Steven and Agarwal, Sandhini and Ahmad, Lama and Akkaya, Ilge and Aleman, Florencia Leoni and Almeida, Diogo and Altenschmidt, Janko and Altman, Sam and Anadkat, Shyamal and others},
+  journal={arXiv preprint arXiv:2303.08774},
+  year={2023}
+}
+
+@inproceedings{CLAUDE-2024,
+  title={The Claude 3 Model Family: Opus, Sonnet, Haiku},
+  author={{Anthropic}},
+  url={https://api.semanticscholar.org/CorpusID:268232499},
+  year={2024}
+}
+
+
+@article{he2025imageddi,
+  title={ImageDDI: Image-enhanced molecular motif sequence representation for drug-drug interaction prediction},
+  author={He, Yuqin and Ma, Tengfei and Li, Chaoyi and Ma, Pengsen and Xiang, Hongxin and Wang, Jianmin and Liu, Yiping and Song, Bosheng and Zeng, Xiangxiang},
+  journal={Information Fusion},
+  pages={103574},
+  year={2025},
+  publisher={Elsevier}
+}
+
+@article{LLAMA3-2024,
+  title={The llama 3 herd of models},
+  author={Grattafiori, Aaron and Dubey, Abhimanyu and Jauhri, Abhinav and Pandey, Abhinav and Kadian, Abhishek and Al-Dahle, Ahmad and Letman, Aiesha and Mathur, Akhil and Schelten, Alan and Vaughan, Alex and others},
+  journal={arXiv preprint arXiv:2407.21783},
+  year={2024}
+}
+
+%%%%%%%%%%%%%%%%%%% Deprecated Citations %%%%%%%%%%%%%%%%%%% 
+
+article{very-early-work,
+  title={Label propagation prediction of drug-drug interactions based on clinical side effects},
+  author={Zhang, Ping and Wang, Fei and Hu, Jianying and Sorrentino, Robert},
+  journal={Scientific reports},
+  volume={5},
+  number={1},
+  pages={12339},
+  year={2015},
+  publisher={Nature Publishing Group UK London}
+}
+
+article{Meta-Learning-for-event-3,
+  title={A meta-learning framework using representation learning to predict drug-drug interaction},
+  author={Deepika, SS and Geetha, TV},
+  journal={Journal of biomedical informatics},
+  volume={84},
+  pages={136--147},
+  year={2018},
+  publisher={Elsevier}
+}
+
+article{early-work-KG,
+  title={Evaluation of knowledge graph embedding approaches for drug-drug interaction prediction using linked open data},
+  author={Celebi, Remzi and Yasar, Erkan and Uyar, Huseyin and Gumus, Ozgur and Dikenelli, Oguz and Dumontier, Michel},
+  year={2018},
+  publisher={Semantic Web Applications and Tools for Healthcare and Life Sciences}
+}
+
+article{early-work-matrix-factorization-1,
+  title={Predicting and understanding comprehensive drug-drug interactions via semi-nonnegative matrix factorization},
+  author={Yu, Hui and Mao, Kui-Tao and Shi, Jian-Yu and Huang, Hua and Chen, Zhi and Dong, Kai and Yiu, Siu-Ming},
+  journal={BMC systems biology},
+  volume={12},
+  number={Suppl 1},
+  pages={14},
+  year={2018},
+  publisher={Springer}
+}
+
+inproceedings{karim2019drug,
+  title={Drug-drug interaction prediction based on knowledge graph embeddings and convolutional-LSTM network},
+  author={Karim, Md Rezaul and Cochez, Michael and Jares, Joao Bosco and Uddin, Mamtaz and Beyan, Oya and Decker, Stefan},
+  booktitle={Proceedings of the 10th ACM international conference on bioinformatics, computational biology and health informatics},
+  pages={113--123},
+  year={2019}
+}
+
+article{early-work-matrix-factorization-2,
+  title={Detecting drug communities and predicting comprehensive drug--drug interactions via balance regularized semi-nonnegative matrix factorization},
+  author={Shi, Jian-Yu and Mao, Kui-Tao and Yu, Hui and Yiu, Siu-Ming},
+  journal={Journal of cheminformatics},
+  volume={11},
+  number={1},
+  pages={28},
+  year={2019},
+  publisher={Springer}
+}
+
+inproceedings{huang2020caster,
+  title={Caster: Predicting drug interactions with chemical substructure representation},
+  author={Huang, Kexin and Xiao, Cao and Hoang, Trong and Glass, Lucas and Sun, Jimeng},
+  booktitle={Proceedings of the AAAI conference on artificial intelligence},
+  volume={34},
+  number={01},
+  pages={702--709},
+  year={2020}
+}
+
+inproceedings{lin2020kgnn,
+  title={KGNN: Knowledge graph neural network for drug-drug interaction prediction.},
+  author={Lin, Xuan and Quan, Zhe and Wang, Zhi-Jie and Ma, Tengfei and Zeng, Xiangxiang},
+  booktitle={Ijcai},
+  volume={380},
+  pages={2739--2745},
+  year={2020}
+  }
+
+article{DDI-MDL_2020,
+  title={A multimodal deep learning framework for predicting drug--drug interaction events},
+  author={Deng, Yifan and Xu, Xinran and Qiu, Yang and Xia, Jingbo and Zhang, Wen and Liu, Shichao},
+  journal={Bioinformatics},
+  volume={36},
+  number={15},
+  pages={4316--4322},
+  year={2020},
+  publisher={Oxford University Press}
+}
+
+article{wang2020gognn,
+  title={Gognn: Graph of graphs neural network for predicting structured entity interactions},
+  author={Wang, Hanchen and Lian, Defu and Zhang, Ying and Qin, Lu and Lin, Xuemin},
+  journal={arXiv preprint arXiv:2005.05537},
+  year={2020}
+}
+
+article{chen2021muffin,
+  title={MUFFIN: multi-scale feature fusion for drug--drug interaction prediction},
+  author={Chen, Yujie and Ma, Tengfei and Yang, Xixi and Wang, Jianmin and Song, Bosheng and Zeng, Xiangxiang},
+  journal={Bioinformatics},
+  volume={37},
+  number={17},
+  pages={2651--2658},
+  year={2021},
+  publisher={Oxford University Press}
+}
+
+inproceedings{lyu2021mdnn,
+  title={MDNN: A multimodal deep neural network for predicting drug-drug interaction events.},
+  author={Lyu, Tengfei and Gao, Jianliang and Tian, Ling and Li, Zhao and Zhang, Peng and Zhang, Ji},
+  booktitle={Ijcai},
+  volume={3536},
+  number={3542.2021},
+  year={2021}
+}
+
+inproceedings{wang2021multi,
+  title={Multi-view graph contrastive representation learning for drug-drug interaction prediction},
+  author={Wang, Yingheng and Min, Yaosen and Chen, Xin and Wu, Ji},
+  booktitle={Proceedings of the web conference 2021},
+  pages={2921--2933},
+  year={2021}
+}
+
+article{lin2022mdf,
+  title={MDF-SA-DDI: predicting drug--drug interaction events based on multi-source drug fusion, multi-source feature fusion and transformer self-attention mechanism},
+  author={Lin, Shenggeng and Wang, Yanjing and Zhang, Lingfeng and Chu, Yanyi and Liu, Yatong and Fang, Yitian and Jiang, Mingming and Wang, Qiankun and Zhao, Bowen and Xiong, Yi and others},
+  journal={Briefings in Bioinformatics},
+  volume={23},
+  number={1},
+  pages={bbab421},
+  year={2022},
+  publisher={Oxford University Press}
+}
+
+article{su2022attention,
+  title={Attention-based knowledge graph representation learning for predicting drug-drug interactions},
+  author={Su, Xiaorui and Hu, Lun and You, Zhuhong and Hu, Pengwei and Zhao, Bowei},
+  journal={Briefings in bioinformatics},
+  volume={23},
+  number={3},
+  pages={bbac140},
+  year={2022},
+  publisher={Oxford University Press}
+}
+
+article{Meta-Learning-for-event-2,
+  title={META-DDIE: predicting drug--drug interaction events with few-shot learning},
+  author={Deng, Yifan and Qiu, Yang and Xu, Xinran and Liu, Shichao and Zhang, Zhongfei and Zhu, Shanfeng and Zhang, Wen},
+  journal={Briefings in bioinformatics},
+  volume={23},
+  number={1},
+  pages={bbab514},
+  year={2022},
+  publisher={Oxford University Press}
+}
+
+article{hong2022lagat,
+  title={LaGAT: link-aware graph attention network for drug--drug interaction prediction},
+  author={Hong, Yue and Luo, Pengyu and Jin, Shuting and Liu, Xiangrong},
+  journal={Bioinformatics},
+  volume={38},
+  number={24},
+  pages={5406--5412},
+  year={2022},
+  publisher={Oxford University Press}
+}
+
+inproceedings{xiong2023multi,
+  title={Multi-relational contrastive learning graph neural network for drug-drug interaction event prediction},
+  author={Xiong, Zhankun and Liu, Shichao and Huang, Feng and Wang, Ziyan and Liu, Xuan and Zhang, Zhongfei and Zhang, Wen},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={37},
+  number={4},
+  pages={5339--5347},
+  year={2023}
+}
+
+inproceedings{lin2023interpretable,
+  title={Interpretable multi-view attention network for drug-drug interaction prediction},
+  author={Lin, Xuan and Wen, Qi and Yang, Sijie and Yu, Zu-Guo and Long, Yahui and Zeng, Xiangxiang},
+  booktitle={2023 IEEE International Conference on Bioinformatics and Biomedicine (BIBM)},
+  pages={422--427},
+  year={2023},
+  organization={IEEE}
+}
+
+article{BioBERT,
+  title={Integrating heterogeneous knowledge graphs into drug--drug interaction extraction from the literature},
+  author={Asada, Masaki and Miwa, Makoto and Sasaki, Yutaka},
+  journal={Bioinformatics},
+  volume={39},
+  number={1},
+  pages={btac754},
+  year={2023},
+  publisher={Oxford University Press}
+}
+
+article{Similarity-1,
+  title={A simplified similarity-based approach for drug-drug interaction prediction},
+  author={Shtar, Guy and Solomon, Adir and Mazuz, Eyal and Rokach, Lior and Shapira, Bracha},
+  journal={Plos one},
+  volume={18},
+  number={11},
+  pages={e0293629},
+  year={2023},
+  publisher={Public Library of Science San Francisco, CA USA}
+}
+
+
+
+article{du2024customized,
+  title={Customized subgraph selection and encoding for drug-drug interaction prediction},
+  author={Du, Haotong and Yao, Quanming and Zhang, Juzheng and Liu, Yang and Wang, Zhen},
+  journal={Advances in Neural Information Processing Systems},
+  volume={37},
+  pages={109582--109608},
+  year={2024}
+}
+
+inproceedings{old-work-with-bad-results,
+  title={Prediction of Drug-Drug Interactions with Zero-Shot Learning},
+  author={Astras, Nikolaos and Vogiatzis, Dimitrios},
+  booktitle={Proceedings of the 13th Hellenic Conference on Artificial Intelligence},
+  pages={1--8},
+  year={2024}
+}
+
+article{information-extract,
+  title={Harnessing large language models' zero-shot and few-shot learning capabilities for regulatory research},
+  author={Meshkin, Hamed and Zirkle, Joel and Arabidarrehdor, Ghazal and Chaturbedi, Anik and Chakravartula, Shilpa and Mann, John and Thrasher, Bradlee and Li, Zhihua},
+  journal={Briefings in Bioinformatics},
+  volume={25},
+  number={5},
+  pages={bbae354},
+  year={2024},
+  publisher={Oxford University Press}
+}
+
+inproceedings{ChemBERTA,
+  title={Leveraging ChemBERTa robustness in drug-drug interaction classification via molecular decomposition},
+  author={Kenneth, Christian and Imani, Alyssa and Pardamean, Bens},
+  booktitle={2024 7th International Seminar on Research of Information Technology and Intelligent Systems (ISRITI)},
+  pages={694--699},
+  year={2024},
+  organization={IEEE}
+}
+
+article{hua2025mmdg,
+  title={MMDG-DTI: Drug--target interaction prediction via multimodal feature fusion and domain generalization},
+  author={Hua, Yang and Feng, Zhenhua and Song, Xiaoning and Wu, Xiao-Jun and Kittler, Josef},
+  journal={Pattern Recognition},
+  volume={157},
+  pages={110887},
+  year={2025},
+  publisher={Elsevier}
+}
+
+article{yuan2025phgl,
+  title={PHGL-DDI: A pre-training based hierarchical graph learning framework for drug-drug interaction prediction},
+  author={Yuan, Yongna and Yue, Jiaqi and Zhang, Ruisheng and Su, Wei},
+  journal={Expert Systems with Applications},
+  volume={270},
+  pages={126408},
+  year={2025},
+  publisher={Elsevier}
+}
+
+inproceedings{wang2025pkag,
+  title={PKAG-DDI: Pairwise Knowledge-Augmented Language Model for Drug-Drug Interaction Event Text Generation},
+  author={Wang, Ziyan and Xiong, Zhankun and Huang, Feng and Zhang, Wen},
+  booktitle={Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  pages={10996--11010},
+  year={2025}
+}
+
+inproceedings{maself,
+  title={Self-supervised Blending Structural Context of Visual Molecules for Robust Drug Interaction Prediction},
+  author={Ma, Tengfei and Chen, Kun and Zang, Yongsheng and Chen, Yujie and Ren, Xuanbai and Song, Bosheng and Liu, Yiping and others},
+  booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems},
+  year={2025}
+}
+
+@article{UsingLLM4DDI,
+  title={Drug-drug interaction identification using large language models},
+  author={Blotske, Kaitlin and Zhao, Xingmeng and Henry, Kelli and Gao, Yanjun and Tilley, Adeleine and Cargile, Moriah and Murray, Brian and Smith, Susan E and Barreto, Erin F and Bauer, Seth and others},
+  journal={medRxiv},
+  pages={2025--12},
+  year={2025},
+  publisher={Cold Spring Harbor Laboratory Press}
+}
+
+@article{D3,
+  title={D3: a small language model for drug-drug interaction prediction and comparison with large language models},
+  author={Ibrahim, Ahmed and Hosseini, Abdullah and Ibrahim, Salma and Sattar, Aamenah and Serag, Ahmed},
+  journal={Machine Learning with Applications},
+  volume={20},
+  pages={100658},
+  year={2025},
+  publisher={Elsevier}
+}
+
+
+
+@inproceedings{ExDDI,
+  title={Exddi: Explaining drug-drug interaction predictions with natural language},
+  author={Sun, Zhaoyue and Li, Jiazheng and Pergola, Gabriele and He, Yulan},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={39},
+  number={24},
+  pages={25228--25236},
+  year={2025}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%
+
+@book{em:86,
+  editor  = "Engelmore, Robert and Morgan, Anthony",
+  title   = "Blackboard Systems",
+  year    = 1986,
+  address = "Reading, Mass.",
+  publisher = "Addison-Wesley",
+}
+
+@inproceedings{c:83,
+  author  = "Clancey, William J.",
+  year    = 1983,
+  title   = "{Communication, Simulation, and Intelligent
+Agents: Implications of Personal Intelligent Machines
+for Medical Education}",
+  booktitle="Proceedings of the Eighth International Joint Conference on Artificial Intelligence {(IJCAI-83)}", 
+  pages   = "556-560",
+  address = "Menlo Park, Calif",
+  publisher = "{IJCAI Organization}",
+}
+@inproceedings{c:84,
+  author  = "Clancey, William J.",
+  year    = 1984,
+  title   = "{Classification Problem Solving}",
+  booktitle = "Proceedings of the Fourth National 
+              Conference on Artificial Intelligence",
+  pages   = "45-54",
+  address = "Menlo Park, Calif.",
+  publisher="AAAI Press",
+}
+@article{r:80,
+  author = {Robinson, Arthur L.},
+  title = {New Ways to Make Microcircuits Smaller},
+  volume = {208},
+  number = {4447},
+  pages = {1019--1022},
+  year = {1980},
+  doi = {10.1126/science.208.4447.1019},
+  publisher = {American Association for the Advancement of Science},
+  issn = {0036-8075},
+  URL = {https://science.sciencemag.org/content/208/4447/1019},
+  eprint = {https://science.sciencemag.org/content/208/4447/1019.full.pdf},
+  journal = {Science},
+}
+@article{r:80x,
+  author  = "Robinson, Arthur L.",
+  year    = 1980,
+  title   = "{New Ways to Make Microcircuits Smaller---Duplicate Entry}",
+  journal = "Science",
+  volume  =  208,
+  pages   = "1019-1026",
+}
+@article{hcr:83,
+title = {Strategic explanations for a diagnostic consultation system},
+journal = {International Journal of Man-Machine Studies},
+volume = {20},
+number = {1},
+pages = {3-19},
+year = {1984},
+issn = {0020-7373},
+doi = {https://doi.org/10.1016/S0020-7373(84)80003-6},
+url = {https://www.sciencedirect.com/science/article/pii/S0020737384800036},
+author = {Diane Warner Hasling and William J. Clancey and Glenn Rennels},
+abstract = {This article examines the problem of automatte explanation of reasoning, especially as it relates to expert systems. By explanation we mean the ability of a program to discuss what it is doing in some understandable way. We first present a general framework in which to view explanation and review some of the research done in this area. We then focus on the explanation system for NEOMYCIN, a medical consultation program. A consultation program interactively helps a user to solve a problem. Our goal is to have NEOMYCIN explain its problem-solving strategies. An explanation of strategy describes the plan the program is using to reach a solution. Such an explanation is usually concrete, referring to aspects of the current problem situation. Abstract explanations articulate a general principle, which can be applied in different situations; such explanations are useful in teaching and in explaining by analogy. We describe the aspects of NEOMYCIN that make abstract strategic explanations possible—the representation of strategic knowledge explicitly and separately from domain knowledge— and demonstrate how this representation can be used to generate explanations.}
+}
+@article{hcrt:83,
+  author  = "Hasling, Diane Warner and Clancey, William J. and Rennels, Glenn R. and Test, Thomas",
+  year    = 1983,
+  title   = "{Strategic Explanations in Consultation---Duplicate}",
+  journal = "The International Journal of Man-Machine Studies",
+  volume  = 20,
+  number  = 1,
+  pages   = "3-19",
+}
+@techreport{r:86,
+  author  = "Rice, James",
+  year    = 1986,
+  title   = "{Poligon: A System for Parallel Problem Solving}",
+  type    = "Technical Report", 
+  number  = "KSL-86-19", 
+  institution = "Dept.\ of Computer Science, Stanford Univ.",
+}
+@phdthesis{c:79,
+  author  = "Clancey, William J.",
+  year    = 1979,
+  title   = "{Transfer of Rule-Based Expertise
+through a Tutorial Dialogue}",
+  type    = "{Ph.D.} diss.",
+  school  = "Dept.\ of Computer Science, Stanford Univ.",
+  address = "Stanford, Calif.",
+}
+@unpublished{c:21,
+  author  = "Clancey, William J.",
+  title   = "{The Engineering of Qualitative Models}",
+  year    = 2021,
+  note    = "Forthcoming",
+}
+@misc{c:22,
+      title={Attention Is All You Need}, 
+      author={Ashish Vaswani and Noam Shazeer and Niki Parmar and Jakob Uszkoreit and Llion Jones and Aidan N. Gomez and Lukasz Kaiser and Illia Polosukhin},
+      year={2017},
+      eprint={1706.03762},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+@misc{c:23,
+  title        = "Pluto: The 'Other' Red Planet",
+  author       = "{NASA}",
+  howpublished = "\url{https://www.nasa.gov/nh/pluto-the-other-red-planet}",
+  year         = 2015,
+  note         = "Accessed: 2018-12-06"
+}
+
+

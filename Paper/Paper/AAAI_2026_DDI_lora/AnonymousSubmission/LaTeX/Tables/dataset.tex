@@ -1,0 +1,19 @@
+\begin{table}[t]
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{l|ccccc}
+    \toprule
+    Dataset (task) & Drugs & Classes & Train & Val & Test \\
+    \midrule
+    Ryu (binary)             & 1{,}700 & 2   & 142{,}808 & 13{,}712 & 15{,}248 \\
+    Ryu (multi-class)        & 1{,}700 & 86  & 71{,}560  & 6{,}862  & 7{,}649  \\
+    Latest-800 (binary)      & 800     & 2   & 70{,}702  & 8{,}180  & 6{,}084  \\
+    Latest-800 (multi-class) & 800     & 165 & 35{,}351  & 4{,}090  & 3{,}042  \\
+    \bottomrule
+  \end{tabular}%
+  }
+  \caption{Dataset statistics under the S2 cold-start split, where both drugs in every test pair are unseen during training. Drugs and Classes denote nominal counts. Train, Val, and Test denote the numbers of DDI pairs in a representative fold.}
+  \label{tab:datasets}
+\end{table}

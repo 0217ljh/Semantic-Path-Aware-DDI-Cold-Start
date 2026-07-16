@@ -1,0 +1,65 @@
+========================================================================
+LEAKAGE AUDIT  --  800-drug seed42 cold-start S2
+========================================================================
+
+[1] DRUG SET DISJOINTNESS
+  SEEN (in train): 640
+  UNSEEN test_s2: 159
+  UNSEEN val_s2:  159
+  SEEN n test_s2: 0  (expect 0)
+  SEEN n val_s2 : 0  (expect 0)
+  test_s2 n val_s2 UNSEEN: 159
+  total distinct drugs touched: 799
+
+[2] PAIR DISJOINTNESS (canonical)
+  train+: 53743  test_s2+: 1919  val_s2+: 1918
+  train n test_s2: 0  (expect 0)
+  train n val_s2 : 0  (expect 0)
+  test  n val_s2 : 0  (expect 0)
+
+[3] MERGED KG (mask1) DDI-EDGE AUDIT
+  total edges: 7,099,528  drug nodes: 7,754
+  drug->drug edges (any rel): 4855  (expect 0 for DDI-masked)
+            src src_kind      dst dst_kind relation source_kg  directed
+723144  DB01069     Drug  DB00777     Drug  het:CrC  hetionet     False
+723146  DB01231     Drug  DB00209     Drug  het:CrC  hetionet     False
+723147  DB01327     Drug  DB01112     Drug  het:CrC  hetionet     False
+723148  DB00257     Drug  DB04794     Drug  het:CrC  hetionet     False
+723149  DB00432     Drug  DB01262     Drug  het:CrC  hetionet     False
+
+[4] meet_feat (MNAH count cache) sanity on test_s2 pairs
+  test_s2 pairs covered: 1919/1919
+  with >=1 mediator count: 1836
+  mean total mediators per test pair: 33.83
+  NOTE non-zero is NOT leakage; counts are over biomedical (DDI-masked) KG
+
+[5] z_m InfoNCE training-set leakage check
+  z_m records flagged is_seen=True: 640
+  zm_seen n test_s2 UNSEEN: 0  (expect 0)
+  zm_seen n val_s2 UNSEEN:  0  (expect 0)
+  zm_seen subset of SEEN train graph: True  (expect True)
+
+[6] LLM sanitized text — post-redact partner-drug / DDI-phrase residue
+  total jsonl records: 1900
+  flagged at distill time (raw text had partner/DDI): 525
+  records with non-empty sanitized_text: 1530
+  POST-REDACT still contains other drug name: 0  (expect ~0)
+  POST-REDACT still contains DDI phrase:     62   (expect ~0)
+
+[8] TRAIN NEGATIVE SAMPLING (epoch 0)
+  train neg pairs: 53743
+  train_neg n test_s2 pairs: 0  (expect 0)
+  train_neg n val_s2 pairs:  0  (expect 0)
+  train_neg drugs subset of SEEN: True  (expect True)
+  train_neg drugs: 640/640
+
+[9] TEST_s2 negative pool
+  test_s2 neg pairs: 1919
+  test_neg n train+: 0  (expect 0)
+  test_neg n test+:  0  (expect 0)
+  test_neg drugs subset of UNSEEN test set: False  (expect True)
+  test_neg drugs: 160
+
+========================================================================
+Audit complete. Any (expect 0) line showing >0 is a leakage finding.
+========================================================================

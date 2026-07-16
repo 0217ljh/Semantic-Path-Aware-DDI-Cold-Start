@@ -1,0 +1,19 @@
+{
+  "filter_version": "v2.1 \u2014 prescriptive-only, drug names preserved (RECOMMENDED-header catch + discontinu noun-form preserved)",
+  "n_rows": 400,
+  "n_PKB": 200,
+  "n_PDB": 200,
+  "char_reduction": {
+    "mean_original": 376.945,
+    "mean_filtered": 364.6575,
+    "mean_pct_kept": 97.40906612912676
+  },
+  "sentence_reduction": {
+    "mean_orig_sent": 2.2375,
+    "mean_kept_sent": 2.1575,
+    "mean_pct_sent_kept": 97.25178571428572
+  },
+  "rows_with_empty_filtered_text": 1,
+  "rows_unchanged_by_filter": 369,
+  "rows_filtered_text_<30char": 1
+}

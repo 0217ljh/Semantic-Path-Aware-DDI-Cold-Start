@@ -1,0 +1,72 @@
+[E2b] device=cuda
+[E2b] nodes=178029  edges=7099528
+
+[E2b] PairNorm (corrected) K=1 seed=42
+      epoch  1/15  loss=0.6794  AUC=0.6201  best=0.6201
+      epoch  5/15  loss=0.6721  AUC=0.6266  best=0.6266
+      epoch 10/15  loss=0.6720  AUC=0.6251  best=0.6266
+      epoch 15/15  loss=0.6719  AUC=0.6238  best=0.6266
+  AUC=0.6266  cosine=0.2408  dirichlet=699.84  dim_var=0.0134  time=12.6s
+
+[E2b] PairNorm (corrected) K=2 seed=42
+      epoch  1/15  loss=0.6725  AUC=0.6370  best=0.6370
+      epoch  5/15  loss=0.6497  AUC=0.6569  best=0.6607
+      epoch 10/15  loss=0.6405  AUC=0.6749  best=0.6773
+      epoch 15/15  loss=0.6366  AUC=0.6840  best=0.6891
+  AUC=0.6891  cosine=0.1782  dirichlet=11.01  dim_var=0.0640  time=24.5s
+
+[E2b] PairNorm (corrected) K=4 seed=42
+      epoch  1/15  loss=0.6778  AUC=0.6393  best=0.6393
+      epoch  5/15  loss=0.6518  AUC=0.6610  best=0.6610
+      epoch 10/15  loss=0.6443  AUC=0.6731  best=0.6731
+      epoch 15/15  loss=0.6392  AUC=0.6811  best=0.6811
+  AUC=0.6811  cosine=0.1518  dirichlet=219.85  dim_var=0.0335  time=49.1s
+
+[E2b] PairNorm (corrected) K=6 seed=42
+      epoch  1/15  loss=0.6779  AUC=0.6244  best=0.6244
+      epoch  5/15  loss=0.6547  AUC=0.6578  best=0.6578
+      epoch 10/15  loss=0.6425  AUC=0.6616  best=0.6791
+      epoch 15/15  loss=0.6361  AUC=0.6769  best=0.6877
+  AUC=0.6877  cosine=0.1498  dirichlet=46.20  dim_var=0.0284  time=70.0s
+
+[E2b] PairNorm (corrected) K=8 seed=42
+      epoch  1/15  loss=0.6768  AUC=0.5882  best=0.5882
+      epoch  5/15  loss=0.6558  AUC=0.6526  best=0.6526
+      epoch 10/15  loss=0.6526  AUC=0.6611  best=0.6611
+      epoch 15/15  loss=0.6417  AUC=0.6717  best=0.6742
+  AUC=0.6742  cosine=0.0534  dirichlet=41.61  dim_var=0.0651  time=94.3s
+
+[E2b] MLP-control (random Gaussian init) K=2 seed=42
+      epoch  1/15  loss=0.6957  AUC=0.4911  best=0.4911
+      epoch  5/15  loss=0.6194  AUC=0.4930  best=0.4930
+      epoch 10/15  loss=0.5768  AUC=0.4956  best=0.4973
+      epoch 15/15  loss=0.5674  AUC=0.4970  best=0.4973
+  AUC=0.4973  cosine=0.1398  dirichlet=2.81  dim_var=0.0107  time=1.2s
+
+[E2b] MLP-control (random Gaussian init) K=8 seed=42
+      epoch  1/15  loss=0.6943  AUC=0.5061  best=0.5061
+      epoch  5/15  loss=0.6931  AUC=0.5000  best=0.5061
+      epoch 10/15  loss=0.6931  AUC=0.5000  best=0.5061
+      epoch 15/15  loss=0.6931  AUC=0.5000  best=0.5061
+  AUC=0.5061  cosine=1.0000  dirichlet=0.00  dim_var=0.0000  time=4.3s
+
+[E2b] Vanilla GCN K=8 with random Gaussian init (sanity)
+      epoch  1/15  loss=0.6901  AUC=0.6099  best=0.6099
+      epoch  5/15  loss=0.6504  AUC=0.6401  best=0.6401
+      epoch 10/15  loss=0.6437  AUC=0.6384  best=0.6500
+      epoch 15/15  loss=0.6319  AUC=0.6554  best=0.6554
+  AUC=0.6554  cosine=0.6936  dirichlet=10.75  dim_var=0.0127  time=88.3s
+
+[E2b] saved → depth_controls_rerun.json
+
+[E2b] SUMMARY:
+PairNorm fixed:
+  K=1  AUC=0.6266  cosine=0.2408  dirichlet=699.84  dim_var=0.0134
+  K=2  AUC=0.6891  cosine=0.1782  dirichlet=11.01  dim_var=0.0640
+  K=4  AUC=0.6811  cosine=0.1518  dirichlet=219.85  dim_var=0.0335
+  K=6  AUC=0.6877  cosine=0.1498  dirichlet=46.20  dim_var=0.0284
+  K=8  AUC=0.6742  cosine=0.0534  dirichlet=41.61  dim_var=0.0651
+MLP-control (random init):
+  K=2  AUC=0.4973  cosine=0.1398  dirichlet=2.81
+  K=8  AUC=0.5061  cosine=1.0000  dirichlet=0.00
+Vanilla K=8 with random init sanity: AUC=0.6554  dirichlet=10.75  dim_var=0.0127

@@ -1,0 +1,53 @@
+Title: GraphLoRA: Structure-Aware Contrastive Low-Rank Adaptation for Cross-Graph Transfer Learning
+Authors: Zhe-Rui Yang, Jindong Han, Chang-Dong Wang, Hao Liu (Sun Yat-sen University; HKUST / HKUST(GZ))
+Venue+Year: KDD '25 (31st ACM SIGKDD), Toronto, ON, Canada, August 2025
+arXiv-or-DOI: DOI 10.1145/3690624.3709186 ; ACM ISBN 979-8-4007-1245-6/25/08 ; code https://github.com/AllminerLab/GraphLoRA
+PDF filename: GRAPHLORA.pdf
+
+## TL;DR
+GraphLoRA transfers a GNN pre-trained on a source graph to a target graph with a different feature/structure distribution by (1) aligning node-feature distributions via a Structure-aware MMD, and (2) injecting a SECOND small trainable GNN alongside the frozen pre-trained one, whose per-layer weight update is LoRA-decomposed (BA, rank r << dim), trained with a graph-contrastive loss + a homophily-based structure regularizer. It edits GNN WEIGHTS for cross-graph transfer; it is NOT about unseen entities / cold-start link prediction.
+
+## Problem & Contributions
+- Problem: cross-graph transfer of pre-trained GNNs suffers "negative transfer" (Fig 1) due to (i) cross-graph feature discrepancy, (ii) cross-graph structural discrepancy, (iii) target-graph label scarcity. Task studied is node classification (Sec 3.2).
+- Contributions (Sec 1): (a) Structure-aware MMD (SMMD) that folds graph structure into a distribution-discrepancy measure; (b) GraphLoRA = a low-rank adaptation GNN added beside the frozen pre-trained GNN, coupled with graph contrastive learning, to bridge structural gaps and avoid catastrophic forgetting, with a theoretical representational-capacity result (Thm 1); (c) a structure-aware (homophily) regularizer for label scarcity; (d) experiments on 8 datasets vs 14 baselines tuning only ~20% of parameters.
+
+## Method / Core mechanism (equations in words + notation)
+Setup: source graph G^s, target graph G^t; frozen pre-trained GNN g_theta; tunable added module. Node classification.
+1) Node Feature Adaptation (Sec 4.2): a linear projector p(x^t; omega) maps target features into source feature space (z^t in R^{d_s}). Minimize feature discrepancy via Structure-aware MMD (SMMD, Eq 8-9): standard MMD (Eq 5) but the within-target kernel term is reweighted by gamma_{i,i'} = log(1 + 1/S_{i,i'}), where S is a Personalized-PageRank diffusion matrix (Eq 6-7). Effect: pairs with stronger diffusion connection get SMALLER weight, preserving homophily/structure during feature mapping.
+2) Structural Knowledge Transfer via low-rank adaptation (Sec 4.3, THE LoRA PART): keep the pre-trained GNN g_theta frozen and add a second GNN g'_phi with the SAME architecture whose parameters are the weight UPDATES. Per layer l, output becomes H_l = GNN_l(H_{l-1}; W_l) + GNN'_l(H_{l-1}; W_l^B W_l^A), where the update ΔW_l is factorized as W_l^B (d_{l-1} x r) times W_l^A (r x d_l), rank r << min(d_{l-1}, d_l) (Eq 10). So the LOW-RANK RESIDUAL SITS ON THE GNN's PER-LAYER WEIGHT MATRIX (the message-passing transform), added as a parallel GNN branch. Trained with a supervised graph-contrastive loss L_cl (Eq 11): frozen vs tunable embeddings of the same node = positives; same-label nodes also positives; different nodes/labels = negatives.
+3) Structure-aware Regularization (Sec 4.4, Eq 12): homophily prior. Predicted label vectors of connected neighbors pushed similar, disconnected pushed dissimilar (sigmoid of inner product), to combat label scarcity.
+4) Optimization (Sec 4.5): classifier on (h_i + h'_i); total loss L = L_cls + lambda1 L_smmd + lambda2 L_cl + lambda3 L_str + lambda4 ||Theta|| (Eq 14-15). Fine-tune complexity O(N_t b + M) (Sec 4.6).
+Theory (Thm 1, Sec 4.3; proof in Appendix A): under mild rank/architecture conditions, there exist low-rank adaptations making the adapted frozen GNN g_0 EXACTLY equal to a target GNN g (with L <= L layers), i.e. LoRA on a pre-trained GNN can in principle reach the optimal target GNN.
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Main node-classification accuracy, public + 10-shot, 5 source pre-trainings, 5 target datasets (Table 1). GraphLoRA is best or 2nd-best in most cells. Avg improvement 1.01% over best baseline and 3.33% over GRACE; +2.23% public / +4.43% 10-shot over GRACE (Sec 5.2). Larger gains under label scarcity.
+- Cross-graph transfer (Sec 5.2.1): avg +10.12% over direct-transfer GRACE_t, +8.21% over GTOT, +9.78% over AdapterGNN, +8.74% over GraphControl.
+- Efficiency (Table 3): avg fine-tune runtime 31.0s, competitive/lower than most baselines.
+- Large-scale (Table 4 Reddit; Table 5 Reddit/ogbn-arxiv/ogbn-products): best in most cases; e.g. ogbn-arxiv 68.61, ogbn-products 75.05; several baselines OOM.
+- Hyperparameter r (Sec 5.5.2, Fig 4): stable across r; best around r in [2^3, 2^5], tunable params 7%-20%; too small under-fits, too large over-fits; even r=1 is "commendable".
+- Ablations (Table 6): removing node-feature-adaptation ("w/o nfa") and SMMD ("w/o smmd") hurts most; "w/o lrd" (no low-rank decomposition on the update) degrades but modestly; "w/o str" hurts more in 10-shot.
+- Catastrophic forgetting (Table 7): after PubMed pretrain then fine-tune elsewhere and re-test PubMed, GraphLoRA retains ~79.8-80.9 vs full-FT collapsing to ~59.6; avg +18.64% over FT.
+- t-SNE (Fig 5): clearer class boundaries than GRACE / GRACE_t.
+
+## Relevance to our cold-start low-rank DDI paper (RW bucket; how we'd cite; concrete DELTA vs our method)
+RW bucket: "Low-rank adaptation applied to GNNs / graph transfer learning" (a PEFT-for-GNN neighbor). This is the CLOSEST method-name neighbor and the delta must be stated sharply.
+How we'd cite: as the representative work that ports LoRA into the GNN setting for cross-GRAPH transfer, to contrast WHERE the low rank lives and WHAT is being transferred.
+CONCRETE DELTA vs us (state all three):
+1) WHERE the low rank sits. GraphLoRA puts the low-rank factor BA on the GNN's PRE-TRAINED PER-LAYER WEIGHT MATRICES (the message-passing transform), as a parallel adapter GNN (Eq 10). We put low rank on the MEDIATOR RESIDUAL INTERACTION FUNCTION for a drug PAIR, H = H_base + M_A M_B, i.e. on the interaction/output function over shared typed mediators, not on backbone conv weights.
+2) WHAT problem. They do cross-graph node classification where the target graph's NODES/labels exist and are (few-shot) LABELED; the entities are seen at fine-tune time. We do cold-start DDI link prediction where BOTH drugs are UNSEEN at test — no per-entity fine-tuning is possible, so cold-safety must come from the parametrization (drugs only SELECT shared mediator bases via M_A), not from adapting weights on target data.
+3) WHY low rank. For them low rank is a PEFT/anti-forgetting/anti-overfitting device on transferable backbone weights; their Thm 1 is an expressivity (can-fit-any-target) claim, not a claim that the transferable signal is intrinsically lower-rank. Our thesis is the opposite direction: the transferable-to-unseen signal ADMITS a lower-rank realization than warm fitting needs (a claim about the signal, not merely a parameter budget).
+Shared analogy worth noting: both use "frozen shared component + small low-rank add-on," but ours ties the shared bases to typed mediators and the per-pair coefficients to a block-sparse selection, which is the cold-start-safe piece GraphLoRA does not have.
+
+## Safe-to-cite claims (section pointers)
+- LoRA-style low-rank weight update BA applied per GNN layer as a parallel frozen+trainable GNN (Sec 4.3, Eq 10).
+- Freezing pre-trained weights + small tunable add-on mitigates catastrophic forgetting (Sec 4.3; Table 7).
+- Low-rank keeps tunable params small, ~7-20% at r in [8,32], reducing overfitting under label scarcity (Sec 5.5.2, Fig 4).
+- Small r suffices / performance stable across r (Sec 5.5.2).
+- Thm 1: under mild conditions low-rank adaptation of a frozen GNN can equal a target GNN (Sec 4.3; Appendix A) — an EXPRESSIVITY existence result.
+
+## Do-NOT-overclaim / caveats
+- Task is node classification / cross-GRAPH transfer, NOT link prediction, NOT DDI, NOT cold-start unseen-entity. Do not imply they handle unseen entities.
+- Their entities (target nodes) ARE present and few-shot LABELED during fine-tuning; there is no zero-shot/both-unseen regime.
+- Thm 1 is an existence/expressivity claim ("there exist low-rank adaptations such that ... exactly equal to g"), NOT a generalization bound and NOT a statement that transferable signal is low-rank. Do not cite it as a rank-of-signal or generalization result.
+- The "20% parameters" headline is the added-adapter budget for node classification; not a rank of any DDI interaction.
+- SMMD, contrastive loss, and homophily regularizer are integral to their gains (ablations Table 6); the low-rank piece alone ("w/o lrd") is a modest contributor. Do not attribute their headline gains to the LoRA component alone.

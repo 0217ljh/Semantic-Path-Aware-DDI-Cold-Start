@@ -1,0 +1,288 @@
+{
+  "PK-B": [
+    [
+      "Drug →[het:CcSE]— Side Effect —[het:CcSE]→ Drug",
+      8545
+    ],
+    [
+      "Drug —[prime:drug_effect]— effect/phenotype —[prime:drug_effect]— Drug",
+      4342
+    ],
+    [
+      "Drug —[prime:drug_protein]— gene/protein —[prime:drug_protein]— Drug",
+      980
+    ],
+    [
+      "Drug →[db:enzyme]— Protein —[db:enzyme]→ Drug",
+      887
+    ],
+    [
+      "Drug —[prime:contraindication]— disease —[prime:contraindication]— Drug",
+      648
+    ],
+    [
+      "Drug →[het:CbG]— Gene —[het:CbG]→ Drug",
+      463
+    ],
+    [
+      "Drug →[db:transporter]— Protein —[db:transporter]→ Drug",
+      235
+    ],
+    [
+      "Drug →[het:CdG]— Gene —[het:CdG]→ Drug",
+      195
+    ],
+    [
+      "Drug →[het:CuG]— Gene —[het:CuG]→ Drug",
+      132
+    ],
+    [
+      "Drug →[db:carrier]— Protein —[db:carrier]→ Drug",
+      67
+    ],
+    [
+      "Drug —[prime:contraindication]— disease —[prime:indication]— Drug",
+      63
+    ],
+    [
+      "Drug →[het:CdG]— Gene —[het:CuG]→ Drug",
+      53
+    ],
+    [
+      "Drug —[het:CrC]— Drug —[het:CrC]— Drug",
+      25
+    ],
+    [
+      "Drug →[db:target]— Protein —[db:target]→ Drug",
+      23
+    ],
+    [
+      "Drug —[prime:indication]— disease —[prime:indication]— Drug",
+      22
+    ],
+    [
+      "Drug —[prime:contraindication]— disease —[prime:off-label use]— Drug",
+      8
+    ],
+    [
+      "Drug →[het:CbG]— Gene —[het:CuG]→ Drug",
+      8
+    ],
+    [
+      "Drug →[het:CtD]— Disease —[het:CtD]→ Drug",
+      5
+    ],
+    [
+      "Drug —[prime:indication]— disease —[prime:off-label use]— Drug",
+      4
+    ],
+    [
+      "Drug →[het:CbG]— Gene —[het:CdG]→ Drug",
+      3
+    ],
+    [
+      "Drug —[het:CrC]— Drug_outside —[het:CrC]— Drug",
+      1
+    ],
+    [
+      "Drug →[het:CpD]— Disease —[het:CpD]→ Drug",
+      1
+    ]
+  ],
+  "PD-B": [
+    [
+      "Drug →[het:CcSE]— Side Effect —[het:CcSE]→ Drug",
+      8934
+    ],
+    [
+      "Drug —[prime:drug_effect]— effect/phenotype —[prime:drug_effect]— Drug",
+      5182
+    ],
+    [
+      "Drug —[prime:contraindication]— disease —[prime:contraindication]— Drug",
+      1036
+    ],
+    [
+      "Drug —[prime:drug_protein]— gene/protein —[prime:drug_protein]— Drug",
+      371
+    ],
+    [
+      "Drug —[prime:indication]— disease —[prime:indication]— Drug",
+      328
+    ],
+    [
+      "Drug →[het:CbG]— Gene —[het:CbG]→ Drug",
+      247
+    ],
+    [
+      "Drug →[db:enzyme]— Protein —[db:enzyme]→ Drug",
+      214
+    ],
+    [
+      "Drug —[het:CrC]— Drug —[het:CrC]— Drug",
+      101
+    ],
+    [
+      "Drug →[het:CdG]— Gene —[het:CdG]→ Drug",
+      99
+    ],
+    [
+      "Drug →[het:CuG]— Gene —[het:CuG]→ Drug",
+      90
+    ],
+    [
+      "Drug —[prime:contraindication]— disease —[prime:indication]— Drug",
+      86
+    ],
+    [
+      "Drug →[db:target]— Protein —[db:target]→ Drug",
+      76
+    ],
+    [
+      "Drug —[prime:off-label use]— disease —[prime:off-label use]— Drug",
+      68
+    ],
+    [
+      "Drug —[prime:indication]— disease —[prime:off-label use]— Drug",
+      54
+    ],
+    [
+      "Drug →[db:carrier]— Protein —[db:carrier]→ Drug",
+      43
+    ],
+    [
+      "Drug →[db:transporter]— Protein —[db:transporter]→ Drug",
+      43
+    ],
+    [
+      "Drug →[het:CdG]— Gene —[het:CuG]→ Drug",
+      34
+    ],
+    [
+      "Drug →[het:CtD]— Disease —[het:CtD]→ Drug",
+      30
+    ],
+    [
+      "Drug —[prime:contraindication]— disease —[prime:off-label use]— Drug",
+      18
+    ],
+    [
+      "Drug —[het:CrC]— Drug_outside —[het:CrC]— Drug",
+      11
+    ],
+    [
+      "Drug →[het:CpD]— Disease —[het:CtD]→ Drug",
+      11
+    ],
+    [
+      "Drug →[het:CbG]— Gene —[het:CuG]→ Drug",
+      7
+    ],
+    [
+      "Drug ←[het:PCiC]— Pharmacologic Class —[het:PCiC]← Drug",
+      7
+    ],
+    [
+      "Drug →[het:CpD]— Disease —[het:CpD]→ Drug",
+      5
+    ],
+    [
+      "Drug →[db:pathway]— Pathway —[db:pathway]→ Drug",
+      1
+    ],
+    [
+      "Drug →[het:CbG]— Gene —[het:CdG]→ Drug",
+      1
+    ]
+  ],
+  "NEG": [
+    [
+      "Drug →[het:CcSE]— Side Effect —[het:CcSE]→ Drug",
+      6306
+    ],
+    [
+      "Drug —[prime:drug_effect]— effect/phenotype —[prime:drug_effect]— Drug",
+      3940
+    ],
+    [
+      "Drug —[prime:contraindication]— disease —[prime:contraindication]— Drug",
+      789
+    ],
+    [
+      "Drug —[prime:drug_protein]— gene/protein —[prime:drug_protein]— Drug",
+      253
+    ],
+    [
+      "Drug →[db:enzyme]— Protein —[db:enzyme]→ Drug",
+      235
+    ],
+    [
+      "Drug →[het:CbG]— Gene —[het:CbG]→ Drug",
+      98
+    ],
+    [
+      "Drug —[prime:contraindication]— disease —[prime:indication]— Drug",
+      67
+    ],
+    [
+      "Drug →[db:transporter]— Protein —[db:transporter]→ Drug",
+      66
+    ],
+    [
+      "Drug →[db:carrier]— Protein —[db:carrier]→ Drug",
+      45
+    ],
+    [
+      "Drug →[het:CdG]— Gene —[het:CdG]→ Drug",
+      44
+    ],
+    [
+      "Drug —[prime:indication]— disease —[prime:off-label use]— Drug",
+      21
+    ],
+    [
+      "Drug →[het:CuG]— Gene —[het:CuG]→ Drug",
+      18
+    ],
+    [
+      "Drug —[prime:contraindication]— disease —[prime:off-label use]— Drug",
+      16
+    ],
+    [
+      "Drug →[het:CdG]— Gene —[het:CuG]→ Drug",
+      15
+    ],
+    [
+      "Drug —[het:CrC]— Drug —[het:CrC]— Drug",
+      11
+    ],
+    [
+      "Drug →[db:target]— Protein —[db:target]→ Drug",
+      8
+    ],
+    [
+      "Drug —[prime:indication]— disease —[prime:indication]— Drug",
+      4
+    ],
+    [
+      "Drug →[het:CpD]— Disease —[het:CtD]→ Drug",
+      4
+    ],
+    [
+      "Drug →[het:CtD]— Disease —[het:CtD]→ Drug",
+      2
+    ],
+    [
+      "Drug →[het:CbG]— Gene —[het:CdG]→ Drug",
+      2
+    ],
+    [
+      "Drug —[het:CrC]— Drug_outside —[het:CrC]— Drug",
+      1
+    ],
+    [
+      "Drug —[prime:off-label use]— disease —[prime:off-label use]— Drug",
+      1
+    ]
+  ]
+}

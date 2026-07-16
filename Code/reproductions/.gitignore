@@ -1,0 +1,5 @@
+# Paper original datasets — cloned from upstream repos, not tracked
+# New canonical naming per CLAUDE.md §"复现代码规范":
+*/_Original-Dataset/
+# Old name kept for reproductions not yet migrated to the new spec:
+*/Original-Dataset/

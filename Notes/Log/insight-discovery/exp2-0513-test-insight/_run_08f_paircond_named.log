@@ -1,0 +1,71 @@
+[E8.6] loaded key (len 108)
+[E8.6] loading KG ...
+[E8] cold-start G2 drugs (unseen at train): 634;  G1 (seen): 1266
+[E8] after S2 closedness filter: positives=54369  negatives=54369
+[E8] feature-filtered pool sizes:  PD-pos=8418  PK-pos=7972  neg=8823
+[E8.6] PD-pos=30  PK-pos=30  NEG=30
+
+[E8.6] === SELECTOR PROMPT PREVIEW (with names) ===
+
+Drug A: Pentoxifylline
+Drug A's documented side effects / phenotypes:
+Blood fibrinogen decreased, Fibrinogen decreased, Cholestasis intrahepatic, Meningitis aseptic, Bad taste, Leukaemia, Salivation, Emotional distress, Abdominal bloating, Sleep disturbance, Cholecystitis, Lacrimation, Heartburn, Influenza-like symptoms, Laryngitis, Throat sore, Oropharyngeal discomfort, Cholestasis, Scotoma, Cholecystitis
+
+Drug B: Cilostazol
+Drug B's documented side effects / phenotypes:
+Bradyarrhythmia, Haemorrhage subcutaneous, Oesophageal haemorrhage, Epidural haemorrhage, Bleeding tendency, Nodal arrhythmia, Retroperitoneal haemorrhage, Subdural haematoma, Polycythaemia, Iron deficiency anaemia, Pulmonary haemorrhage, Haemorrhagic disorder, Abscess periodontal, Electrocardiogram QT corrected interval prolonged, Abnormal faeces, Duodenitis, Cerebral infarction, Retinal haemorrhage, Atrioventricular block complete, Varicose vein
+
+Identify 1 or 2 pairs of effects (one from drug A, one from drug B) that could compose into a clinically significant pharmacodynamic DDI risk. Prefer one pair; output a second only if mechanistically important and independent of the first.
+[E8.6] === END PREVIEW ===
+
+[E8.6] selector cache: 0
+[E8.6] === Stage 1: pair-conditional selector WITH names ===
+  [1/90]  pair=PD-pos-DB00806_DB01166  #sel=1  elapsed=2s ETA=185s
+  [20/90]  pair=PD-pos-DB00438_DB00605  #sel=2  elapsed=44s ETA=153s
+  [40/90]  pair=PK-pos-DB00528_DB00745  #sel=0  elapsed=85s ETA=107s
+  [60/90]  pair=PK-pos-DB00757_DB08820  #sel=1  elapsed=129s ETA=64s
+  [80/90]  pair=NEG-DB00744_DB01586  #sel=0  elapsed=172s ETA=22s
+
+[E8.6] === SELECTOR OUTPUTS (first 4 PD-pos) ===
+
+  [PD-pos-DB00806_DB01166]  Pentoxifylline + Cilostazol
+  Raw LLM output:
+    Pair1: A_effect="Blood fibrinogen decreased" | B_effect="Bleeding tendency"
+  Parsed pairs: [('Blood fibrinogen decreased', 'Bleeding tendency')]
+
+  [PD-pos-DB00268_DB01088]  Ropinirole + Iloprost
+  Raw LLM output:
+    NONE
+  Parsed pairs: []
+
+  [PD-pos-DB00191_DB00491]  Phentermine + Miglitol
+  Raw LLM output:
+    NONE
+  Parsed pairs: []
+
+  [PD-pos-DB00035_DB00457]  Desmopressin + Prazosin
+  Raw LLM output:
+    Pair1: A_effect="Water retention" | B_effect="Urinary incontinence"
+  Parsed pairs: [('Water retention', 'Urinary incontinence')]
+
+[E8.6] reasoner cache: 0
+[E8.6] === Stage 2: reasoner WITH names ===
+  [1/90]  pair=PD-pos-DB00806_DB01166  score=0.65  elapsed=4s ETA=325s
+  [20/90]  pair=PD-pos-DB00438_DB00605  score=0.25  elapsed=72s ETA=251s
+  [40/90]  pair=PK-pos-DB00528_DB00745  score=0.15  elapsed=149s ETA=186s
+  [60/90]  pair=PK-pos-DB00757_DB08820  score=0.15  elapsed=219s ETA=109s
+  [80/90]  pair=NEG-DB00744_DB01586  score=0.05  elapsed=289s ETA=36s
+
+[E8.6] === AUROC (pair-conditional two-stage, WITH names, effect) ===
+  PD  pair-cond+named effect  AUROC=0.739 [CI 0.623,0.854]  pos_mean=0.30 neg_mean=0.14  n_pos=30/n_neg=30
+  PK  pair-cond+named effect  AUROC=0.619 [CI 0.476,0.750]  pos_mean=0.17 neg_mean=0.14  n_pos=30/n_neg=30
+
+[E8.6] === E8.6 (pair-cond+named) vs E8.2 (single+named) ===
+  PD  single+named=0.652  pair-cond+named=0.739  Δ=+0.087
+  PK  single+named=0.510  pair-cond+named=0.619  Δ=+0.109
+
+[E8.6] avg pairs/drug-pair: 0.44  (0-sel: 52, 1-sel: 36, 2-sel: 2)
+[E8.6] tokens: sel in=47431 out=1477; reas in=16757 out=6017
+[E8.6] cost~=$0.305
+
+[E8.6] saved → llm_oracle_results_paircond_named.json

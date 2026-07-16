@@ -1,0 +1,36 @@
+[set6] loading ...
+[set6] n_drug=1994 n_class=215 n_pairs=565978
+[set6] fold0: train_drug=1600 test_drug=394 train_pairs=364607 test_pairs=21912
+[set6] building KGs (kg_builder, KG3 from train) ...
+test_acc: 0.2930814165753925 train_acc: 0.6908903474170173 test_score: 0.10114750338380207
+epoch [1] train_loss: 0.001088 testing_loss: 0.000234 
+test_acc: 0.3002464403066813 train_acc: 0.8120102947458203 test_score: 0.10366665309831809
+epoch [2] train_loss: 0.000568 testing_loss: 0.000233 
+test_acc: 0.28692040890836074 train_acc: 0.8424388508690643 test_score: 0.09238160602751047
+epoch [3] train_loss: 0.000464 testing_loss: 0.000233 
+test_acc: 0.265881708652793 train_acc: 0.8601657462599346 test_score: 0.08689566840061229
+epoch [4] train_loss: 0.000407 testing_loss: 0.000234 
+test_acc: 0.27866009492515514 train_acc: 0.8723830499064984 test_score: 0.1013294358764207
+epoch [5] train_loss: 0.000368 testing_loss: 0.000233 
+test_acc: 0.2735487404162103 train_acc: 0.8821641106769964 test_score: 0.09736625047670792
+epoch [6] train_loss: 0.000338 testing_loss: 0.000234 
+test_acc: 0.27112997444322745 train_acc: 0.8895949992973463 test_score: 0.09811468788009325
+epoch [7] train_loss: 0.000316 testing_loss: 0.000234 
+test_acc: 0.2781580868930267 train_acc: 0.8967582838345133 test_score: 0.10589211072051297
+epoch [8] train_loss: 0.000296 testing_loss: 0.000233 
+test_acc: 0.25757575757575757 train_acc: 0.9015136968766001 test_score: 0.09590267752142571
+epoch [9] train_loss: 0.000281 testing_loss: 0.000234 
+test_acc: 0.26337166849215043 train_acc: 0.9066139580759256 test_score: 0.1013864535323096
+epoch [10] train_loss: 0.000267 testing_loss: 0.000234 
+test_acc: 0.2592643300474626 train_acc: 0.9103930042827089 test_score: 0.09819456252554148
+epoch [11] train_loss: 0.000254 testing_loss: 0.000234 
+test_acc: 0.2643756845564075 train_acc: 0.9145009193631871 test_score: 0.09989259447105885
+epoch [12] train_loss: 0.000243 testing_loss: 0.000234 
+test_acc: 0.26108981380065716 train_acc: 0.9175192864517242 test_score: 0.10931023350993084
+epoch [13] train_loss: 0.000235 testing_loss: 0.000234 
+test_acc: 0.2565261044176707 train_acc: 0.9206905763708008 test_score: 0.11379335497635727
+epoch [14] train_loss: 0.000226 testing_loss: 0.000234 
+test_acc: 0.26569916027747353 train_acc: 0.9232252820702265 test_score: 0.11952462997804666
+epoch [15] train_loss: 0.000218 testing_loss: 0.000234 
+=== MKG-FENN task3 (both-unseen, Set_6 215-class, single fold) ===
+  ACC=0.2657 micro-AUPR=0.2003 micro-AUC=0.9443 macro-F1=0.1195 macro-PRE=0.2190 macro-REC=0.1057

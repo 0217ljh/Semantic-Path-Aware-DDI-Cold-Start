@@ -1,0 +1,63 @@
+Title: The Expressive Power of Low-Rank Adaptation
+Authors: Yuchen Zeng, Kangwook Lee (University of Wisconsin-Madison)
+Venue+Year: ICLR 2024 (conference paper)
+arXiv-or-DOI: arXiv:2310.17513 (ICLR 2024 proceedings); code at github.com/UW-Madison-Lee-Lab/Expressive_Power_of_LoRA
+PDF filename: ICLR-2024-the-expressive-power-of-low-rank-adaptation-Paper-Conference.pdf
+
+## TL;DR
+First theoretical analysis of what LoRA can *represent*. For fully connected ReLU nets (FNN), any frozen model f0 of depth L (>= target depth Lbar) can be adapted by LoRA to EXACTLY match a target model fbar, provided the (uniform) LoRA-rank R >= (width of fbar)/(depth L / depth Lbar), i.e. roughly rank >= (width)*(Lbar/L). When R is below this threshold, they bound the residual by a specific singular value of the layerwise "functionality gap." For Transformers, adapting only attention weights suffices, with required rank about (embedding size)/2. Results are exact-representation existence results (expressivity), not optimization/generalization.
+
+## Problem & Contributions
+- LoRA (Hu et al. 2022) is empirically dominant but theoretically unexplained. Open questions posed (Sec. 1): (i) minimum LoRA-rank to adapt frozen f0 to match target fbar; (ii) how depth/width set that rank; (iii) approximation error when rank is below threshold.
+- Contribution 1 (FNN, exact): identify the necessary/sufficient LoRA-rank for a frozen FNN to EXACTLY represent a target FNN (Theorem 3, Corollary 4).
+- Contribution 2 (FNN, approximate): quantify the approximation error as a function of LoRA-rank when rank is below the exact-representation threshold (Theorem 5 uniform-rank; Theorem 6 general per-layer ranks).
+- Contribution 3 (Transformer): rank about embedding-size/2 on attention weights suffices to adapt a same-size frozen TFN to a target TFN (Theorem 7, Corollary 10).
+- Contribution 4: contrast LoRA vs final-layer tuning; LoRA can adapt even a RANDOM network, final-layer tuning provably cannot (Lemma 4). Insights validated empirically (Sec. 5, Table 1).
+- Scope caveat (Sec. 1): "focuses solely on expressive power ... excludes optimization and generalization."
+
+## Method / Core mechanism (in words + notation)
+Setup. Target model fbar and frozen model f0, weight matrices in R^{D x D} (D = width). Uniform LoRA-rank R in [D] unless stated; adapted layer weight = W_l + Delta_W_l with rank(Delta_W_l) <= R. LoRA form throughout is the additive low-rank update W_l + Delta_W_l (the W = W0 + BA construction of Hu et al.), plus updatable biases.
+
+Core lemma (linear warm-up, Lemma 1). For a single target matrix W and a frozen product of L matrices, define error matrix E := W - prod_{l=1}^L W_l with RE = rank(E). Then the minimal achievable operator-norm discrepancy over rank-R adapters equals sigma_{RL+1}(E) (the (RL+1)-th singular value of E). Hence when R >= RE / L the product of adapted matrices exactly equals W (fbar = f exactly). KEY IDEA: L matrices each rank-<=R compose to an "effective rank" of L*R, so the product can realize the best rank-(LR) approximation of the target -- an Eckart-Young-Mirsky-style result extended to a *product* of low-rank-constrained matrices (Sec. 2).
+
+Rank-sufficiency results (the load-bearing part for us):
+- Theorem 3 (FNN exact, uniform partition). Let M := L/Lbar (frozen layers per target layer). Under a mild non-singularity assumption (Assumption 1; holds w.p. 1 for random weights, Lemma 3), if uniform LoRA-rank
+      R >= max_{i in [Lbar]} rank( Wbar_i - prod_{l in P_i} W_l ) / M,
+  then there exist rank-<=R adapters and biases making the adapted f EXACTLY equal target fbar for all x. In words: required rank = (per-layer rank of the frozen-vs-target functional gap) divided by the number of frozen layers allotted per target layer.
+- Corollary 4 (random models). If weights are drawn from continuous distributions, then R >= D/M suffices (w.p. 1) for exact representation. With Lbar << L this means the rank-R adapter carries ~2RD params/layer, and total ~2 D^2 Lbar params -- i.e. about 2x the target's D^2 Lbar parameters. So LoRA's expressive power is "nearly optimal up to a constant factor of 2" (Sec. 3.3). Two levers reduce the required rank: (a) a DEEPER frozen model (larger M), and (b) a frozen model CLOSER to the target (smaller functional gap).
+- Theorem 5 (FNN approximation, below threshold). Define per-layer error E_i = sigma_{RM+1}( Wbar_i - prod_{l in P_i} W_l ). Then there exist rank-<=R adapters with
+      E || fbar(x) - f(x) ||_2  <=  sum_{i=1}^{Lbar} ( max_k || Wbar_k ||_F + E_k )^{Lbar - i} * E_i  * (magnitude/parameter factor beta).
+  Error is driven by (i) target parameter/input magnitude, (ii) rank R and frozen-vs-target discrepancy via E_i, (iii) frozen depth L (through M).
+- Theorem 6 (general partition, per-layer ranks R_l). If sum_{l in P_i} R_l >= rank(Wbar_i - prod_{l in P_i} W_l) for all i, exact adaptation exists; matching approximation bound given. Non-uniform partitions/ranks can lower the required rank (motivated by Zhang et al. 2023 AdaLoRA-style varying ranks).
+
+Transformer result (Theorem 7). For frozen and target TFNs with the same number L of blocks, define a rank-based "functionality gap" G_i to block i (or output layer). If LoRA-rank R >= max_i G_i / 2, then adapting ONLY the attention matrices (WQ, WK, WV, WO) plus W2 of last block and output Wo, with biases updated, exactly represents fbar. Corollary 10: for random models this gives rank about D/2 = (embedding size)/2. Consistent with Hu et al.'s empirical finding that adapting attention alone is enough. (Skip connections excluded for tractability; softmax/ReLU handled by segmenting blocks.)
+
+Final-layer-tuning contrast (Lemma 4). For D >= 2 and a one-layer target, a random frozen net cannot be adapted to match fbar by tuning ONLY the last L-1 layers (w.p. 1), even with (L-1)D^2 params -- whereas LoRA needs only ~2 D^2. So for L >= 3, LoRA is strictly superior to final-layer tuning at equal/fewer params (Sec. 3.3).
+
+## Key results & numbers
+- FNN exact-representation rank threshold: R >= rank(functional gap)/M; for random models R >= D/M (Theorem 3, Corollary 4). With Lbar << L, total LoRA params ~2 D^2 Lbar vs target D^2 Lbar (factor-2 near-optimality) (Sec. 3.3).
+- Transformer: R about (embedding size)/2 on attention weights for exact same-size adaptation (Theorem 7, Corollary 10, Abstract).
+- Minimal residual for the linear case equals sigma_{RL+1}(E) exactly (Lemma 1).
+- Experiments (Sec. 5, Fig. 1, D=16): their explicit adapter CONSTRUCTION reaches near-zero MSE when R >= D/(L/Lbar) = 8 (L/Lbar = 2), corroborating theory; pretrained frozen models need lower rank than random ones. Gradient-update LoRA slightly beats their hand construction in the small-rank FNN regime (they conjecture suboptimality from over-matching intermediate outputs). Table 1 maps each empirical finding to its theorem.
+
+## Relevance to our cold-start low-rank DDI paper
+- RW bucket: Stream B theory / rank-sufficiency of low-rank adaptation. This is the paper we cite to ARGUE our chosen rank "a" (number of typed-mediator bases per relation type) is SUFFICIENT to represent the target transferable signal, and to bound generalization/approximation when the rank is truncated.
+- How we'd cite: (1) Theorem 3 / Corollary 4 to state that a low-rank additive update of rank ~ (functional gap rank)/(depth budget) can EXACTLY realize a target -- i.e. a bounded rank suffices when the base is already close to the target; this backs our claim that a small number of shared mediators can represent the transferable DDI structure. (2) Theorem 5 (and the linear sigma_{RL+1}(E) bound, Lemma 1) to give a principled residual bound when our rank a is below what warm fitting would need -- the residual is governed by tail singular values of the gap matrix, which is exactly the "diagnosed low-rank transferable structure" story. (3) The "closer base -> lower required rank" lever supports designing H_base so the residual gap is small.
+- Concrete DELTA vs our method: Their rank is an EXPRESSIVITY threshold for EXACT representation in generic FNN/TFN weight space, derived for a fixed (single) target and driven by network width/depth (M = L/Lbar) and a functional-gap rank. It is agnostic to WHY the target is low-rank and says nothing about UNSEEN entities or transfer -- their setting is match-one-known-target, warm. OURS uses low rank as a TRANSFER inductive bias for cold-start (both drugs unseen): the low rank is a DIAGNOSED property of the transferable-to-unseen signal, not a width/depth-derived sufficiency threshold, and our factors are STRUCTURED (typed-mediator bases M_B per relation type, block-sparse selection M_A) rather than free dense Delta_W_l. Their bounds are worst-case existence results (an adapter EXISTS); they explicitly exclude optimization and generalization, so we cannot cite them for a generalization-to-unseen guarantee -- only for rank-sufficiency of representation and residual magnitude. Their depth-driven rank reduction (deeper frozen model lowers rank) has no analogue in our single-residual DDI scorer.
+
+## Safe-to-cite claims (section pointers)
+- Lemma 1: minimal rank-R adapter residual for the linear product case = sigma_{RL+1}(E), E = W - prod W_l; exact when R >= RE/L (Sec. 2).
+- Theorem 3 / Corollary 4: FNN exact-representation needs R >= rank(gap)/M; for random weights R >= D/M; total LoRA params ~2x target (Sec. 3.3).
+- Theorem 5 / Theorem 6: explicit approximation-error upper bounds below the exact threshold; general partitions with per-layer ranks (Sec. 3.3).
+- Theorem 7 / Corollary 10: attention-only LoRA of rank ~ D/2 exactly adapts a same-size Transformer (Sec. 4.2).
+- Lemma 4: final-layer tuning cannot adapt a random net to a one-layer target; LoRA can (Sec. 3.3).
+- Two rank-lowering levers: deeper frozen model (larger M) and base closer to target (Corollary 4, Sec. 3.3; Table 1).
+- Assumptions hold w.p. 1 for randomly generated weights (Lemma 3).
+
+## Do-NOT-overclaim / caveats
+- These are EXISTENCE / expressive-power results: they prove effective low-rank adapters EXIST, and explicitly EXCLUDE optimization and generalization (Sec. 1). Do NOT cite as a generalization bound, and do NOT claim gradient descent will find these adapters.
+- The clean "rank >= width/depth" statement is the INFORMAL abstract version. The precise thresholds involve rank of a functional-gap matrix (Wbar_i - prod W_l) and non-singularity assumptions; state it as such, not as an unconditional width/depth formula.
+- Results assume equal width D across frozen and target (extendable to wider frozen, Sec. H) and, for TFN, EXCLUDE skip connections for tractability -- flag this if we lean on the Transformer theorem.
+- Corollary 4's "factor-2 near-optimality" holds in the random-model / Lbar << L regime; not a universal statement.
+- Transformer approximation error BELOW the rank threshold is NOT bounded here (listed as future work, Sec. 6). Only FNN has the below-threshold error bound.
+- Nothing in this paper concerns knowledge graphs, drug-drug interaction, relation-typed scoring, or unseen entities. The bridge to our cold-start transfer claim is OUR analogy; do not attribute a DDI/transfer claim to this paper.

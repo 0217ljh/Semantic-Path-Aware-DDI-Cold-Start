@@ -1,0 +1,52 @@
+Title: Graph Neural Networks Exponentially Lose Expressive Power for Node Classification
+Authors: Kenta Oono, Taiji Suzuki (University of Tokyo; Preferred Networks; RIKEN AIP)
+Venue+Year: ICLR 2020 (conference paper)
+arXiv-or-DOI: arXiv:1905.10947v5 [cs.LG], 6 Jan 2021
+PDF filename: Graph Neural Networks Exponentially Lose Expressive Power for Node Classification.pdf
+
+NOTE ON DUPLICATE: "GRAPH NEURAL NETWORKS EXPONENTIALLY LOSE.pdf" in the same folder is a byte-identical duplicate (same 1,473,346-byte size) of this PDF. This single .txt covers both. The user may delete the short-named PDF; no separate summary was written for it.
+
+## TL;DR
+Oono & Suzuki prove that as a GCN (and a more general MPNN-style dynamical system) grows deep, its node features exponentially converge to a low-dimensional "information-less" invariant subspace M that encodes only connected-component membership and node degree, losing all other discriminative signal. The distance to M shrinks at rate O((s*lambda)^L), where s is the max singular value of the weights, lambda is set by the (augmented) normalized-Laplacian spectrum, and L is depth. This is a theoretical explanation of over-smoothing framed as an UNWANTED loss of expressive power.
+
+## Problem & Contributions
+Problem: Deep GCNs empirically fail to improve (or worsen) node-classification accuracy as layers are stacked; prior "over-smoothing" observations (Li et al. 2018) lacked a rigorous non-linear theory. The paper asks under what spectral conditions neither depth nor non-linearity adds expressive power.
+Contributions (Sec. 1, Introduction bullet list):
+- Relate asymptotic GNN behavior to underlying-graph topology via the (augmented) normalized-Laplacian spectrum.
+- Prove that if GCN weights satisfy a spectral condition, the output carries no information beyond node degree and connected components in the infinite-depth limit (Theorems 1, 2).
+- Apply the theory to Erdos-Renyi graphs: when the graph is dense and large, a broad range of GCNs suffers information loss (Theorem 3).
+- Propose a principled weight-normalization guideline and confirm empirically that scaling weights above the collapse threshold improves accuracy.
+
+## Method / Core theory
+The forward map is cast as a dynamical system X^(l+1) = f_l(X^(l)) with f_l(X) = MLP_l(P X), P symmetric; GCN is the special case f_l(X) = sigma(P X W_l) with P = I - augmented-normalized-Laplacian (Sec. 3.2, Sec. 4). M := U tensor R^C is the invariant subspace built from U, the eigenspace of the largest Laplacian eigenvalue (Assumptions 1-2: U has a non-negative orthonormal basis and is P-invariant).
+
+Main theorems (stated in words):
+- Theorem 1 (Sec. 3.3): One layer is a contraction toward M: dist_M(f_l(X)) <= s_l * lambda * dist_M(X). Proof key: ReLU is non-expansive w.r.t. dist_M (uses non-negativity of the basis of U).
+- Corollary 2: dist_M(X^(l)) = O((s*lambda)^l); if s*lambda < 1 the output converges exponentially to M for ANY initial value. (This is the "exponential loss of expressive power / rank of useful information collapses to component+degree" result.)
+- Theorem 2 (Sec. 4, GCN case): dist_M(X^(l)) <= (s*lambda)^l * dist_M(X^(0)); exponential convergence to the information-less space when s*lambda < 1. Two nodes in the same connected component with equal degree become indistinguishable.
+- Theorem 3 (Sec. 5, Erdos-Renyi G_{N,p}): if logN/(Np) = o(1) and the max singular value s is below an explicit threshold s0, then for large N the GCN satisfies Theorem 2's collapse condition with probability >= 1 - epsilon. Denser and larger graphs mix signals faster, so more GCNs collapse.
+The theory generalizes the classical fact that an irreducible aperiodic finite Markov chain converges exponentially to its equilibrium (Theorem 1 recovers this with M=1, C=1, W=1; Remark 1).
+
+## Key results & numbers (Section pointers)
+- Convergence rate O((s*lambda)^L) (Sec. 3.3 Corollary 2; Sec. 4 Theorem 2).
+- Erdos-Renyi threshold s0 = (1/7) * sqrt((Np - p + 1)/log(4N/epsilon)); s0 -> infinity as N grows, so most GCNs on large non-sparse graphs collapse (Sec. 5, Theorem 3).
+- Synthetic experiments (Sec. 6.1-6.2, Figs. 1-2): the vector-field visualization confirms f uniformly decreases distance to M only under the non-negativity assumption (Case 1) and not when it is violated (Case 2); measured log-relative distance tracks the l*log(s*lambda) upper bound when s*lambda is small (loose for large s*lambda).
+- Real data (Sec. 6.3, Fig. 3, "Noisy Cora"): citation nets (Cora/CiteSeer/PubMed) are too sparse (lambda^{-1} ~ 1 + 3.62e-3), so edges are randomly added to raise lambda^{-1} to 1.11. GCNs with s outside the collapse region s < lambda^{-1} (e.g. s = 10) outperform those inside, and beat the unnormalized baseline; during training s does not shrink into the collapse region. Chance rate 30.2%.
+
+## Relevance to our cold-start low-rank DDI paper
+This is a CANONICAL "rank collapse is bad" foil for our related-work section. Oono & Suzuki treat the exponential contraction of features onto a low-dimensional invariant subspace as an UNINTENTIONAL, purely harmful loss of expressive power ("information loss") that must be prevented (their fix: keep weight singular values above the collapse threshold). We cite this to establish the standard negative valence of "low rank" / "subspace collapse" in the deep-GNN literature, then contrast: our cold-start DDI method DELIBERATELY designs an INTENTIONAL low-rank residual as a transfer inductive bias across warm/cold drugs. Same word "low rank," opposite valence and opposite intent (they fight it; we engineer it). Ideal placement in related work: the paragraph framing over-smoothing / expressive-power collapse as the phenomenon we invert.
+
+How we would cite: "Deep GNNs are known to lose expressive power as their node features contract exponentially onto a low-dimensional subspace carrying only degree and component information [Oono & Suzuki 2020], a loss the literature treats as a pathology to be avoided. In contrast, we deliberately ..."
+
+## Safe-to-cite claims (section/theorem pointers)
+- "GCN outputs converge exponentially to a subspace carrying only connected-component and degree information, at rate O((s*lambda)^L)." (Sec. 3.3 Cor. 2; Sec. 4 Theorem 2.)
+- "This convergence rate depends on the (augmented) normalized-Laplacian spectrum and the max singular value of the weights." (Theorem 1, Theorem 2.)
+- "On sufficiently dense, large Erdos-Renyi graphs, a broad range of GCNs provably suffers this information loss with high probability." (Sec. 5, Theorem 3.)
+- "The paper frames this as over-smoothing = an unwanted loss of expressive power and proposes weight-scaling above the collapse threshold as a remedy." (Sec. 1; Sec. 6.3.)
+
+## Do-NOT-overclaim / caveats
+- The exponential-collapse theorems are proven for LINEAR-per-layer GCN / ReLU-MLP dynamical systems on SYMMETRIC P; they rely on the non-negativity Assumption 1 (Case 2 in Sec. 6.1 shows the bound fails when it is violated). Do not state the result holds for arbitrary GNN architectures.
+- The collapse target is degree + connected-component information, NOT literally "rank 1" or "a constant vector" in general; do not conflate with strict rank-1 collapse.
+- Theorem 3's guarantee is a high-probability statement on dense-enough Erdos-Renyi graphs (logN/(Np)=o(1)); real sparse citation graphs did NOT collapse without artificially adding edges (Sec. 6.3). Do not claim all real-world GNNs collapse.
+- The bound O((s*lambda)^L) is tight only for small s*lambda; the authors note it is loose for large s*lambda (Sec. 6.2). It is an upper bound on distance, not an exact rank measurement.
+- This is a node-classification / expressive-power analysis; it does not study DDI, link prediction, cold-start transfer, or intentional low-rank design. Any bridge to our setting is our framing, not their claim.

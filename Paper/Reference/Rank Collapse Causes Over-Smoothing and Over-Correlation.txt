@@ -1,0 +1,52 @@
+Title: Rank Collapse Causes Over-Smoothing and Over-Correlation in Graph Neural Networks
+Authors: Andreas Roth, Thomas Liebig (TU Dortmund University; Lamarr Institute for ML and AI, Germany)
+Venue+Year: 2024 (preprint; marked "Preprint. Preliminary work." on p.1)
+arXiv-or-DOI: arXiv:2308.16800v3 [cs.LG], 17 Sep 2024
+PDF filename: Rank Collapse Causes Over-Smoothing and Over-Correlation.pdf
+
+## TL;DR
+Roth & Liebig argue that RANK COLLAPSE of node representations is the single underlying cause of BOTH over-smoothing and over-correlation in GNNs. Using a vectorized (Kronecker-product) view of message passing, they prove that for ANY symmetric/stochastic aggregation matrix, deep representations collapse in probability onto a low-dimensional invariant subspace determined solely by the dominant eigenvalue(s) of the aggregation operator, independent of the learned feature transformations. Their fix: replace a single Kronecker product W tensor A with a SUM of Kronecker products (SKP), which provably preserves rank and prevents collapse.
+
+## Problem & Contributions
+Problem: Over-smoothing (node states become too similar with depth) and over-correlation (feature columns become perfectly correlated / low effective rank, Jin et al. [8]) are two leading causes of poor deep-GNN performance, but their shared theoretical root and their interaction with the learned feature transformations W were not understood; prior over-smoothing bounds either ignored W or only bounded coefficients loosely.
+Contributions (Sec. 1):
+- A shared theoretical account: a fixed subspace induced by the AGGREGATION function (not by W or the input features) dominates deep representations, yielding unified proofs for over-smoothing and over-correlation.
+- Identify RANK COLLAPSE (not over-smoothing per se) as the crucial forward-looking challenge: over-smoothing is aggregation-specific and fixable, but rank collapse happens for ALL aggregation functions.
+- Propose the Sum of Kronecker Products (SKP) as a general property that provably solves rank collapse (and hence over-smoothing/over-correlation), confirmed empirically.
+
+## Method / Core theory
+Setup (Sec. 2, 5): linearized layer X^(k+1) = A~ X^(k) W^(k). Vectorize: vec(A~ X W) = (W^T tensor A~) vec(X) = T vec(X), so aggregation and transformation combine into one Kronecker-product operator T = W tensor A~ (Eq. 6). Bases S^(i) = I_d tensor v_i are built from eigenvectors v_i of A~.
+
+Core theorems / how rank collapse is LINKED to over-smoothing & over-correlation:
+- Lemma 5.1: The subspaces Q_i = span(I_d tensor v_i) are invariant under ANY T = W tensor A~.
+- Theorem 5.2 ("relative behavior is fixed"): the ratio of amplification of subspace i vs j equals |lambda_i(A~)| / |lambda_j(A~)|, INDEPENDENT of W. So which signals grow or shrink is decided entirely by the aggregation spectrum; feature transformations cannot change it.
+- Proposition 5.3 / Theorem 5.4: as depth -> infinity, normalized representations converge (in probability, w.r.t. Lebesgue measure over W) to the dominant subspace Q_1 (largest |lambda|), convergence rate |lambda_2|/|lambda_1|. Non-dominant subspaces become negligible.
+- Proposition 5.5: for A~ = D^{-1/2} A D^{-1/2}, over-smoothing (normalized Dirichlet energy -> 0) happens for ALL W^(k) in probability, rate (lambda_2/lambda_1)^2. This recasts the earlier Oono-Suzuki / Cai-Wang bounds using NORMALIZED representations, arguing prior "over-separation" claims were an artifact of not normalizing (the norm was overshadowing the Dirichlet energy; Prop. 4.1, Fig. 1).
+- Sec. 5.3-5.4 (Prop. 5.6, 5.7): extends to arbitrary and row-stochastic aggregations (covers GAT / graph transformers, which also over-smooth).
+- THE LINK (Sec. 6, Theorem 6.1, informal): for ALL A~, in the limit the RANK of X^(l) is (in probability) bounded by the joint algebraic multiplicity j of the aggregation eigenvalues of maximal magnitude |lambda_1|. => representations collapse to a low-rank state with at most j relevant features. If j reduces to rank-1 (unique dominant eigenvalue) this is PERFECT feature correlation = over-correlation (Jin et al. [8]). Over-smoothing is the SPECIAL CASE where the dominant subspace Q_1 happens to consist of smooth signals (e.g. symmetric-normalized aggregation, whose dominant eigenvector is D^{1/2} 1). Thus rank collapse is the common cause; over-smoothing and over-correlation are its two manifestations.
+- Fix (Sec. 7): T = W tensor A~ collapses because it is a SINGLE Kronecker product. A Sum of Kronecker Products T = sum_i (W_i tensor A~_i) cannot be reduced to one, and Theorem 7.1 (informal) shows d terms can amplify d independent signals across d columns, preserving rank. Computed cheaply as sum_i A~_i X W_i. Residual connections, multi-head attention, and mixed aggregations are retrospectively explained as SKPs.
+
+## Key results & numbers (Section pointers)
+- Convergence rate to the dominant subspace: |lambda_2(A~)| / |lambda_1(A~)| (Prop. 5.3); over-smoothing rate (lambda_2/lambda_1)^2 (Prop. 5.5).
+- Limiting rank bound = joint algebraic multiplicity j of the top-magnitude eigenvalues of A~ (Theorem 6.1).
+- Empirical validation (Sec. 8, Figs. 2-4): 9 node-classification datasets (Cora, Citeseer, Pubmed [homophilic]; Texas, Wisconsin, Cornell, Chameleon, Squirrel, Film [heterophilic]); 8-layer non-linear (ReLU) models, d=32, 10 runs. The SKP fits ALL datasets almost perfectly within <250 steps; single Kronecker product (KP, = standard GCN/SAGE/GIN/FAGCN) and softmax-SKP (= multi-head GAT/GATv2/TransformerConv) are slower and unstable and converge to higher loss. Increasing width d in {16,64,128} does NOT help KP (only more instability); increasing depth l in {1,4,32} hurts KP/FAGCN but barely affects SKP (Figs. 3-4). Confirms rank collapse persists in the finite-depth non-linear regime.
+
+## Relevance to our cold-start low-rank DDI paper
+Strong "rank collapse is bad" foil, MORE explicit than Oono-Suzuki because it makes RANK the central object. Roth & Liebig treat the collapse of node-feature RANK onto a low-dimensional subspace as the FUNDAMENTAL PATHOLOGY behind over-smoothing and over-correlation, something a good architecture must PREVENT (their SKP restores rank). We cite this as the sharpest statement of the negative valence of "low rank" in deep GNNs, then contrast: our cold-start DDI method deliberately introduces an INTENTIONAL low-rank residual as a cross-drug transfer inductive bias. Same vocabulary ("low rank", "subspace", "collapse"), opposite valence: they engineer AGAINST low rank to protect expressivity; we engineer a low-rank component BECAUSE the transferable warm->cold DDI signal is inherently low-rank.
+
+How we would cite: "Rank collapse of node features has been identified as the common root of over-smoothing and over-correlation in deep GNNs [Roth & Liebig 2024], motivating rank-preserving designs such as sums of Kronecker products. We take the opposite stance for cold-start transfer: rather than resisting low rank, we deliberately parameterize a low-rank residual as the inductive bias that carries drug-drug interaction signal from warm to cold drugs."
+
+## Safe-to-cite claims (section/theorem pointers)
+- "Rank collapse of node representations is the underlying cause of both over-smoothing and over-correlation." (Abstract; Sec. 6; Conclusion.)
+- "For any symmetric aggregation, deep normalized representations converge in probability to a subspace fixed by the dominant eigenvalue(s) of the aggregation, independent of the learned feature transformations, at rate |lambda_2|/|lambda_1|." (Theorem 5.2, Prop. 5.3, Theorem 5.4.)
+- "In the limit the rank of representations is bounded by the algebraic multiplicity of the top-magnitude aggregation eigenvalue; a unique dominant eigenvalue yields perfect feature correlation (over-correlation)." (Theorem 6.1.)
+- "Over-smoothing is the special case where the dominant subspace consists of smooth signals." (Sec. 5.2-5.3.)
+- "A sum of Kronecker products provably preserves rank and prevents collapse, and empirically fits 9 node-classification datasets far better than single-Kronecker-product (GCN-family) or softmax-SKP (GAT-family) models even at 32 layers." (Theorem 7.1; Sec. 8, Figs. 2-4.)
+
+## Do-NOT-overclaim / caveats
+- This is an arXiv PREPRINT explicitly labeled "Preliminary work" (p.1); it is not (as extracted) a peer-reviewed venue paper. Cite as a preprint.
+- The exact rank-collapse and convergence theorems are proven for the LINEARIZED update X^(k+1)=A~ X^(k) W^(k); the non-linear (ReLU, finite-depth) case is supported EMPIRICALLY (Sec. 8), not by the same proofs. Theorems 6.1, 7.1 are stated informally in the main text (full statements/proofs in Appendix A).
+- Convergence to Q_1 and over-smoothing hold IN PROBABILITY over W (Lebesgue measure); a measure-zero set of W avoids collapse. Do not state it is deterministic for every W.
+- The paper argues prior "over-separation" claims (Oono-Suzuki, Cai-Wang) stem from not normalizing representations (Sec. 4-5.2). If we cite both papers, note this tension rather than presenting them as identical claims.
+- SKP is presented as a general design PRINCIPLE and validated on node classification; the paper does NOT address DDI, link prediction, cold-start, or intentional low-rank transfer. The bridge to our DDI setting is our own framing.
+- Empirical results report OPTIMIZATION/training loss (ability to fit), not held-out test accuracy tables; do not claim generalization/SOTA accuracy numbers.

@@ -1,0 +1,45 @@
+{
+  "experiment": "E7 meeting-node LR baseline",
+  "feature_groups": [
+    "protein_gene",
+    "pathway",
+    "side_effect",
+    "disease",
+    "anatomy",
+    "compound",
+    "biological_process",
+    "molecular_function",
+    "cellular_component",
+    "pharmacologic_class",
+    "exposure"
+  ],
+  "n_features": 22,
+  "n_train": 408938,
+  "n_test_s2": 108738,
+  "results": {
+    "LR_binary": {
+      "test_auc": 0.7025475267118297,
+      "test_auc_ci_95": [
+        0.6992294631063428,
+        0.7053478633878807
+      ],
+      "test_auprc": 0.680763892300456
+    },
+    "LR_count": {
+      "test_auc": 0.7171123221897099,
+      "test_auc_ci_95": [
+        0.7139654429206452,
+        0.7198279652497096
+      ],
+      "test_auprc": 0.7257427460536208
+    },
+    "paired_diff_count_vs_binary": {
+      "mean": 0.014565113251957211,
+      "ci_95": [
+        0.013296071688115954,
+        0.015794233349715713
+      ]
+    }
+  },
+  "gcn_k2_comparison": "TBD \u2014 populate after E2"
+}

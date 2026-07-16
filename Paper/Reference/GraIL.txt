@@ -1,0 +1,58 @@
+Title: Inductive Relation Prediction by Subgraph Reasoning
+Authors: Komal K. Teru, Etienne Denis, William L. Hamilton (McGill University; Mila)
+Venue+Year: ICML 2020 (pre-print header on PDF says "Pre-print. Copyright 2020")
+arXiv-or-DOI: arXiv:1911.06962v2 [cs.LG], 12 Feb 2020
+PDF filename: GraIL.pdf
+
+## TL;DR
+GraIL (Graph Inductive Learning) predicts a relation between two target nodes by extracting the enclosing subgraph around them, labeling each node by its shortest-path distances to the two targets (double-radius labeling, no node identities/embeddings), and scoring the labeled subgraph with a relation-aware attentive GNN. Because it reasons purely over local structure and never learns per-entity embeddings, it is naturally inductive and generalizes to entirely unseen entities and even unseen test graphs. It beats rule-induction baselines (NeuralLP, DRUM, RuleN) on new inductive KG benchmarks (Abstract; Sec 4.1; Tables 1-2).
+
+## Problem & Contributions
+Problem: The dominant KG link-prediction paradigm learns per-entity embeddings, which (a) do not explicitly capture the compositional/logical rules underlying the KG and (b) are inherently transductive (all entities must be seen at training). Real KGs evolve with new entities (e.g., new molecules in biomedical KGs), so inductive prediction without retraining is needed (Sec 1-2).
+Contributions (Sec 1):
+1. GraIL, a GNN framework with a strong inductive bias toward entity-independent relational semantics; predicts relations from subgraph structure around a candidate edge rather than from entity embeddings; naturally generalizes to unseen nodes/graphs.
+2. Theoretical result (Theorem 1, Corollary 1): GraIL can represent a useful subset of first-order path-based logical rules (Horn clauses), and can count how many such rules are satisfied for a query pair.
+3. New fully-inductive benchmark datasets sampled from WN18RR, FB15k-237, NELL-995 (train-graph and ind-test-graph have disjoint entities; Sec 4.1, Appendix F, Table 13).
+4. Shows GraIL's structural inductive bias is complementary to embedding methods; ensembling GraIL with KGE methods improves transductive performance (Sec 4.2).
+
+## Method / Core mechanism (equations in words + notation)
+Task: score a triplet (u, r_t, v) — likelihood of target relation r_t between head u and tail v (Sec 3).
+Three sub-tasks (Sec 3.1):
+1. Subgraph extraction: Take the k-hop (undirected) neighborhoods N_k(u) and N_k(v); the enclosing subgraph is the graph induced by their intersection N_k(u) ∩ N_k(v), after pruning isolated nodes or nodes farther than k from either target. By Observation 1 this recovers all nodes on paths of length ≤ k+1 between u and v. Edge direction ignored during extraction but preserved during message passing; the target edge is added to enable message passing between u and v.
+2. Node labeling (double-radius vertex labeling, extends Zhang & Chen 2018): each node i gets tuple (d(i,u), d(i,v)) = shortest distances to u and to v (each computed without routing through the other target). Targets are uniquely labeled (0,1) and (1,0). Node feature = concatenation of one-hot(d(i,u)) and one-hot(d(i,v)). No external node attributes are used — the model sees ONLY structure. Feature dimension is bounded by the number of hops (Observation 1).
+3. GNN scoring: Message passing with layer update h^k_t = COMBINE(h^{k-1}_t, a^k_t), where a^k_t is an aggregation of neighbor messages (Eqs 2-3). AGGREGATE is R-GCN-style multi-relational with edge attention: a^k_t = sum over relations r and over relation-r neighbors s of (alpha^k · W^k_r · h^{k-1}_s), where W^k_r is a per-relation transform (with basis sharing) and alpha^k_{r,r_t,s,t} is an unnormalized sigmoid-gated attention weight that is a function of source, neighbor, edge type r, AND the target relation r_t (learned attention embeddings e^a_r, e^a_{r_t}). Edge dropout used as regularization. COMBINE (best): h^k_t = ReLU(W^k_self h^{k-1}_t + a^k_t) (Eq 4).
+Readout: subgraph representation = average pool of all node representations after L layers (Eq 5). Final score = linear layer over concatenation of [subgraph rep, h^L_u, h^L_v, learned target-relation embedding e_{r_t}] (Eq 6). Best model also concatenates intermediate-layer reps via JK-connections (Eq 8, Appendix A).
+Training: noise-contrastive hinge/margin loss; for each positive triplet sample a negative by replacing head or tail with a uniformly random entity (Eq 7).
+Theory (Sec 3.3): Theorem 1 — for any path-based Horn rule r_t(X,Y) <- r_1(X,Z_1) ∧ ... ∧ r_k(Z_{k-1},Y), there is a parameter setting of a k-layer GraIL with 1-dimensional embeddings (d=1) such that score(u,r_t,v) != 0 iff the rule body is satisfied between u and v. Corollary 1: GraIL can count how many such same-head rules fire for a query pair, so score ∝ number of satisfied rules. The attention mechanism and unique target-node labeling are the load-bearing ingredients of this proof (Appendix G).
+Inference complexity (Sec 3.4): O(log(V)·E + R·d·k) per candidate edge over the extracted subgraph, dominated in practice by shortest-path (Dijkstra) computation on the subgraph.
+
+## Key results & numbers (with Table/Fig/Section pointers)
+- Inductive relation prediction (Sec 4.1). GraIL vs NeuralLP, DRUM, RuleN on fully-inductive splits (train and test graphs have DISJOINT entities), 4 versions each of WN18RR / FB15k-237 / NELL-995.
+  - AUC-PR (Table 1): GraIL is best on all 12 splits. E.g. WN18RR v1 94.32 vs RuleN 90.26; WN18RR v3 85.80 vs RuleN 76.46; FB15k-237 v1 84.69 vs RuleN 75.24; NELL-995 v2 92.62 vs RuleN 88.40.
+  - Hits@10 (Table 2, ranking each test triplet against 50 negatives): GraIL best on all splits, e.g. FB15k-237 v1 64.15 vs RuleN 49.76; NELL-995 v2 93.25 vs RuleN 81.75.
+  - Paper reports average relative gains of 5.25% (AUC-PR) and 6.75% (Hits@10) over the strongest inductive baseline (Abstract, Sec 1). Results averaged over 5 runs, low variance (Sec 4.1 Results).
+- Ablations (Table 7, on FB15k-237 v3 and NELL v3): removing enclosing-subgraph extraction (using naive k-hop neighborhood) drops FB v3 91.68 -> 84.25 and causes catastrophic overfit (train AUC >99%); removing double-radius node labeling (constant (1,1) labels) drops to 82.07 / 84.46; removing GNN attention drops to 90.27 / 87.30. All three components matter; labeling and subgraph extraction most.
+- Transductive setting (Sec 4.2, Tables 3-6): GraIL alone is not SOTA transductively, but late-fusion ensembling GraIL with KGE methods (TransE/DistMult/ComplEx/RotatE) gives consistent gains on 2 of 3 datasets (avg gain 1.5% WN18RR, 0.62% NELL-995), orders of magnitude larger than KGE-KGE ensembling; no significant gain on FB15k-237. Early fusion (GraIL++, concatenating TransE embeddings into node features) boosts up to 18.2% (Table 6), showing GraIL can also leverage node features when available.
+- Config used (Sec 4.1): 3-layer GNN, latent dim 32, basis dim 4, edge dropout 0.5, 3-hop subgraphs (to match RuleN rules of length up to 4). Performance stable for d in 1..64 (Sec 3.3).
+
+## Relevance to our cold-start low-rank DDI paper (RW Para 1 premise; how we'd cite; the gap we build on)
+GraIL is a canonical anchor for our Related Work Para 1 (inductive KG link prediction as the identity-free-reasoning premise). It concretely demonstrates that a model reasoning over local subgraph STRUCTURE and PATHS — with entity identities deliberately withheld (no per-entity embeddings; only distance-based structural node labels) — can predict relations between entities that were never seen at training, and even across entirely new test graphs (Sec 4.1; Theorem 1). This is exactly the premise our "drugs-as-selectors, no per-drug embedding" design inherits: structural/path evidence, not entity identity, carries transferable signal.
+How we'd cite: In Para 1 we cite GraIL (with NBFNet) as establishing that entity-identity-free structural/path reasoning generalizes to unseen entities, grounding the feasibility of our no-per-drug-embedding cold-start design. GraIL's double-radius labeling and Theorem 1 give a clean, citable statement that "the subgraph/path structure around a candidate edge is sufficient to score it without any entity-specific parameters."
+The gap we build on (our Para-1 turn): GraIL establishes identity-free reasoning is FEASIBLE and can encode path rules, but (i) its inductive benchmarks make TEST-graph entities unseen collectively, yet the setting and theory are framed around encoding relational path rules generally — it does not ask which INTERACTION structure remains transferable specifically when BOTH endpoints of the target edge are unseen simultaneously, and (ii) it does not characterize or bound the RANK / low-dimensional structure of that transferable interaction signal (it notes d=1 suffices for single rules and performance is stable up to d=64, but this is about rule expressivity, not a rank characterization of the cross-endpoint interaction). Our paper takes up exactly that unasked question.
+
+## Safe-to-cite claims (section pointers)
+- GraIL is naturally inductive; generalizes to unseen entities and entirely new graphs by reasoning over subgraph structure without per-entity embeddings (Abstract; Sec 1; Sec 4.1).
+- Node inputs are purely structural (double-radius distance labels), no node attributes required (Sec 3.1 Step 2).
+- Theorem 1 / Corollary 1: GraIL can represent path-based Horn-clause rules and count how many fire for a query pair; provable with d=1 latent dimension (Sec 3.3; Appendix G).
+- Outperforms NeuralLP, DRUM, RuleN across inductive WN18RR/FB15k-237/NELL-995 in AUC-PR and Hits@10 (Tables 1-2); avg relative gains 5.25% AUC-PR, 6.75% Hits@10 (Abstract).
+- Enclosing-subgraph extraction, double-radius labeling, and GNN attention are each necessary (ablation Table 7).
+- Inference cost dominated by shortest-path computation on the extracted subgraph; O(log(V)E + Rdk) (Sec 3.4).
+- Complementary to KGE methods; ensembling helps (Sec 4.2, Tables 3-6).
+
+## Do-NOT-overclaim / caveats
+- GraIL is NOT a DDI or drug-drug method; benchmarks are generic KGs (WN18RR, FB15k-237, NELL-995), not biomedical DDI. Do not attribute any DDI cold-start result to it.
+- "Inductive" here means unseen entities / new test graph; the paper does NOT specifically isolate a "both endpoints of the query unseen, and only that" analysis, nor does it study drug cold-start. Do not claim it addresses the both-drugs-unseen DDI regime.
+- The d=1 result (Theorem 1) is about representing a single path rule; it is NOT a claim that the transferable interaction signal is globally low-rank. Do not cite it as evidence of low-rank structure of interactions — that framing is ours.
+- Transductively, GraIL alone is not SOTA; its value transductively is via ensembling (Sec 4.2). Do not claim standalone transductive SOTA.
+- Practical subgraph sizes are small (typically ≤ 2-3 hops); scalability is limited by per-edge subgraph materialization (this limitation is later highlighted by NBFNet, Table 1). Do not claim GraIL scales to large KGs efficiently.
+- Numbers above are as printed in Tables 1-2 and 7; averaged over 5 runs with standard errors omitted by the authors (Sec 4.1). No per-seed variance is reported in-text.

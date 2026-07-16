@@ -1,0 +1,28 @@
+[smoke] task=multilabel train=(300, 5) val=(75, 5) test=(120, 5) n_out=200 regime=transductive/S0
+/home/lakestar_ljh/miniconda3/envs/project_1/lib/python3.10/site-packages/outdated/__init__.py:36: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import parse_version
+222.0
+  0%|          | 0/300 [00:00<?, ?it/s]  0%|          | 0/300 [00:00<?, ?it/s]
+  0%|          | 0/75 [00:00<?, ?it/s]  0%|          | 0/75 [00:00<?, ?it/s]
+  0%|          | 0/120 [00:00<?, ?it/s]  0%|          | 0/120 [00:00<?, ?it/s]
+  0%|          | 0/300 [00:00<?, ?it/s]  2%|▏         | 6/300 [00:00<00:04, 59.51it/s] 14%|█▎        | 41/300 [00:00<00:01, 227.31it/s] 21%|██▏       | 64/300 [00:00<00:01, 214.60it/s] 32%|███▏      | 96/300 [00:00<00:00, 253.53it/s] 42%|████▏     | 126/300 [00:00<00:00, 266.49it/s] 54%|█████▍    | 162/300 [00:00<00:00, 295.59it/s] 65%|██████▌   | 196/300 [00:00<00:00, 304.50it/s] 76%|███████▌  | 227/300 [00:00<00:00, 275.04it/s] 86%|████████▌ | 258/300 [00:00<00:00, 284.17it/s] 97%|█████████▋| 292/300 [00:01<00:00, 298.53it/s]100%|██████████| 300/300 [00:01<00:00, 273.72it/s]
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+  0%|          | 0/75 [00:00<?, ?it/s] 15%|█▍        | 11/75 [00:00<00:00, 109.50it/s] 43%|████▎     | 32/75 [00:00<00:00, 167.86it/s] 84%|████████▍ | 63/75 [00:00<00:00, 231.38it/s]100%|██████████| 75/75 [00:00<00:00, 216.74it/s]
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+  0%|          | 0/120 [00:00<?, ?it/s]  5%|▌         | 6/120 [00:00<00:01, 59.96it/s] 32%|███▏      | 38/120 [00:00<00:00, 206.63it/s] 59%|█████▉    | 71/120 [00:00<00:00, 261.57it/s] 84%|████████▍ | 101/120 [00:00<00:00, 250.89it/s]
+Traceback (most recent call last):
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 72, in <module>
+    main()
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_smoke_unified.py", line 61, in main
+    model.fit_leaf(sub)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_label_cls/baseline_unified.py", line 121, in fit_leaf
+    self.fit(leaf.train, leaf.val, resources=leaf.resources, _test=leaf.test)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/multi_label_cls/baseline_unified.py", line 167, in fit
+    generate_subgraph_datasets(params)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/subgraph_extraction/datasets.py", line 51, in generate_subgraph_datasets
+    links2subgraphs(adj_list, graphs, params, max_label_value)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/subgraph_extraction/graph_sampler.py", line 111, in links2subgraphs
+    extraction_helper(A, split['pos'], labels, split_env)
+  File "/mnt/d/My-Research/03-Projects/Semantic-Path-Aware-DDI-Cold-Start/Code/baseline/sumgnn/_core/subgraph_extraction/graph_sampler.py", line 100, in extraction_helper
+    with env.begin(write=True, db=split_env) as txn:
+lmdb.MapFullError: mdb_txn_commit: MDB_MAP_FULL: Environment mapsize limit reached

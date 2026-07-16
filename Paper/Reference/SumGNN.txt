@@ -1,0 +1,54 @@
+Title: SumGNN: multi-typed drug interaction prediction via efficient knowledge graph summarization
+Authors: Yue Yu, Kexin Huang (joint first authors), Chao Zhang, Lucas M. Glass, Jimeng Sun, Cao Xiao (corresponding)
+Venue+Year: Bioinformatics, 37(18), 2021, pp. 2988-2995 (Oxford University Press). Received Oct 2020, accepted Mar 2021.
+arXiv-or-DOI: DOI 10.1093/bioinformatics/btab207
+PDF filename: SumGNN.pdf
+
+## TL;DR
+SumGNN predicts multi-typed DDIs by (1) extracting the local ENCLOSING subgraph around a drug pair from a large biomedical KG (HetioNet), (2) a layer-independent relation-aware self-attention "summarization" that scores and prunes edges to a sparse reasoning pathway, and (3) a multi-channel encoder fusing the summarized subgraph message passing, a subgraph pooled embedding, and Morgan fingerprints, then decoding the interaction type. It is the canonical SUBGRAPH-based (enclosing-subgraph) DDI method. It is inductive at the subgraph level and excels in low-DATA relation types, but its standard evaluation is warm-start (7:1:2 edge split, not a drug-level unseen split); it is NOT an emerging-drug cold-start method.
+
+## Problem & Contributions
+- Problem (Abstract, Intro pp. 1-2): large biomedical KGs are big and noisy; only a small local subgraph is relevant to a drug pair. Prior work either ignores the KG or integrates it globally with limited success, and mostly does binary (not multi-typed) DDI prediction.
+- Contributions (Intro, p. 2): (1) local-subgraph extraction around drug pairs for noise reduction and scalability; (2) a subgraph SUMMARIZATION scheme (layer-independent self-attention) that prunes edges into an interpretable reasoning pathway; (3) multi-channel data+knowledge integration for multi-typed DDI. Reports up to 5.54% F1 gain over the best baseline and strong low-resource performance.
+
+## Method / Core mechanism (equations in words + notation)
+Problem settings (§3.1): DDI graph G_DDI = {(u,r,v)} with pharmacological-effect relations R_D; external biomedical KG G_KG = {(h,r,t)}; drugs are shared entities (D subset of E, R_D subset of R). Task: map drug pair (u,v) to effect r in R_D. Entity embeddings initialized with TransE.
+(A) Local subgraph extraction (§3.2 A): for pair (u,v), take k-hop neighborhoods N_k(u), N_k(v) and form the ENCLOSING subgraph G_Sub on their intersection. Augment each node i with a positional vector p_i = [one-hot(d(i,u)) || one-hot(d(i,v))] (shortest-path distances to the two center drugs), concatenated to h^(0)_i (following Zhang & Chen 2018 / GraIL-style labeling).
+(B) Knowledge summarization (§3.2 B): a layer-INDEPENDENT, relation-aware self-attention assigns each edge (i,j) a signal-intensity score a_{i,j} = Threshold( tanh( h^(0)_j W_J (h^(0)_i W_I + r_ij)^T / sqrt(d_k) ), c )  (Eq. 1), where W_I, W_J are key weights, r_ij the relation embedding, c a threshold. Scores range in [-1,1]; edges below threshold c get weight 0 (pruned from message passing). Because it depends only on the first-layer embedding, one consistent pathway is produced for interpretability (contrasted with per-layer attention).
+(C) Multi-channel integration (§3.2 C):
+  - Channel 1 (summarized knowledge): relation-aware message passing weighted by a^(l)_{u,v}: b^(l)_v = sum_{u in N_v} a^(l)_{u,v} (h^(l-1)_u W^(l)_r)  (Eq. 2), with basis-decomposition of W^(l)_r (Eq. 3), and node update h^(l)_v = ReLU(W^(l)_self h^(l-1)_v + b^(l)_v)  (Eq. 4).
+  - Channel 2 (subgraph features): mean of node embeddings, h_GSub = Mean(W_Sub h^(l)_i)  (Eq. 5).
+  - Channel 3 (drug fingerprint): Morgan fingerprint f_v (used only for drug nodes since KG has non-drug node types).
+  Layer-aggregation concatenates per-layer node/subgraph embeddings; final pair representation h_{u,v} = [h_u ; h_v ; h_GSub]; decoder p_{u,v} = W_pred h_{u,v}  (Eq. 6).
+Training (§3.2.1): multi-class cross-entropy (Eq. 7) for DrugBank; multi-label binary cross-entropy with negative sampling (Eq. 8) for TWOSIDES; total loss Eq. 9; Adam. Inference: extract the subgraph for an (unseen) node pair and run the same pipeline (inductive at subgraph level).
+
+## Key results & numbers (with Table/Fig/Section pointers)
+Datasets (§4.1): DrugBank (1,709 drugs, 136,351 pairs, 86 pharmacological relation types; filtered to single-label edges) and TWOSIDES (645 drugs, 46,221 pairs, 200 side-effect types, multi-label). External KG: HetioNet, with all overlapping DDI edges removed to avoid leakage -> 33,765 nodes / 11 types, 1,690,693 edges / 23 relation types. Evaluation split: 7:1:2 train/dev/test (edge split; DrugBank stratified to cover all classes). Five runs.
+Table 1 (§4.2, p. 5), values in %:
+- DrugBank (multi-class): F1 / Acc / Cohen's Kappa. SumGNN 86.85+-0.44 / 92.66+-0.14 / 90.72+-0.13. Best baselines: GraIL 81.31 / 89.89 / 88.07; KGNN 73.99 / 90.89 / 89.64; Decagon (no-KG GNN) 57.35 / 87.19 / 86.07; MLP 61.10 / 82.14 / 80.50.
+- TWOSIDES (multi-label): ROC-AUC / PR-AUC / AP@50. SumGNN 94.86+-0.21 / 93.35+-0.14 / 88.75+-0.22. Best baselines: GraIL 92.89 / 91.10 / 86.21; KGNN 92.84 / 90.78 / 86.05.
+- Reported gains (§4.2): up to 5.54% absolute F1 over the SOTA KG baseline; +27.19% F1 over best no-KG baseline on DrugBank.
+- Ablation rows (Table 1): SumGNN-KG (no KG) 78.35 F1; -Sum (no summarization) 83.20; -SF (no subgraph feature) 84.47; -CF (no chemical fingerprint) 83.57; -LIA (no layer-independent attention) 86.54. Removing KG costs 8.5% absolute Macro-F1 on DrugBank (§4.6).
+- Low-data relations (§4.3, Fig. 2): when a relation has <10 training samples, Decagon and KGNN predict none correctly while SumGNN still reaches 57.14% F1; SumGNN gives >=38.19% F1 improvement for relations occurring <50 times. Attributed to feeding a different subgraph each propagation (inductive bias over unseen subgraphs).
+- Efficiency (§4.8, Table 2): subgraph anchoring saves ~80% training time vs propagating over the entire KG; hop k=3 near-optimal on DrugBank (k>3 adds noise), TWOSIDES stable even at 1-hop.
+- Case study (§4.7, Fig. 3): pruned pathway for Paroxetine + Hydroflumethiazide highlights side-effect nodes (orthostatic hypotension, aplastic anemia) supporting the predicted "increase of CNS depressant activities".
+
+## Relevance to our cold-start low-rank DDI paper (§2.1 taxonomy slot: node/path/subgraph; warm vs cold; how we'd cite / whether it's a baseline)
+- Taxonomy slot: SUBGRAPH-based. It is the canonical enclosing-subgraph DDI method (k-hop intersection subgraph + GraIL-style double-radius node labeling + summarization). Cite it as the anchor of the subgraph branch in §2.1, and as the direct precursor/contrast to EmerGNN (which the EmerGNN paper compares against and ablates as a "subgraph-representation" variant).
+- Warm vs cold: WARM-START in its own paper (7:1:2 EDGE split, transductive drug set; both drugs typically seen). It is inductive at the subgraph level (an unseen pair's subgraph is extracted at inference), and it excels at low-DATA relation types, but it does NOT define or evaluate an emerging-drug (unseen-drug) split. Note: the EmerGNN paper re-runs SumGNN under its cold-start S1/S2 protocol (Table 1 there: SumGNN S1 DrugBank F1 35.0, TWOSIDES PR-AUC 80.3), where SumGNN underperforms EmerGNN. So when citing SumGNN's cold-start numbers, cite them from EmerGNN, not from this paper.
+- Use in our paper: cite as the representative subgraph-based DDI baseline in §2.1. Contrast: SumGNN pools an enclosing subgraph (bidirectional, undirected k-hop intersection) whereas EmerGNN uses a directed path/flow subgraph; ours differs again via low-rank typed adapters. Potential baseline for warm-start comparison; for cold-start, use the EmerGNN-reported SumGNN numbers.
+
+## Safe-to-cite claims (section pointers)
+- SumGNN extracts a local k-hop enclosing subgraph around a drug pair from a biomedical KG to reduce noise and improve scalability (Intro; §3.2 A).
+- It uses a layer-independent relation-aware self-attention to score and prune subgraph edges into an interpretable reasoning pathway (§3.2 B, Eq. 1).
+- Multi-channel encoding fuses summarized-subgraph message passing, a pooled subgraph embedding, and Morgan fingerprints (§3.2 C, Eqs. 2-6).
+- On DrugBank (multi-class) F1 = 86.85 and TWOSIDES (multi-label) PR-AUC = 93.35, outperforming GraIL and KGNN (Table 1, §4.2).
+- Subgraph anchoring saves ~80% training time vs full-KG propagation (§4.8, Table 2); removing the KG costs 8.5% absolute F1 (§4.6).
+- Strong in low-data relations: 57.14% F1 for relations with <10 training samples where Decagon/KGNN score 0 (§4.3).
+
+## Do-NOT-overclaim / caveats
+- SumGNN is a WARM-START method in this paper; "low-resource" here means low-DATA relation TYPES, not unseen drugs. Do NOT cite it as an emerging-drug cold-start method. Its cold-start (S1/S2) numbers come from the EmerGNN paper, not from this Bioinformatics paper.
+- Table 1 values were recovered from pypdf text (page 5) and read cleanly, but a few "6" tokens in the raw text are actually the +-/plus-minus symbol; the mean values quoted (86.85, 92.66, 94.86, 93.35, GraIL 81.31, KGNN 73.99, etc.) are the intended numbers -- reconfirm the +-std against the PDF before quoting.
+- The DrugBank set here (1,709 drugs / 136,351 pairs, single-label-filtered) differs from the DrugBank splits in DDIPrompt and EmerGNN; do not assume identical benchmarks across the three papers.
+- The KG used is HetioNet with overlapping DDI edges removed for leakage control; do not claim it uses the raw full KG.
+- "Inductive" here is subgraph-level inductiveness (new pair -> new subgraph), not drug-level inductive generalization to drugs unseen during training.
